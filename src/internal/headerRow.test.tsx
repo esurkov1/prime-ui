@@ -1,8 +1,9 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { StatusDot } from "@/components/status-dot/StatusDot";
+import { cssRule, cssValue } from "@/test/css";
 
 import {
   HeaderLineContent,
@@ -11,6 +12,8 @@ import {
   SectionTitle,
   useTitleFloor,
 } from "./headerRow";
+
+const CSS = "src/internal/headerRow.module.css";
 
 describe("HeaderRowContent", () => {
   it("places mark, titles (title row, then description) and end whatever the order given", () => {
@@ -157,5 +160,76 @@ describe("HeaderLineContent", () => {
       </div>,
     );
     expect(container.querySelector(`.${headerRowStyles.separator}`)).toBeNull();
+  });
+
+  it("finds a StatusDot behind the consumer's own component by its marker", async () => {
+    function LineState({ live }: { live: boolean }) {
+      return (
+        <>
+          <StatusDot tone={live ? "success" : "neutral"}>{live ? "В эфире" : "Выключен"}</StatusDot>
+          {live ? "192.168.1.47" : null}
+        </>
+      );
+    }
+    const view = render(
+      <div>
+        <HeaderLineContent>
+          <LineState live />
+        </HeaderLineContent>
+      </div>,
+    );
+    const text = view.container.querySelector(`.${headerRowStyles.descriptionText}`);
+    expect(text?.firstElementChild).toHaveAttribute("data-status-dot");
+    expect(text).toHaveAttribute("data-lead-dot");
+    // The dot alone: nothing to separate it from.
+    view.rerender(
+      <div>
+        <HeaderLineContent>
+          <LineState live={false} />
+        </HeaderLineContent>
+      </div>,
+    );
+    await waitFor(() => expect(text).not.toHaveAttribute("data-lead-dot"));
+    const after = cssRule(
+      CSS,
+      ".descriptionText[data-lead-dot] > [data-status-dot]:first-child::after",
+    );
+    expect(cssValue(after, "content")).toBe('"·" / ""');
+  });
+
+  it("leaves a dot written straight in the line to the element-type path", () => {
+    const { container } = render(
+      <div>
+        <HeaderLineContent>
+          <StatusDot tone="success">Оплачен</StatusDot>
+          Обновлён вчера
+        </HeaderLineContent>
+      </div>,
+    );
+    expect(container.querySelector("[data-lead-dot]")).toBeNull();
+    expect(container.querySelector(`.${headerRowStyles.separator}`)).not.toBeNull();
+  });
+});
+
+describe("header row CSS", () => {
+  const TRIMMED =
+    '.header[data-lines="two"]:not(:has(> .mark)):is(:not(:only-child), [data-nested])';
+  const SUPPORTS = ["@supports (text-box: trim-start cap alphabetic)"];
+
+  it("clips a title only along its line, so a cap-trimmed title keeps its glyph tops", () => {
+    const title = cssRule(CSS, ".title");
+    expect(cssValue(title, "overflow-x")).toBe("clip");
+    expect(cssValue(title, "overflow-y")).toBe("visible");
+    expect(cssValue(title, "text-overflow")).toBe("ellipsis");
+    expect(cssValue(cssRule(CSS, `${TRIMMED} .title`, SUPPORTS), "text-box")).toBe(
+      "trim-start cap alphabetic",
+    );
+  });
+
+  it("stands the badges of a trimmed title on its baseline", () => {
+    expect(cssValue(cssRule(CSS, ".titleRow"), "align-items")).toBe("center");
+    expect(cssValue(cssRule(CSS, `${TRIMMED} .titleRow`, SUPPORTS), "align-items")).toBe(
+      "baseline",
+    );
   });
 });

@@ -49,7 +49,7 @@ describe("Fieldset", () => {
     expect(group).not.toHaveAttribute("aria-describedby");
   });
 
-  it("disabled disables every kit control inside, natively and in its own state", () => {
+  it("disabled disables every kit control inside, each in its own state", () => {
     render(
       <Fieldset label="Реквизиты" disabled>
         <Input.Root label="Название">
@@ -102,10 +102,17 @@ describe("Fieldset", () => {
     expect(screen.getByRole("slider", { name: "Скидка" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Высокий" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Сохранить" })).toBeDisabled();
+    // Segments stay reachable in their roving group: `aria-disabled`, never native.
     for (const radio of screen.getAllByRole("radio", { name: /Компании|Личный/ })) {
-      expect(radio).toBeDisabled();
+      expect(radio).toHaveAttribute("aria-disabled", "true");
       expect(radio).toHaveAttribute("data-disabled", "true");
     }
+    // The group says it is disabled; the controls disable themselves (the form skips them).
+    expect(screen.getByRole("group", { name: "Реквизиты" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    expect(screen.getByRole("group", { name: "Реквизиты" })).not.toHaveAttribute("disabled");
     expect(screen.getByRole("radiogroup", { name: "Чей расход" })).toHaveAttribute(
       "aria-disabled",
       "true",
@@ -153,7 +160,10 @@ describe("Fieldset", () => {
         </Fieldset>
       </Fieldset>,
     );
-    expect(screen.getByRole("group", { name: "Контакты" })).toBeDisabled();
+    expect(screen.getByRole("group", { name: "Контакты" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
     expect(screen.getByRole("switch", { name: "Рассылка" })).toBeDisabled();
   });
 
@@ -272,5 +282,28 @@ describe("Fieldset", () => {
     const group = screen.getByRole("group");
     expect(group.querySelector("legend")).toBeNull();
     expect(group).toContainElement(screen.getByLabelText("Почта"));
+  });
+  it("layout sets how the fields stand: a stack by default, pair on request, every child one cell", () => {
+    const { rerender } = render(
+      <Fieldset label="Реквизиты">
+        <span>ИНН</span>
+      </Fieldset>,
+    );
+    expect(screen.getByRole("group", { name: "Реквизиты" })).toHaveAttribute(
+      "data-layout",
+      "stack",
+    );
+    rerender(
+      <Fieldset label="Реквизиты" layout="pair">
+        <span>ИНН</span>
+        <span>КПП</span>
+        <span>БИК</span>
+      </Fieldset>,
+    );
+    const group = screen.getByRole("group", { name: "Реквизиты" });
+    expect(group).toHaveAttribute("data-layout", "pair");
+    const cells = screen.getByText("ИНН").parentElement;
+    expect(cells?.children).toHaveLength(3);
+    expect(screen.getByText("БИК").parentElement).toBe(cells);
   });
 });

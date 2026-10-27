@@ -54,11 +54,14 @@
   min-width: 0;
 }
 
+/* Cut only along the line: a title trimmed to its cap height (below) is lower than its glyphs, and
+   a block clip would shave their tops (round letters, «Й», accents). */
 .title {
   flex: 0 1000 auto;
   min-width: 0;
   margin: 0;
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   color: var(--prime-color-text-primary);
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -68,9 +71,15 @@
   min-width: min(var(--header-title-min, calc(var(--prime-space-1) * 0)), 100%);
 }
 
+/* The trimmed title is lower than its line, so its badges stand on its baseline instead of the
+   centre of that shorter box: centred they would sit low against the letters. */
 @supports (text-box: trim-start cap alphabetic) {
   .header[data-lines="two"]:not(:has(> .mark)):is(:not(:only-child), [data-nested]) .title {
     text-box: trim-start cap alphabetic;
+  }
+
+  .header[data-lines="two"]:not(:has(> .mark)):is(:not(:only-child), [data-nested]) .titleRow {
+    align-items: baseline;
   }
 }
 
@@ -121,6 +130,14 @@
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* A `StatusDot` the consumer's own component rendered first (`data-lead-dot`, found by its
+   `data-status-dot`): the «·» after it is drawn here, silent for assistive tech. */
+.descriptionText[data-lead-dot] > [data-status-dot]:first-child::after {
+  content: "·" / "";
+  margin-inline-end: calc(var(--prime-space-1) * 1.5);
+  color: var(--prime-color-text-muted);
 }
 
 /* Beside the title the end is as wide as its controls (the titles column grows to push it to the

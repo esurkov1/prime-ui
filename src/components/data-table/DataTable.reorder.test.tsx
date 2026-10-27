@@ -181,13 +181,13 @@ describe("DataTable onReorder", () => {
     const onMove = vi.fn();
     const sort: DataTableSortState = { columnId: "deals", order: "asc" };
     render(<Pipeline onMove={onMove} defaultSort={sort} />);
-    // The focusable host of the disabled grip stands for it: a disabled button that opens the hint.
-    const host = handle("Договор");
-    expect(host).toHaveAttribute("data-disabled-host");
-    expect(host).toHaveAttribute("aria-disabled", "true");
-    const grip = host.firstElementChild as HTMLElement;
-    expect(grip).toBeDisabled();
-    act(() => host.focus());
+    // The disabled grip stays a reachable button of its own (no host around it): it opens the hint.
+    const grip = handle("Договор");
+    expect(grip.tagName).toBe("BUTTON");
+    expect(grip).not.toHaveAttribute("data-disabled-host");
+    expect(grip).toHaveAttribute("aria-disabled", "true");
+    expect(grip).not.toBeDisabled();
+    act(() => grip.focus());
     expect(await screen.findByRole("tooltip")).toHaveTextContent(
       "Порядок задан сортировкой. Сбросьте её, чтобы перемещать строки",
     );

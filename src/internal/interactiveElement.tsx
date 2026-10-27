@@ -1,6 +1,7 @@
 import type * as React from "react";
 
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { useInheritedDisabledControl } from "./disabledContext";
 import { Slot } from "./slot";
 
 type BaseProps = Omit<React.HTMLAttributes<HTMLElement>, "onClick"> & {
@@ -44,8 +45,11 @@ type InteractiveElementProps =
  * link child loses its `href` (`Slot`).
  */
 export function InteractiveElement(props: InteractiveElementProps) {
-  const { ref, disabled = false, onClick, ...rest } = props;
+  const { ref, disabled: disabledProp = false, onClick, ...rest } = props;
   const elementRef = useMergedRefs<HTMLElement>(ref);
+  // Its own `disabled` or a disabled Fieldset around it.
+  const off = useInheritedDisabledControl(disabledProp);
+  const { disabled } = off;
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     if (disabled) {
       event.preventDefault();
@@ -65,6 +69,7 @@ export function InteractiveElement(props: InteractiveElementProps) {
           // A link without `href` keeps its role, so the disabled state is announced on a link.
           role={disabled ? (link.role ?? "link") : link.role}
           aria-disabled={disabled || undefined}
+          data-reachable-disabled={off.reachable || undefined}
           onClick={handleClick}
         />
       );
@@ -76,7 +81,10 @@ export function InteractiveElement(props: InteractiveElementProps) {
           {...button}
           ref={elementRef}
           type={type}
-          disabled={disabled}
+          disabled={off.native}
+          aria-disabled={off.ariaDisabled ?? button["aria-disabled"]}
+          // A row of a roving list keeps `tabIndex={-1}` by the list's model, not out of reach.
+          data-reachable-disabled={off.reachable || undefined}
           onClick={handleClick}
         />
       );
@@ -92,6 +100,7 @@ export function InteractiveElement(props: InteractiveElementProps) {
           {...slot}
           ref={elementRef}
           aria-disabled={disabled || undefined}
+          data-reachable-disabled={off.reachable || undefined}
           onClick={handleClick}
         >
           {children}

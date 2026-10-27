@@ -127,10 +127,16 @@
   }
 }
 
-.item:disabled {
+.item:is(:disabled, [aria-disabled="true"]) {
   background: var(--prime-color-fill-muted);
   color: var(--prime-color-text-disabled);
   cursor: not-allowed;
+}
+
+/* Saving (a pending `onPressedChange` promise): the segment already shows its new state, keeps its
+   size and colors, and takes no press until the answer. */
+.item[aria-busy="true"]:not(:disabled, [aria-disabled="true"]) {
+  cursor: progress;
 }
 
 /* Invalid (`invalid` / `error`): one inset danger ring of a field around the whole group, never a

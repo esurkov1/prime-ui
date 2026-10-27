@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -373,5 +373,127 @@ describe("Radio.Indicator", () => {
     );
     expect(screen.getByTestId("host")).toHaveAttribute("data-size", "l");
     expect(screen.getByTestId("own")).toHaveAttribute("data-size", "xs");
+  });
+});
+
+describe("Radio.Group — async onValueChange", () => {
+  /** A promise the test settles by hand. */
+  function deferred() {
+    let resolve: () => void = () => {};
+    let reject: (reason: unknown) => void = () => {};
+    const promise = new Promise<void>((done, fail) => {
+      resolve = done;
+      reject = fail;
+    });
+    return { promise, resolve, reject };
+  }
+
+  function Plan(props: { onValueChange: (value: string) => void | Promise<void> }) {
+    return (
+      <Radio.Group aria-label="Тариф" defaultValue="month" onValueChange={props.onValueChange}>
+        <Radio.Root value="month">
+          <Radio.Label>Месяц</Radio.Label>
+        </Radio.Root>
+        <Radio.Root value="year">
+          <Radio.Label>Год</Radio.Label>
+        </Radio.Root>
+        <Radio.Root value="trial">
+          <Radio.Label>Пробный</Radio.Label>
+        </Radio.Root>
+      </Radio.Group>
+    );
+  }
+
+  it("shows the pick busy, not disabled; other picks wait; resolve keeps it", async () => {
+    const save = deferred();
+    const onValueChange = vi.fn(() => save.promise);
+    const { container } = render(<Plan onValueChange={onValueChange} />);
+    const group = screen.getByRole("radiogroup");
+    const year = screen.getByRole("radio", { name: "Год" });
+    fireEvent.click(year);
+    expect(year).toBeChecked();
+    expect(group).toHaveAttribute("aria-busy", "true");
+    expect(container.querySelectorAll("label[data-loading]")).toHaveLength(3);
+    for (const radio of screen.getAllByRole("radio")) expect(radio).not.toBeDisabled();
+
+    fireEvent.click(screen.getByRole("radio", { name: "Пробный" }));
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+    expect(year).toBeChecked();
+
+    await act(async () => {
+      save.resolve();
+    });
+    expect(year).toBeChecked();
+    expect(group).not.toHaveAttribute("aria-busy");
+    expect(container.querySelector("[data-loading]")).toBeNull();
+  });
+
+  it("reject puts the previous pick back", async () => {
+    const save = deferred();
+    render(<Plan onValueChange={() => save.promise} />);
+    fireEvent.click(screen.getByRole("radio", { name: "Год" }));
+    await act(async () => {
+      save.reject(new Error("offline"));
+    });
+    expect(screen.getByRole("radio", { name: "Месяц" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Год" })).not.toBeChecked();
+    expect(screen.getByRole("radiogroup")).not.toHaveAttribute("aria-busy");
+  });
+
+  it("keyboard: the arrows wait while saving and walk again after the answer", async () => {
+    const user = userEvent.setup();
+    const save = deferred();
+    const onValueChange = vi.fn((): void | Promise<void> => save.promise);
+    render(<Plan onValueChange={onValueChange} />);
+    screen.getByRole("radio", { name: "Месяц" }).focus();
+    await user.keyboard("{ArrowDown}");
+    const year = screen.getByRole("radio", { name: "Год" });
+    expect(year).toBeChecked();
+    expect(year).toHaveFocus();
+    await user.keyboard("{ArrowDown}");
+    expect(year).toBeChecked();
+    expect(year).toHaveFocus();
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      save.resolve();
+    });
+    onValueChange.mockImplementation(() => undefined);
+    await user.keyboard("{ArrowDown}");
+    expect(screen.getByRole("radio", { name: "Пробный" })).toBeChecked();
+    expect(onValueChange).toHaveBeenLastCalledWith("trial");
+  });
+
+  it("controlled: shown ahead of the owner, then the owner's value wins", async () => {
+    const save = deferred();
+    function Controlled() {
+      const [value, setValue] = React.useState("month");
+      return (
+        <Radio.Group
+          aria-label="Тариф"
+          value={value}
+          onValueChange={async (next) => {
+            await save.promise;
+            setValue(next);
+          }}
+        >
+          <Radio.Root value="month">
+            <Radio.Label>Месяц</Radio.Label>
+          </Radio.Root>
+          <Radio.Root value="year">
+            <Radio.Label>Год</Radio.Label>
+          </Radio.Root>
+        </Radio.Group>
+      );
+    }
+    render(<Controlled />);
+    const year = screen.getByRole("radio", { name: "Год" });
+    fireEvent.click(year);
+    expect(year).toBeChecked();
+    await act(async () => {
+      save.resolve();
+    });
+    expect(year).toBeChecked();
+    expect(screen.getByRole("radiogroup")).not.toHaveAttribute("aria-busy");
   });
 });

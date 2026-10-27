@@ -82,9 +82,9 @@ export const api: ComponentApi = {
         },
         {
           name: "onValueChange",
-          type: "(value: string) => void",
-          en: "Called with the picked value; native `onChange` still fires.",
-          ru: "Вызывается с выбранным значением; нативный `onChange` тоже срабатывает.",
+          type: "(value: string) => void | Promise<void>",
+          en: "The picked value; native `onChange` still fires. A promise: a Spinner for the chevron (`aria-busy`); a controlled owner sets `value` before resolving; reject brings the previous value back (say why with `error`).",
+          ru: "Выбранное значение; нативный `onChange` тоже срабатывает. Промис: спиннер вместо шеврона (`aria-busy`); управляемый владелец ставит `value` до resolve; при reject вернётся прежнее (причину покажите в `error`).",
         },
         {
           name: "focusRing",
@@ -148,6 +148,14 @@ export const api: ComponentApi = {
       {
         en: "The chevron is decorative (`aria-hidden`).",
         ru: "Шеврон декоративен (`aria-hidden`).",
+      },
+      {
+        en: "While a value is saved (a pending promise from `onValueChange`) the select has `aria-busy`; the Spinner is hidden from assistive tech. A refused save puts the previous value back — say why with `error`.",
+        ru: "Пока значение сохраняется (ожидающий промис из `onValueChange`), на select `aria-busy`, а спиннер скрыт от вспомогательных технологий; при отказе возвращается прежнее значение, причину покажите через `error`.",
+      },
+      {
+        en: 'Under a `Tooltip.Trigger` a disabled select is `aria-disabled="true"` with no native `disabled`, `name` or `required`: it keeps its tab stop and its node, opens no picker, takes no key but Tab, the form skips it.',
+        ru: 'В `Tooltip.Trigger` выключенный список — `aria-disabled="true"` без нативного `disabled`, `name` и `required`: остаётся точкой Tab и тем же узлом, не открывается, не принимает клавиш, кроме Tab, форма его пропускает.',
       },
     ],
   },

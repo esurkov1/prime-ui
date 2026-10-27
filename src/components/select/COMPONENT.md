@@ -228,7 +228,7 @@ The panel is the shared floating surface; its options are the kit's one list row
 | status hue | `variant="status"` and the picked option's `color` | trigger `data-variant="status"`, `data-color`, `data-tier`; the hue glides in (`base`) — an optimistic pick at once, a refused save back; hover and press a step deeper (fill and ink, 4.5:1 kept) |
 | open | `open` / `defaultOpen` / click / arrows | trigger `data-state="open"`, `aria-expanded`; panel `data-state`, `data-side`; chevron turns 180° |
 | invalid | `invalid` or `error` | `data-invalid="true"`, `aria-invalid` on the trigger; error text below; the control shakes once when an error arrives (`data-shake` on the frame) |
-| disabled | `disabled` | native `disabled`, `data-disabled="true"` |
+| disabled | `disabled`, or a disabled `Fieldset` around it | native `disabled`, `data-disabled="true"`; under a `Tooltip.Trigger` the trigger is `aria-disabled="true"` instead, the same node |
 | loading | `loading` | `data-loading="true"`, `aria-busy` on the trigger and the list; with no item on screen, `aria-hidden` skeleton rows (`data-skeleton`) in the list; `labels.loading` in a polite live region |
 | saving | a pending promise from `onValueChange` | the new value shows; Spinner instead of the chevron, `data-loading="true"` and `aria-busy` on the trigger, `aria-busy` on the list; picks and clear wait; a rejection restores the value and puts `labels.changeFailed` in a polite `role="status"` region |
 | loading more | `loadingMore` | skeleton rows after the items; the end of the list is watched while `hasMore` (`onLoadMore` once per batch) |
@@ -315,6 +315,7 @@ The panel is the shared floating surface; its options are the kit's one list row
 - While an `onValueChange` promise is pending the trigger is `aria-busy`; a rejection announces `labels.changeFailed` in a polite `role="status"` region.
 - With `name`, hidden inputs carry the value into a native form submit; native trigger events (`onFocus`, `onBlur`, `onKeyDown`) reach the button.
 - An outside press closes the list without moving focus back: focus follows the pointer (foundation §8).
+- Under a `Tooltip.Trigger` a disabled `Select.Trigger` is `aria-disabled="true"` with no native `disabled`: it keeps its tab stop and its node, a press or a key opens nothing.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

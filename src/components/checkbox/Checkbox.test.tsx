@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -392,5 +392,87 @@ describe("Checkbox", () => {
     await userEvent.keyboard(" ");
     expect(checkbox).toBeChecked();
     expect(onChange).not.toHaveBeenCalled();
+  });
+
+  /** A promise the test settles by hand. */
+  function deferred() {
+    let resolve: () => void = () => {};
+    let reject: (reason: unknown) => void = () => {};
+    const promise = new Promise<void>((done, fail) => {
+      resolve = done;
+      reject = fail;
+    });
+    return { promise, resolve, reject };
+  }
+
+  it("async: shows the new state busy, not disabled; presses wait; resolve keeps it", async () => {
+    const save = deferred();
+    const onCheckedChange = vi.fn(() => save.promise);
+    const { container } = render(
+      <Checkbox.Root onCheckedChange={onCheckedChange}>
+        <Checkbox.Label>Счета на почту</Checkbox.Label>
+      </Checkbox.Root>,
+    );
+    const checkbox = screen.getByRole("checkbox", { name: "Счета на почту" });
+    fireEvent.click(checkbox);
+    expect(checkbox).toBeChecked();
+    expect(checkbox).toHaveAttribute("aria-busy", "true");
+    expect(checkbox).not.toBeDisabled();
+    expect(container.querySelector("label")).toHaveAttribute("data-loading", "true");
+    // Space (a click on the native input) waits for the answer.
+    checkbox.focus();
+    await userEvent.keyboard(" ");
+    expect(onCheckedChange).toHaveBeenCalledTimes(1);
+    expect(checkbox).toBeChecked();
+
+    await act(async () => {
+      save.resolve();
+    });
+    expect(checkbox).toBeChecked();
+    expect(checkbox).not.toHaveAttribute("aria-busy");
+    expect(container.querySelector("[data-loading]")).toBeNull();
+    // The keyboard toggles again once the save is answered.
+    await userEvent.keyboard(" ");
+    expect(onCheckedChange).toHaveBeenLastCalledWith(false);
+  });
+
+  it("async: reject puts the previous state back", async () => {
+    const save = deferred();
+    render(<Checkbox.Root aria-label="SMS" defaultChecked onCheckedChange={() => save.promise} />);
+    const checkbox = screen.getByRole("checkbox");
+    fireEvent.click(checkbox);
+    expect(checkbox).not.toBeChecked();
+    await act(async () => {
+      save.reject(new Error("offline"));
+    });
+    expect(checkbox).toBeChecked();
+    expect(checkbox).not.toHaveAttribute("aria-busy");
+  });
+
+  it("async controlled: shown ahead of the owner, then the owner's checked wins", async () => {
+    const save = deferred();
+    function Controlled() {
+      const [checked, setChecked] = React.useState(false);
+      return (
+        <Checkbox.Root
+          aria-label="Сводка"
+          checked={checked}
+          onCheckedChange={async (next) => {
+            await save.promise;
+            setChecked(next);
+          }}
+        />
+      );
+    }
+    render(<Controlled />);
+    const checkbox = screen.getByRole("checkbox");
+    fireEvent.click(checkbox);
+    expect(checkbox).toBeChecked();
+    expect(checkbox).toHaveAttribute("aria-busy", "true");
+    await act(async () => {
+      save.resolve();
+    });
+    expect(checkbox).toBeChecked();
+    expect(checkbox).not.toHaveAttribute("aria-busy");
   });
 });

@@ -27,7 +27,7 @@ adds text that explains what the layout failed to show.
 |---|---|---|
 | One record, read | label · value pairs | `DescriptionList` |
 | One record, edited | a form: fields 20 apart, groups 32 apart | `Fieldset`, fields |
-| One record of 2–4 short fields in a form | one row of fields | an [intrinsic grid](responsive.md#intrinsic-grids) |
+| Short related fields of one record in a form (ИНН and КПП, «от» and «до») | two to a row, one column on a narrow form | `Fieldset layout="pair"` ([forms](composition.md#7-forms)) |
 | Records of one shape a person adds, edits, removes | one row per record, the headings once above | `FieldList` |
 | Records of one shape a person reads, sorts, filters | a table | `DataTable` |
 | One value in several units or currencies (a deposit in ₽, $, ฿) | the fields side by side in one row under one heading, the unit in each field | `Input.InlineAffix` |
@@ -353,6 +353,57 @@ Every word on screen must carry something the person does not see already.
 - **Count the labels.** On a form of repeating rows, labels on screen ≤ number of columns + the
   list label. More means a layout bug.
 
+### Only what a person acts on
+
+A surface a person works from — a status popover, the page's bar, a card's header, a list row —
+holds the state and the controls; metadata that changes no decision (the firmware version, the
+uptime, a serial number, the build date) leaves it for the record's own «Об устройстве» section or
+its page. The test: would the person do anything differently after reading it? If not, it goes.
+
+- **A record's identifier is its title's `number`** (`Card.Title number`, `Drawer.Title number`,
+  `List.ItemText number`), muted after the name — never a line «ID устройства» of its own.
+- **An icon in a `Banner` only where the message reads worse without it.** A title that names the
+  state («Устройство не в сети площадки») needs no `Banner.Icon`; the tone already marks it.
+
+```tsx partial
+// bad — the ID as a line of its own, the header full of facts nobody acts on, an icon over a title
+// that says it all
+<Card.Header>
+  <Card.Title>Контроллер сцены</Card.Title>
+  <Card.Description>Прошивка 2.4.1 · работает 14 ч 20 мин</Card.Description>
+</Card.Header>
+<Card.Body>
+  <DescriptionList.Root>
+    <DescriptionList.Item label="ID устройства">A4CF129B</DescriptionList.Item>
+  </DescriptionList.Root>
+</Card.Body>
+<Banner.Root tone="warning">
+  <Banner.Content>
+    <Banner.Icon>
+      <Icon name="status.warning" />
+    </Banner.Icon>
+    <Banner.Title>Устройство не в сети площадки</Banner.Title>
+  </Banner.Content>
+</Banner.Root>
+```
+
+```tsx good
+// good — the ID is the title's number, the line under it is the state; the banner's title speaks
+<>
+  <Card.Header>
+    <Card.Title number="A4CF129B">Контроллер сцены</Card.Title>
+    <Card.Description>
+      <StatusDot tone="success">В сети</StatusDot> · вывод на 6 модулей
+    </Card.Description>
+  </Card.Header>
+  <Banner.Root tone="warning">
+    <Banner.Content>
+      <Banner.Title>Устройство не в сети площадки</Banner.Title>
+    </Banner.Content>
+  </Banner.Root>
+</>
+```
+
 ## 4. Words
 
 The kit's UI language is Russian; these are the rules of its copy.
@@ -502,6 +553,60 @@ Which button starts each step and how the confirm behaves:
 - **Group by meaning, order by use:** fields in the order a person has the information (company →
   contact → payment), the most used first in every list.
 
+### Controls first, readings after
+
+Inside a block, what a person changes stands before what they read: the brightness and the frame
+rate first, the measured output under them; the fields of a form before its summary. A summary
+panel — a status popover opened from its chip in the bar (`Popover.Trigger` around a `Badge.Root`
+with its `tone` and a `Badge.Description`) — follows the same order by use: the main mode switch
+first, then the settings changed most, then the reference sections, the rare ones (tests,
+diagnostics) last, a `Divider` between sections.
+
+```tsx partial
+// bad — readings first, the controls under them; the tests in the middle; no lines between sections
+<Popover.Content>
+  <DescriptionList.Root>…сеть, видеопоток…</DescriptionList.Root>
+  <Button.Root variant="soft" tone="neutral">Тест линии</Button.Root>
+  <Slider label="Яркость" defaultValue={80} />
+  <DescriptionList.Root>…модули…</DescriptionList.Root>
+</Popover.Content>
+```
+
+```tsx good
+// good — the mode and the frequent settings first, the reference next, the rare test last
+<Popover.Root>
+  <Popover.Trigger>
+    <Badge.Root tone="success">
+      <Badge.Dot />
+      В эфире
+      <Badge.Description>NDI · 60 к/с</Badge.Description>
+    </Badge.Root>
+  </Popover.Trigger>
+  <Popover.Content>
+    <Radio.Group label="Режим" orientation="horizontal" defaultValue="ndi">
+      <Radio.Root value="ndi">
+        <Radio.Label>NDI</Radio.Label>
+      </Radio.Root>
+      <Radio.Root value="show">
+        <Radio.Label>Шоу</Radio.Label>
+      </Radio.Root>
+    </Radio.Group>
+    <Slider label="Яркость" defaultValue={80} />
+    <Divider />
+    <DescriptionList.Root>
+      <DescriptionList.Item label="Источник">Студия 2</DescriptionList.Item>
+    </DescriptionList.Root>
+    <Divider />
+    <Button.Root variant="soft" tone="neutral">
+      <Button.Icon>
+        <Icon name="action.play" />
+      </Button.Icon>
+      Тест линии
+    </Button.Root>
+  </Popover.Content>
+</Popover.Root>
+```
+
 ## 8. Changing a screen someone built
 
 1. **Audit before editing.** Go through [checklist.md](checklist.md), [anti-slop.md](anti-slop.md)
@@ -567,4 +672,102 @@ A setting lives with what it governs, as a field of the form that already holds 
     </Switch.Root>
   </Drawer.Section>
 </>
+```
+
+## 11. One fact, one place
+
+Every value the product knows stands in one place on a screen and has one home in the app, and
+every action has one way in sight. A second place for the same fact makes a person compare the two
+and wonder which one is true; a second way of the same action makes them choose between equals.
+Before adding a block, a line or a control, look for its value or its action on the screen: shown
+already → no new place.
+
+- **A summary holds what the page does not.** A status popover, the page's `Page.Description`, a
+  side block sum up what is off this page; what the page shows in a block of its own (the video
+  stream, the network that is connected) stays out of the summary, and no card repeats a popover.
+- **A setting shows its live value in its own `hint`.** The measured value of what a control sets
+  (the real frame rate under «Частота кадров», the real resolution under the module's size) is
+  that control's `hint` («Сейчас 60 к/с»), never a row of its own beside it. A row of its own only
+  when the fact departs from the setting, and then as a judgement: `tone="warning"` with the gap in
+  its words («Фактическое разрешение 1280 × 720»).
+- **A set edited as a list has no count field.** When people add, remove and reorder the items
+  (modules, lines, stages), the list is the count: no «Количество» beside it, no stepper that
+  grows the list.
+- **One action, one way in sight.** Where the system finds things itself (devices on the network,
+  printers), the manual path (an address field with «+») never stands beside the automatic one: it
+  waits in the block's «⋯» menu or in the empty state («Добавить по IP»), and only when the
+  automatic way can really fail.
+
+```tsx partial
+// bad — the measured rate as a row beside its control, a count beside the list that counts
+<Select.Root label="Частота кадров" defaultValue="60">…</Select.Root>
+<DescriptionList.Root>
+  <DescriptionList.Item label="Кадров в секунду">60</DescriptionList.Item>
+</DescriptionList.Root>
+<Input.Root label="Количество модулей">…</Input.Root>
+<FieldList label="Модули" … />
+```
+
+```tsx good
+// declare: const modules: { id: string; name: string }[]
+// declare: const setModules: (modules: { id: string; name: string }[]) => void
+// good — the live value is the setting's hint, the departing fact a warning row, the list counts itself
+<>
+  <Select.Root label="Частота кадров" hint="Сейчас 60 к/с" defaultValue="60">
+    <Select.Trigger>
+      <Select.Value />
+    </Select.Trigger>
+    <Select.Content>
+      <Select.Item value="30">30 к/с</Select.Item>
+      <Select.Item value="60">60 к/с</Select.Item>
+    </Select.Content>
+  </Select.Root>
+  <DescriptionList.Root>
+    <DescriptionList.Item label="Фактическое разрешение" tone="warning">
+      1280 × 720
+    </DescriptionList.Item>
+  </DescriptionList.Root>
+  <FieldList
+    label="Модули"
+    columns={[{ label: "Название" }]}
+    value={modules}
+    onValueChange={setModules}
+    getId={(item) => item.id}
+    createItem={() => ({ id: crypto.randomUUID(), name: "" })}
+    addLabel="Модуль"
+    renderItem={(item, row) => (
+      <Input.Root>
+        <Input.Wrapper>
+          <Input.Field
+            value={item.name}
+            onChange={(event) => row.update({ name: event.target.value })}
+          />
+        </Input.Wrapper>
+      </Input.Root>
+    )}
+  />
+</>
+```
+
+```tsx partial
+// bad — two ways of one action side by side: an address field beside the search
+<Page.Actions>
+  <Input.Root>…IP-адрес…</Input.Root>
+  <Button.Root>Найти устройства</Button.Root>
+</Page.Actions>
+```
+
+```tsx good
+// good — the search is the way; the manual address waits in the empty state for when it fails
+<EmptyPage.Root size="s" aria-labelledby="devices-empty">
+  <EmptyPage.Title as="h3" id="devices-empty">
+    Устройства не найдены
+  </EmptyPage.Title>
+  <EmptyPage.Description>Проверьте, что они в той же сети.</EmptyPage.Description>
+  <EmptyPage.Actions>
+    <Button.Root variant="soft" tone="neutral">
+      Добавить по IP
+    </Button.Root>
+  </EmptyPage.Actions>
+</EmptyPage.Root>
 ```

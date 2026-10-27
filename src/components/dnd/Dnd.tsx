@@ -8,12 +8,18 @@ import { useScrollRegion } from "@/hooks/useScrollRegion";
 import { flowGaps, useVirtualRows } from "@/hooks/useVirtualRows";
 import { GripVertical } from "@/icons/glyphs/grip-vertical";
 import { Lock } from "@/icons/glyphs/lock";
-
+import { Plus } from "@/icons/glyphs/plus";
+import addTileStyles from "@/internal/addTile.module.css";
 import { cx } from "@/internal/cx";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { motionTiming } from "@/internal/motionTiming";
 import { namedRole } from "@/internal/namedRole";
+import { handoffFocus } from "@/internal/overlay/focus";
+import { press } from "@/internal/press";
 import { stillCopy } from "@/internal/stillCopy";
+import textRole from "@/internal/textRole.module.css";
+import { touchTargetClass } from "@/internal/touchTarget";
 import type { AsyncHandler } from "@/internal/usePendingChanges";
 
 import { DragControllerContext, useDragController } from "./context";
@@ -513,6 +519,80 @@ function DndSortable<T>({
 }
 DndSortable.displayName = "Dnd.Sortable";
 
+export type DndAddButtonProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "type" | "children"
+> & {
+  label?: string;
+  ref?: React.Ref<HTMLButtonElement>;
+};
+
+/**
+ * The add tile at the end of a `Dnd.Sortable` (its `children`): a cell of the list (`li` in
+ * `ul` / `ol`, else `div`) that is no item — never carried, never a place to drop in front of —
+ * holding a `<button>` that fills it, so in a grid it stands as tall as the cells of its row.
+ */
+function DndAddButton({
+  label,
+  className,
+  disabled,
+  "aria-label": ariaLabel,
+  ref,
+  ...rest
+}: DndAddButtonProps) {
+  const context = React.useContext(SortableContext);
+  const controller = useDragController();
+  const inactive = useInheritedDisabled(disabled);
+  if (context === null) throw new Error("Dnd.AddButton must be rendered inside Dnd.Sortable");
+  if (context.itemTag === "tr" || context.itemTag === "th") {
+    throw new Error('Dnd.AddButton is a cell of a "div", "ul" or "ol" Dnd.Sortable');
+  }
+  const Cell = context.itemTag;
+  const text = label ?? controller.labels().add;
+  return (
+    <Cell ref={handFocusOnLeave} className={cx(addTileStyles.cell, styles.add)} data-dnd-add="">
+      {/* Not `Button`: the tile is the dashed add slot FileUpload draws (`internal/addTile`), not a
+          button look. */}
+      <button
+        ref={ref}
+        type="button"
+        // The word leaves a narrow cell (only the «+» stays): the name never goes with it.
+        aria-label={ariaLabel ?? text}
+        {...rest}
+        disabled={inactive}
+        className={cx(
+          addTileStyles.target,
+          press.press,
+          touchTargetClass,
+          styles.addButton,
+          className,
+        )}
+      >
+        <span className={cx(fieldTierClass, addTileStyles.icon)} data-size="xs" aria-hidden="true">
+          <Plus />
+        </span>
+        <span className={cx(textRole.caption, addTileStyles.text, styles.addText)}>{text}</span>
+      </button>
+    </Cell>
+  );
+}
+DndAddButton.displayName = "Dnd.AddButton";
+
+/** The tile leaves while focused (the add that filled the list): focus goes to the last item. */
+function handFocusOnLeave(cell: HTMLElement | null) {
+  if (!cell) return;
+  const list = cell.parentElement;
+  return () => {
+    if (!list || !cell.contains(document.activeElement)) return;
+    queueMicrotask(() => {
+      // Strict Mode replays a detach on a cell that stays: only a cell that left hands focus on.
+      if (!list.isConnected || cell.isConnected) return;
+      const items = list.querySelectorAll<HTMLElement>(":scope > [data-dnd-item]");
+      handoffFocus(cell, items[items.length - 1]);
+    });
+  };
+}
+
 /**
  * A cell that spans every column of its table: the gap and the empty row of a `tbody` list. The
  * count is read from a row of the table (a head row included), so the list need not know it.
@@ -899,4 +979,5 @@ export const Dnd = {
   Draggable: DndDraggable,
   DropZone: DndDropZone,
   Handle: DndHandle,
+  AddButton: DndAddButton,
 };

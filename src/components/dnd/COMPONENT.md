@@ -7,7 +7,7 @@
 
 ## When to use
 - Reordering a list, a row of chips or a set of settings by hand (`Dnd.Sortable`).
-- Reordering tiles in a wrapping grid: photos, covers (`axis="grid"`).
+- Reordering tiles in a wrapping grid: photos, covers (`axis="grid"`); an add tile as its last cell (`Dnd.AddButton`).
 - Moving an item between lists to an exact position: a board of columns (several `Dnd.Sortable` with one `kind`; Alt + ← / → moves across from the keyboard).
 - A list with a pinned first row or a system item that must hold its place (`locked`).
 - Reordering the rows of a table of your own (`as="tbody"`; a group's heading row in `header`). For records in a [DataTable](../data-table/COMPONENT.md) use its `onReorder`.
@@ -33,7 +33,8 @@ Dnd.Root                         session owner: overlay (portal), live region, l
 │  ├─ Dnd.SortableItem           one item (li in ul/ol, tr in tbody, th in tr, div otherwise); the gap is drawn before it
 │  │  └─ Dnd.Handle              optional grip, last in the item: a ghost icon-only Button (with `handle` on the list); a lock in a `locked` item; busy while the item's move is saved
 │  ├─ empty                      the `empty` content while the list has no items
-│  └─ children                   optional content after the items that never moves (an add tile)
+│  └─ children                   optional content after the items that never moves
+│     └─ Dnd.AddButton           the add tile: the last cell (li in ul/ol, div otherwise), a dashed slot with «+» and a word; no item
 ├─ Dnd.Draggable                 an item to carry elsewhere; stays in place, faded, until the drop
 └─ Dnd.DropZone                  a box that takes dropped items
 ```
@@ -61,7 +62,7 @@ Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. The list and its drop target
 | `getLabel` | `(item: T) => string` | the `id` | Spoken by the live region. |
 | `onReorder` | `(id: string, beforeId: string \| null) => void \| Promise<void>` | — (required) | Item `id` lands in front of `beforeId` (`null` = last), maybe from a linked list. Apply it with `moveBefore`; a returned promise keeps the item still and busy until it settles, a rejection moves it back. |
 | `renderItem` | `(item: T, index: number) => ReactNode` | — (required) | Returns a `Dnd.SortableItem`. During a drag `index` is the place the item will have on release, so a shown position follows the gap; parts marked `data-dnd-mirror` stay in step on the carried copy. |
-| `children` | `ReactNode` | — | Content after the items that never moves and takes no drop position: an add tile at the end of a grid. Inside `ul` / `ol` it must be `li`. |
+| `children` | `ReactNode` | — | Content after the items that never moves and takes no drop position: the add tile `Dnd.AddButton` at the end of a grid. Inside `ul` / `ol` it must be `li`. |
 | `axis` | `"x" \| "y" \| "grid"` | `"y"` | A column, a single row, or a wrapping grid (`display: grid`; the host sets the tracks and the cells' size, the gap takes a cell). Keyboard: Alt + ↑ / ↓ in a column, Alt + ← / → in a row and a grid. |
 | `handle` | `boolean` | `false` | Only `Dnd.Handle` starts a drag; the rest of the item stays free for clicks and text selection. |
 | `disabled` | `boolean` | `false` | No drag, no keyboard reorder. |
@@ -95,6 +96,15 @@ Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. The list and its drop target
 |---|---|---|---|
 | `aria-label` | `string` | `labels.handle` | Accessible name. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "children">` | — | `className`, `disabled` and the other button attributes. |
+
+### Dnd.AddButton
+`ref` → `HTMLButtonElement`. The add tile: the last cell of a `Dnd.Sortable` (in its `children`; `li` in `ul` / `ol`, else `div`), a `<button>` that fills it — in a `grid` as tall as its row. No item: never carried, never a drop place. Render it only while adding is possible.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `label` | `string` | `labels.add` | The visible word under the «+» (a cell narrower than 6rem keeps only the «+»). |
+| `aria-label` | `string` | `label` | Accessible name; the visible word by default, so a narrow cell keeps it. |
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "children">` | — | `onClick`, `className`, `disabled` (also from a disabled `Fieldset`) and the other button attributes. |
 
 ### Dnd.Draggable
 Generic `Dnd.Draggable<TData>`; `ref` → `HTMLElement`. An item carried onto a `Dnd.DropZone`; stays in place, faded, while carried; a named one is a `button`. No keyboard path: offer a button or a menu for the same move.
@@ -205,6 +215,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 | `data-dnd-flash` | a `Dnd.DropZone` | flashing after a drop (`flashOnDrop`) |
 | `data-dnd-gap`, `data-dnd-ghost` | the gap / a leaving gap's out-of-flow copy, fading out mid-drag | count cells without them (`:not([data-dnd-ghost])`) |
 | `data-dnd-empty` | the `empty` element | the list is empty |
+| `data-dnd-add` | the cell of a `Dnd.AddButton` | the add tile: no item, never carried, never a drop place |
 | `data-dnd-mirror` | a part the host marks | kept in step on the carried copy (a shown position from `renderItem`'s `index`; rolling digits roll) |
 | `data-dnd-ignore`, `data-dnd-handle` | a part the host marks | a press here never drags / always drags |
 
@@ -212,6 +223,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 - The distance between items is `--prime-space-2`; a host sets `--dnd-sortable-gap` on the list for another one.
 - A grid (`axis="grid"`) is `display: grid`: the host sets the tracks (`grid-template-columns`) and the cells' size; the gap takes a cell, and a carried item resizes to the cell it would land in.
 - A `Dnd.Handle` ends its item: the last child, after the item's own trailing controls (a remove button), at the inline end (on the left in RTL); a `locked` item's lock takes the same place, so the grips of every row stand on one line. In a table it is the last cell. An on / off switch leads the item (its first child), so its state reads first and nothing stands between the text and the grip.
+- `Dnd.AddButton` is the last cell of its list; its button fills the cell. In a grid every row takes the height of the tallest (`grid-auto-rows: 1fr`, zero specificity — a host's own rows win), so the tile alone in the last row is as tall as the tiles above it and as wide as a track; in a row (`axis="x"`) it is as tall as the items and as wide as its content; in a column it is a row: «+» before the word, as tall as a control row with its padding. The look is FileUpload's add tile: a dashed `fill-strong` line, no fill, a muted «+» box, the word in the caption role (a cell under 6rem keeps only the «+»); hover `fill-subtle`, the press give, a touch hit area.
 - The reason chip stands `--prime-tooltip-offset` under the carried copy, start-aligned, at most `--prime-tooltip-max-width` wide.
 - The look of a row is the consumer's: give `Dnd.SortableItem` / `Dnd.Draggable` a radius on its own class (the gap and the clone's fill take it) and the row's ancestors may dress it — the clone flies inside empty copies of all of them (a size container as a box of its width), so their variables, selectors and container queries still apply. A table row flies in a one-row copy of its table inside them.
 - A scrollable ancestor under the pointer auto-scrolls within 64 px of its edge (a `ScrollContainer` strip works).
@@ -224,9 +236,10 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 
 | Key | Action |
 |---|---|
-| `Tab` | Moves to the list items (with `handle`, to the grips). |
+| `Tab` | Moves to the list items (with `handle`, to the grips), then to `Dnd.AddButton`. |
 | `Alt + ↑` · `Alt + ↓` | Moves the item one place (`axis="x"` and `"grid"`: Alt + ← / → in the writing direction). |
 | `Alt + ←` · `Alt + →` | In lists sharing a `kind`: moves the item to the same row of the neighbouring list (`axis="x"`: Alt + ↑ / ↓); focus follows. |
+| `Enter` · `Space` | On `Dnd.AddButton`: runs its `onClick`. |
 | `Escape` | Cancels a drag in flight. |
 
 ### ARIA
@@ -238,6 +251,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 - In lists sharing a `kind`, Alt + the across arrows move the item to the same row of the neighbouring list in document order; focus follows the item.
 - Name an item by what it shows: `aria-labelledby` on its visible title and `aria-describedby` on its description. An `aria-label` on the item replaces its content for assistive tech — use it only when the item shows no text (a photo tile). Name every linked list (`aria-label` or `aria-labelledby` on its heading): that name is spoken when an item moves into it.
 - A `locked` item has no role description or shortcuts; its `Dnd.Handle` is a lock: a `<span role="img">` named `labels.locked` with the `status.locked` icon at the grip's size, taking the grip's `ref` and attributes.
+- `Dnd.AddButton` is a `<button>` named by its word (`label`), also when a narrow cell hides the word; it is no item (no role description, no shortcuts). When it leaves while focused (the add that filled the list), focus goes to the last item.
 - Touch: a drag starts after a hold; a finger that moves first scrolls the page.
 - `Dnd.Draggable` has no keyboard path of its own — offer a button or a menu for the same move.
 
@@ -247,6 +261,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 | Key | Default | Used for |
 |---|---|---|
 | `handle` | `"Перетащить"` | Name of `Dnd.Handle`. |
+| `add` | `"Добавить"` | Text and name of `Dnd.AddButton`. |
 | `locked` | `"Закреплено"` | Name of the lock a `Dnd.Handle` shows in a `locked` item. |
 | `roleDescription` | `"перетаскиваемый элемент"` | `aria-roledescription` of every draggable item (its grip with `handle`). |
 | `grabbed` | `"{label}: взят"` | Live region: picked up. |
@@ -264,7 +279,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 |---|---|
 | [overview.tsx](examples/overview.tsx) | Project tasks reordered by dragging the whole row; one root above, the move applied with a helper — `Dnd.Root`, `Dnd.Sortable`, `onReorder`, `moveBefore`. |
 | [handle.tsx](examples/handle.tsx) | Notification channels with the switch ending each row; a reorder mode swaps the switches for the grips, and only a grip starts a drag, the async save can roll the order back — `handle`, `Dnd.Handle`, `onReorder`, `fullWidth`. |
-| [grid.tsx](examples/grid.tsx) | Product photos in a wrapping grid: a photo carried across rows lands in reading order, the gap takes a cell, Alt + ← / → steps it one place — `axis`. |
+| [grid.tsx](examples/grid.tsx) | Product photos in a wrapping grid: a photo carried across rows lands in reading order, the gap takes a cell, Alt + ← / → steps it one place, the add tile stands last as tall as a photo — `axis`, `Dnd.AddButton`. |
 | [locked.tsx](examples/locked.tsx) | Sections of a workspace menu: the home section is pinned first with a lock in place of its grip, the rest reorder around nothing past it; each row is named by its visible title — `locked`, `handle`, `aria-labelledby`. |
 | [board.tsx](examples/board.tsx) | A ticket board: columns share one kind, so a ticket lands in another column at an exact position or moves there with Alt + ← / →, an empty column says so, and a full column refuses it before the release with the reason under the ticket — `kind`, `canDrop`, `empty`, `onReorder`. |
 | [drop-zones.tsx](examples/drop-zones.tsx) | Documents carried onto folders: a zone takes items by kind and gets the document as data, a locked folder refuses before the release and says why under the carried file, a syncing folder is no target at all, a document on signing stays put, the line above follows the drag, the target flashes where the file landed — `Dnd.Draggable`, `Dnd.DropZone`, `data`, `canDrop`, `disabled`, `onDragStart`, `onDragEnd`, `onEnter`, `onLeave`, `flashOnDrop`. |
@@ -288,6 +303,8 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 - An empty-list message rendered next to the list → pass it as `empty`: it stands in the drop slot, and the gap takes its place while an item is over the list.
 - A drag-time look keyed to `<html data-dnd-active>` → key it to the list's `data-dnd-carrying`.
 - `canDrop` returning `false` where the rule is not obvious → return the reason as a string.
+- An add tile made of a `Button` with a `className` that overrides its height → `Dnd.AddButton` in the list's `children`: it fills the cell and stands as tall as its row.
+- A disabled `Dnd.AddButton` once the list is full → stop rendering it: a control that can do nothing leaves (focus goes to the last item).
 
 ## Related
 - **Built from:** [Button](../button/COMPONENT.md), `Icon` (`action.drag` for the grip, `status.locked` for a locked item's lock), [VisuallyHidden](../visually-hidden/COMPONENT.md)

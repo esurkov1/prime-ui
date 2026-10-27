@@ -9,6 +9,7 @@ import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { NativeButton, useInheritedDisabled } from "@/internal/disabledContext";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { GlyphSwap } from "@/internal/glyphSwap";
 import { useLabels } from "@/internal/labels";
@@ -145,10 +146,11 @@ function StepperItem({
   status: statusProp,
   children,
   className,
-  disabled,
+  disabled: disabledProp,
   onClick,
   ...rest
 }: StepperItemProps) {
+  const disabled = useInheritedDisabled(disabledProp);
   const { value, select, orientation, arrows, labels } = useStepperRootContext();
   const index = React.useContext(StepperIndexContext);
   if (index === null) {
@@ -167,9 +169,8 @@ function StepperItem({
         <span className={styles.separator} aria-hidden="true">
           <ChevronRight strokeWidth={2} />
         </span>
-        <button
+        <NativeButton
           {...rest}
-          type="button"
           disabled={disabled}
           className={cx(
             styles.step,
@@ -192,7 +193,7 @@ function StepperItem({
               <ChevronRight strokeWidth={2} />
             </span>
           ) : null}
-        </button>
+        </NativeButton>
       </li>
     </StepperItemProvider>
   );

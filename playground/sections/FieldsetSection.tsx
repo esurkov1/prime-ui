@@ -8,7 +8,15 @@ export const page: ComponentPageConfig = {
     segment: "fieldset",
     label: "Fieldset",
     summary: "Группа полей без рамки: заголовок, ритм, общее отключение",
-    keywords: ["группа полей", "fieldset", "legend", "секция формы", "disabled"],
+    keywords: [
+      "группа полей",
+      "fieldset",
+      "legend",
+      "секция формы",
+      "disabled",
+      "поля в ряд",
+      "два поля",
+    ],
     icon: Rows3,
     order: 8,
   },
@@ -16,7 +24,7 @@ export const page: ComponentPageConfig = {
   title: "Fieldset",
   kind: "primitive",
   description:
-    "Группа связанных полей формы без рамки: заголовок `title-s` в нативном `<legend>`, поля в ритме формы и один `disabled` на всю группу — например, пока идёт запрос.",
+    "Группа связанных полей формы без рамки: заголовок `title-s` в нативном `<legend>`, поля в ритме формы — в колонку или по два в ряд — и один `disabled` на всю группу, например, пока идёт запрос.",
   examples: [
     {
       slot: "overview",
@@ -27,6 +35,12 @@ export const page: ComponentPageConfig = {
       slot: "states",
       description:
         "Обычная группа рядом с выключенной: каждый контрол кита внутри принимает вид неактивного — `disabled`.",
+    },
+    {
+      scenario: "pair",
+      title: "Два в ряд",
+      description:
+        "Реквизиты компании по два в ряд: поле, оставшееся одно в последнем ряду, занимает весь ряд, а в узкой группе поля встают в колонку — `label`, `layout`.",
     },
     {
       slot: "in-form",

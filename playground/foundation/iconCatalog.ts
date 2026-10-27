@@ -216,6 +216,14 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
     meaning: "Открыть фильтры",
     keywords: ["фильтр", "отбор", "filter", "funnel"],
   },
+  "action.flipHorizontal": {
+    meaning: "Отразить слева направо",
+    keywords: ["отразить", "зеркало", "flip", "mirror", "horizontal"],
+  },
+  "action.flipVertical": {
+    meaning: "Отразить сверху вниз",
+    keywords: ["отразить", "перевернуть", "flip", "mirror", "vertical"],
+  },
   "action.login": {
     meaning: "Войти в аккаунт",
     keywords: ["вход", "авторизация", "login", "sign in"],

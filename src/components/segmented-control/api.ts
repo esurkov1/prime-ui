@@ -27,9 +27,9 @@ export const api: ComponentApi = {
         },
         {
           name: "onValueChange",
-          type: "(value: string) => void",
-          en: "Called with the new value on click or arrow keys.",
-          ru: "Вызывается с новым значением при клике или стрелках.",
+          type: "(value: string) => void | Promise<void>",
+          en: "The new value on click or arrow keys. A promise: the thumb moves at once, the track is `aria-busy`, presses wait; a controlled owner sets `value` before resolving; reject glides it back (say why with `error`).",
+          ru: "Новое значение при клике или стрелках. Промис: бегунок встаёт сразу, дорожка — `aria-busy`, нажатия ждут; управляемый владелец ставит `value` до resolve; reject возвращает его (причину — через `error`).",
         },
         {
           name: "disabled",
@@ -83,8 +83,8 @@ export const api: ComponentApi = {
           name: "disabled",
           type: "boolean",
           default: "false",
-          en: "Disables this option; arrow keys skip it.",
-          ru: "Отключает вариант; стрелки его пропускают.",
+          en: "Disables this option (`aria-disabled`, out of the Tab order, a click does nothing); arrow keys skip it. The segment keeps its size and place.",
+          ru: "Отключает вариант (`aria-disabled`, вне порядка Tab, клик не действует); стрелки его пропускают. Сегмент сохраняет размер и место.",
         },
         {
           name: "color",
@@ -256,8 +256,12 @@ export const api: ComponentApi = {
         ru: 'Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid="true"`, `required` — `aria-required="true"`.',
       },
       {
-        en: 'Items are `<button role="radio" aria-checked>` with roving `tabIndex`.',
-        ru: 'Варианты — `<button role="radio" aria-checked>` с перемещаемым `tabIndex`.',
+        en: 'Items are `<button role="radio" aria-checked>` with roving `tabIndex`. A disabled item is `aria-disabled`, not natively `disabled`: inside a `Tooltip` it keeps its node, takes hover, and selection never lands on it.',
+        ru: 'Варианты — `<button role="radio" aria-checked>` с перемещаемым `tabIndex`. Неактивный — `aria-disabled`, а не нативный `disabled`: внутри `Tooltip` он остаётся тем же узлом, принимает наведение, а выбор на него не попадает.',
+      },
+      {
+        en: "While an `onValueChange` promise is pending the track is `aria-busy`; a rejection puts the previous option back as checked.",
+        ru: "Пока сохраняется промис из `onValueChange`, дорожка — `aria-busy`; при отказе прежний вариант снова отмечен.",
       },
       {
         en: 'With an `asChild` item the track is `role="navigation"` (named the same way), the links keep their role and the current one has `aria-current="page"`; `required` and `invalid` do not apply.',

@@ -13,6 +13,11 @@
  * Past the last step a heading with a path stacks (`stackHeading`): the path over the title, the
  * title and the description wrapping, so no line of it is cut to a fragment. Without a path the
  * heading truncates.
+ *
+ * The plan holds against small changes (`margin`): a bar short of room by less than the margin
+ * keeps its step while the heading truncates by that much, and a looser step comes back only once
+ * it fits with the margin to spare. A label that changes by a word, or a resize across a step, so
+ * never flips the row back and forth.
  */
 export type BarPlan = "one" | "below" | "icons-secondary" | "icons" | "fold";
 
@@ -26,7 +31,10 @@ export type BarAction = {
 };
 
 export type BarWidths = {
-  /** Natural width of the heading (its widest line); 0 — none. */
+  /**
+   * Natural width of the heading's title line (path, title, badges); 0 — none. The description
+   * under it truncates in whatever room the line leaves, so it claims no width of its own.
+   */
   heading: number;
   /** Whether the heading starts with a path (a Breadcrumb before the title): it can stack. */
   path: boolean;
@@ -39,6 +47,8 @@ export type BarWidths = {
   gap: number;
   /** Gap between two actions. */
   actionGap: number;
+  /** How far the bar may run short or long of a step before the plan leaves it. */
+  margin: number;
 };
 
 type ActionStep = "full" | "icons-secondary" | "icons" | "fold";
@@ -64,8 +74,16 @@ function actionsWidth(widths: BarWidths, step: ActionStep): number {
   return sum(folds ? [...parts, more] : parts, actionGap);
 }
 
+const RANK: Record<BarPlan, number> = {
+  one: 0,
+  below: 1,
+  "icons-secondary": 2,
+  icons: 3,
+  fold: 4,
+};
+
 /** The first plan whose first line fits `available`; the narrowest of `icons` and `fold` when none does. */
-export function planBar(widths: BarWidths, available: number): BarPlan {
+function firstFit(widths: BarWidths, available: number): BarPlan {
   const { heading, tools, gap } = widths;
   const fits = (actions: number, withTools = false) =>
     sum(withTools ? [heading, tools, actions] : [heading, actions], gap) <= available;
@@ -78,6 +96,24 @@ export function planBar(widths: BarWidths, available: number): BarPlan {
   return actionsWidth(widths, "fold") < icons ? "fold" : "icons";
 }
 
+/**
+ * The plan at `available`, given the plan the bar has now (`current`; none on the first layout).
+ * Short of room, the bar keeps `current` while the heading can give the shortfall — up to the
+ * margin, at most half its own width (it truncates); with room to spare, a looser plan comes back
+ * only once it fits with the margin left over.
+ */
+export function planBar(widths: BarWidths, available: number, current?: BarPlan): BarPlan {
+  const fresh = firstFit(widths, available);
+  if (current === undefined || fresh === current) return fresh;
+  if (RANK[fresh] > RANK[current]) {
+    const give = Math.min(widths.margin, widths.heading / 2);
+    const loose = firstFit(widths, available + give);
+    return RANK[loose] > RANK[current] ? loose : current;
+  }
+  const tight = firstFit(widths, available - widths.margin);
+  return RANK[tight] < RANK[current] ? tight : current;
+}
+
 const PLAN_STEP: Record<BarPlan, ActionStep> = {
   one: "full",
   below: "full",
@@ -86,9 +122,12 @@ const PLAN_STEP: Record<BarPlan, ActionStep> = {
   fold: "fold",
 };
 
-/** Whether the heading stacks at `plan`: it has a path and its one line still does not fit. */
+/**
+ * Whether the heading stacks at `plan`: it has a path, `plan` is the last step, and the heading's
+ * line still does not fit beside the actions.
+ */
 export function stackHeading(widths: BarWidths, available: number, plan: BarPlan): boolean {
-  if (!widths.path) return false;
+  if (!widths.path || plan !== firstFit(widths, 0)) return false;
   const tools = plan === "one" ? widths.tools : 0;
   return (
     sum([widths.heading, tools, actionsWidth(widths, PLAN_STEP[plan])], widths.gap) > available

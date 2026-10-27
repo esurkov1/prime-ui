@@ -1,4 +1,4 @@
-/** Product photos in a wrapping grid: a photo carried across rows lands in reading order, the gap takes a cell, Alt + ← / → steps it one place — `axis`. */
+/** Product photos in a wrapping grid: a photo carried across rows lands in reading order, the gap takes a cell, Alt + ← / → steps it one place, the add tile stands last as tall as a photo — `axis`, `Dnd.AddButton`. */
 import { Dnd, Icon, moveBefore, Thumbnail } from "prime-ui-kit";
 import * as React from "react";
 
@@ -16,8 +16,15 @@ const PHOTOS: Photo[] = [
   { id: "chair-room", title: "В интерьере" },
 ];
 
+/** Shots waiting in the product's media library; the add tile leaves once they are all in. */
+const LIBRARY: Photo[] = [
+  { id: "chair-seat", title: "Сиденье" },
+  { id: "chair-label", title: "Бирка" },
+];
+
 export default function DndGridExample() {
   const [photos, setPhotos] = React.useState(PHOTOS);
+  const next = LIBRARY.find((shot) => !photos.some((photo) => photo.id === shot.id));
 
   return (
     <Dnd.Root>
@@ -42,7 +49,14 @@ export default function DndGridExample() {
             </Thumbnail.Root>
           </Dnd.SortableItem>
         )}
-      />
+      >
+        {next ? (
+          <Dnd.AddButton
+            label="Добавить фото"
+            onClick={() => setPhotos((current) => [...current, next])}
+          />
+        ) : null}
+      </Dnd.Sortable>
     </Dnd.Root>
   );
 }

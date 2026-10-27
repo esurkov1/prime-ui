@@ -111,6 +111,29 @@ describe("List", () => {
     );
   });
 
+  it("bleeds its first and last row into the host's block padding under --list-bleed", () => {
+    const flat = (value: string) =>
+      value.replace(/\s+/g, " ").replace(/\( /g, "(").replace(/ \)/g, ")");
+    const root = cssRule(CSS, ":where(.root)");
+    // The block bleed is the rows' own block padding, scaled by the host's public hook.
+    expect(flat(cssValue(root, "--list-bleed-block"))).toBe(
+      "calc((var(--list-row-h, var(--field-h)) - var(--field-lh)) / 2 * var(--list-bleed, 0))",
+    );
+    // Only where the list opens or closes its host, and never above a group heading.
+    expect(
+      cssValue(
+        cssRule(CSS, ":where(.root:first-child:has(> .item:first-child))"),
+        "margin-block-start",
+      ),
+    ).toBe("calc(var(--list-bleed-block) * -1)");
+    expect(
+      cssValue(
+        cssRule(CSS, ":where(.root:last-child:has(> :is(.item, .group):last-child))"),
+        "margin-block-end",
+      ),
+    ).toBe("calc(var(--list-bleed-block) * -1)");
+  });
+
   it("takes the host tier without its own size", () => {
     render(
       <ControlSizeProvider value="s">

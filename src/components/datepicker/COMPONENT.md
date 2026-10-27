@@ -55,7 +55,7 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `mode` | `"single" \| "range"` | — (required) | One date or a period; sets the value type. |
 | `value` | `Date \| null  ·  DatepickerRange` | — | Controlled value: a date (`single`) or `{ from, to }` in wall-clock time (`range`); `null` — not set. |
 | `defaultValue` | `Date \| null  ·  DatepickerRange` | `null` · `{ from: null, to: null }` | Initial value, uncontrolled. |
-| `onValueChange` | `(value) => void` | — | Called when a pick, a preset, Apply or Reset changes the value. |
+| `onValueChange` | `(value) => void \| Promise<void>` | — | Called when a pick, a preset, Apply or Reset changes the value. A promise: the value waits (`aria-busy`, a Spinner for the chevron); a controlled owner sets `value` before resolving; reject brings the previous one back. |
 | `children` | `ReactNode` | — | `Datepicker.TriggerIcon` — the leading glyph of the field button; without it the field shows only the value and the chevron, like a `Select`. |
 | `open` | `boolean` | — | Controlled visibility of the panel. |
 | `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
@@ -109,7 +109,7 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `mode` | `"single" \| "range"` | — (required) | One date or a period; sets the value type. |
 | `value` | `Date \| null  ·  DatepickerRange` | — | Controlled value: a date (`single`) or `{ from, to }` in wall-clock time (`range`); `null` — not set. |
 | `defaultValue` | `Date \| null  ·  DatepickerRange` | `null` · `{ from: null, to: null }` | Initial value, uncontrolled. |
-| `onValueChange` | `(value) => void` | — | Called when a pick, a preset, Apply or Reset changes the value. |
+| `onValueChange` | `(value) => void \| Promise<void>` | — | Called when a pick, a preset, Apply or Reset changes the value. A promise: the value waits (`aria-busy`, a Spinner for the chevron); a controlled owner sets `value` before resolving; reject brings the previous one back. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Panel tier (day cell 24 · 28 · 32 · 36 · 40). Without it the tier of its host, else `m`. |
 | `months` | `1 \| 2` | `1` | Months side by side; one when there is no room. |
 | `presets` | `DatepickerPreset[] \| false` | `false` | Preset column (`range` only): `DEFAULT_DATEPICKER_PRESETS` (ends with «Всё время») or picks from `datepickerPresets`; a row above the calendar when narrow. |
@@ -185,6 +185,7 @@ A date as a form submits it, in local time: `yyyy-MM-dd`, with `withTime` `yyyy-
 | focus-visible | keyboard | inset focus ring; none with `focusRing` off (`data-focus-ring="false"`) |
 | invalid | `invalid`, `error` | `data-invalid`, `aria-invalid`, inset `danger-border` ring; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | native `disabled`, `data-disabled`, `field-bg-disabled`, cannot open |
+| saving | `onValueChange` returned a pending promise | the new value shows at once, a `Spinner` in place of the chevron, `aria-busy` and `data-loading` on the field button (`cursor: progress`), `aria-busy` on the panel; the field still opens, picks are ignored until the answer; a rejection puts the previous value back |
 | today | the current day | `aria-current="date"`, accent text |
 | selected / band | value | day `aria-pressed` (accent text), `data-edge`; cell `data-band="selected" \| "preview"`, `data-band-start` / `-end` |
 | day disabled | `isDayDisabled`, `disableFuture` | native `disabled`, muted |
@@ -224,6 +225,7 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 - The popover is a `role="dialog"` with a focus trap; focus lands on the picked or today's day.
 - Every month is a table named by the month; days are buttons with the full date as name, picked ones `aria-pressed`, today `aria-current="date"`.
 - One polite live region announces the visible months («Сентябрь 2026 — Октябрь 2026») when they change; the step prompt is a polite live region too; on open the popover focuses the picked (or today's) day (`data-autofocus`); presets are a named group of buttons with `aria-pressed`.
+- While a value is saved (a pending promise from `onValueChange`) the field button and the panel have `aria-busy`; the Spinner is hidden from assistive tech. A refused save puts the previous value back.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -282,5 +284,5 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 - Converting values to UTC inside the component → values are wall-clock dates; convert in the app.
 
 ## Related
-- **Built from:** [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md) (month arrows, the narrow presets row, Reset / Apply), `internal/listRow` (the presets column), [ScrollContainer](../scroll-container/COMPONENT.md) (the presets row when narrow), [VisuallyHidden](../visually-hidden/COMPONENT.md) (month announcement), `Icon` (the TriggerIcon calendar, chevron), [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md)
+- **Built from:** [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md) (month arrows, the narrow presets row, Reset / Apply), `internal/listRow` (the presets column), [ScrollContainer](../scroll-container/COMPONENT.md) (the presets row when narrow), [VisuallyHidden](../visually-hidden/COMPONENT.md) (month announcement), `Icon` (the TriggerIcon calendar, chevron), [Spinner](../spinner/COMPONENT.md) (saving, in place of the chevron), [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md)
 - **See also:** [Input](../input/COMPONENT.md), [Select](../select/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

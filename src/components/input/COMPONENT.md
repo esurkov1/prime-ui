@@ -215,7 +215,7 @@ Input has no `variant` or `tone`: there is one field treatment (fill, no visible
 | no focus ring | `focusRing={false}` | `data-focus-ring="false"` on the wrapper |
 | invalid | `invalid` or non-empty `error` | `data-invalid="true"` on root and wrapper, `aria-invalid="true"` on the input, danger inset ring, danger focus ring; the control shakes once when an error arrives (`data-shake` on the frame) |
 | valid | `valid` (and not invalid: `invalid` or `error` wins) | `data-valid="true"` on the wrapper, a success inset ring; a check (`aria-hidden`) at the end of the field before the end icon and segments pops in and draws its stroke when the value becomes valid, and closes up in place when it goes; a polite live region says `labels.valid` and is in the input's `aria-describedby` while valid |
-| disabled | native `disabled` on `Input.Field`, or a disabled `Fieldset` around it | disabled fill, disabled text and icons, `cursor: not-allowed`, clear button disabled look |
+| disabled | native `disabled` on `Input.Field`, or a disabled `Fieldset` around it | disabled fill, disabled text and icons, `cursor: not-allowed`, clear button disabled look; under a `Tooltip.Trigger` the field is `aria-disabled="true"` and `readOnly` with no `name` or `required`, the same node |
 | read-only | native `readOnly` on `Input.Field` | no hover, default cursor |
 | reserved support row | `reserveSupportRow` | `data-reserve="true"` on the support row |
 | counter over limit | `current > max` | `data-invalid="true"` on `Input.Counter`; the current count rolls its digits to each new value |
@@ -281,6 +281,7 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 - `Input.RevealButton` is a toggle: a constant name `labels.reveal`, `aria-pressed` and `aria-controls` on the input; a pointer press keeps the focus in the field.
 - With `onCommit` the input carries `aria-busy="true"` while saving; a polite live region says `labels.saving`, then `labels.saved`.
 - `Input.Counter` shows `14/40` visually and announces `labels.counter` through `aria-live="polite"`.
+- Under a `Tooltip.Trigger` a disabled `Input.Field` is `aria-disabled="true"` and `readOnly` with no native `disabled`, `name` or `required`: it keeps its tab stop, its node and its text, the form skips it.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

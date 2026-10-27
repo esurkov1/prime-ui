@@ -6,6 +6,7 @@ import { Avatar } from "@/components/avatar/Avatar";
 import { Button } from "@/components/button/Button";
 import { Card } from "@/components/card/Card";
 import { Dropdown } from "@/components/dropdown/Dropdown";
+import { Popover } from "@/components/popover/Popover";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import fieldTier from "@/internal/fieldTier.module.css";
@@ -960,5 +961,88 @@ describe("Badge.Description", () => {
     await user.tab();
     await user.keyboard("{Enter}");
     expect(onClick).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("Badge async onPressedChange", () => {
+  function deferred() {
+    let resolve: () => void = () => {};
+    let reject: (reason: unknown) => void = () => {};
+    const promise = new Promise<void>((done, fail) => {
+      resolve = done;
+      reject = fail;
+    });
+    return { promise, resolve, reject };
+  }
+
+  it("shows the new state at once, waits busy, takes no second press; resolve keeps it", async () => {
+    const save = deferred();
+    const onPressedChange = vi.fn(() => save.promise);
+    render(
+      <Badge.Root data-testid="b" defaultPressed={false} onPressedChange={onPressedChange}>
+        Москва
+      </Badge.Root>,
+    );
+    const button = screen.getByRole("button", { name: "Москва" });
+    const badge = screen.getByTestId("b");
+    await userEvent.click(button);
+    expect(button).toHaveAttribute("aria-pressed", "true");
+    expect(badge).toHaveAttribute("aria-busy", "true");
+    expect(badge).toHaveAttribute("data-pending", "true");
+    await userEvent.click(button);
+    expect(onPressedChange).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      save.resolve();
+    });
+    expect(button).toHaveAttribute("aria-pressed", "true");
+    expect(badge).not.toHaveAttribute("aria-busy");
+  });
+
+  it("reject turns the state back", async () => {
+    const save = deferred();
+    render(
+      <Badge.Root data-testid="b" defaultPressed onPressedChange={() => save.promise}>
+        Москва
+      </Badge.Root>,
+    );
+    const button = screen.getByRole("button", { name: "Москва" });
+    await userEvent.click(button);
+    expect(button).toHaveAttribute("aria-pressed", "false");
+    await act(async () => {
+      save.reject(new Error("offline"));
+    });
+    expect(button).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("b")).not.toHaveAttribute("aria-busy");
+  });
+});
+
+describe("Badge as a Popover trigger", () => {
+  it("a status chip opens a popover: the body is the opener, the tone stays, nothing is pressed", async () => {
+    render(
+      <Popover.Root>
+        <Popover.Trigger>
+          <Badge.Root data-testid="b" tone="success">
+            <Badge.Dot />
+            Синхронизировано
+            <Badge.Description>5 минут назад</Badge.Description>
+          </Badge.Root>
+        </Popover.Trigger>
+        <Popover.Content>Последняя выгрузка в 1С прошла без ошибок</Popover.Content>
+      </Popover.Root>,
+    );
+    const badge = screen.getByTestId("b");
+    const opener = screen.getByRole("button", { name: /Синхронизировано/ });
+    expect(badge).toContainElement(opener);
+    expect(opener).toHaveAttribute("aria-expanded", "false");
+    expect(opener).not.toHaveAttribute("aria-pressed");
+
+    await userEvent.click(opener);
+    expect(opener).toHaveAttribute("aria-expanded", "true");
+    expect(opener).toHaveAttribute("data-state", "open");
+    expect(badge).toHaveAttribute("data-tone", "success");
+    expect(badge).not.toHaveAttribute("data-pressed");
+    // The popover is named by its opener.
+    expect(screen.getByRole("dialog")).toHaveAttribute("aria-labelledby", opener.id);
   });
 });

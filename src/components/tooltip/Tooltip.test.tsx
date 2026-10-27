@@ -4,7 +4,10 @@ import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Button } from "@/components/button/Button";
+import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Fieldset } from "@/components/fieldset/Fieldset";
+import { Select } from "@/components/select/Select";
+import { Textarea } from "@/components/textarea/Textarea";
 
 import { Tooltip } from "./Tooltip";
 
@@ -134,7 +137,7 @@ describe("Tooltip", () => {
     expect(host).toHaveAttribute("aria-describedby", screen.getByRole("tooltip").id);
   });
 
-  it("wraps a control a disabled Fieldset disables, as one of its own", async () => {
+  it("keeps a control a disabled Fieldset disables its own tab stop, as one of its own", async () => {
     render(
       <Fieldset label="Публикация" disabled>
         <Tooltip.Root delayDuration={0}>
@@ -145,15 +148,153 @@ describe("Tooltip", () => {
         </Tooltip.Root>
       </Fieldset>,
     );
-    const host = screen.getByRole("button", { name: "Опубликовать" });
-    expect(host).toHaveAttribute("data-disabled-host");
-    expect(host).toHaveAttribute("aria-disabled", "true");
-    expect(host).toHaveAttribute("tabindex", "0");
-    act(() => keyboardFocus(host));
+    const button = screen.getByRole("button", { name: "Опубликовать" });
+    expect(button.tagName).toBe("BUTTON");
+    expect(button).not.toBeDisabled();
+    expect(button).toHaveAttribute("aria-disabled", "true");
+    expect(button.closest("[data-disabled-host]")).toBeNull();
+    act(() => keyboardFocus(button));
     await act(async () => {
       vi.advanceTimersByTime(0);
     });
     expect(screen.getByRole("tooltip")).toHaveTextContent("Сначала сохраните черновик");
+  });
+
+  it("keeps a disabled choice, field and select trigger the same node, out of the form", () => {
+    const onCheckedChange = vi.fn();
+    function Form({ disabled }: { disabled: boolean }) {
+      return (
+        <form aria-label="Настройки">
+          <Tooltip.Root>
+            <Tooltip.Trigger>
+              <Checkbox.Root name="invite" disabled={disabled} onCheckedChange={onCheckedChange}>
+                <Checkbox.Label>Пригласить</Checkbox.Label>
+              </Checkbox.Root>
+            </Tooltip.Trigger>
+            <Tooltip.Content>Нет прав</Tooltip.Content>
+          </Tooltip.Root>
+          <Tooltip.Root>
+            <Tooltip.Trigger>
+              <Textarea.Root label="Комментарий" name="comment" disabled={disabled} />
+            </Tooltip.Trigger>
+            <Tooltip.Content>Нет прав</Tooltip.Content>
+          </Tooltip.Root>
+          <Select.Root label="Менеджер" disabled={disabled}>
+            <Tooltip.Root>
+              <Tooltip.Trigger>
+                <Select.Trigger>
+                  <Select.Value />
+                </Select.Trigger>
+              </Tooltip.Trigger>
+              <Tooltip.Content>Нет прав</Tooltip.Content>
+            </Tooltip.Root>
+            <Select.Content>
+              <Select.Item value="anna">Анна</Select.Item>
+            </Select.Content>
+          </Select.Root>
+        </form>
+      );
+    }
+    const { rerender } = render(<Form disabled={false} />);
+    const checkbox = screen.getByRole("checkbox", { name: "Пригласить" });
+    const field = screen.getByRole("textbox", { name: "Комментарий" });
+    const trigger = screen.getByRole("combobox", { name: "Менеджер" });
+    fireEvent.change(field, { target: { value: "Позвонить в среду" } });
+    rerender(<Form disabled />);
+    expect(screen.getByRole("checkbox", { name: "Пригласить" })).toBe(checkbox);
+    expect(screen.getByRole("textbox", { name: "Комментарий" })).toBe(field);
+    expect(screen.getByRole("combobox", { name: "Менеджер" })).toBe(trigger);
+    for (const control of [checkbox, field, trigger]) {
+      expect(control).not.toBeDisabled();
+      expect(control).toHaveAttribute("aria-disabled", "true");
+      expect(control.closest("[data-disabled-host]")).toBeNull();
+    }
+    expect(field).toHaveValue("Позвонить в среду");
+    expect(field).toHaveAttribute("readonly");
+    // The form skips them, as it skips a disabled control.
+    const form = screen.getByRole("form", { name: "Настройки" }) as HTMLFormElement;
+    expect([...new FormData(form).keys()]).toEqual([]);
+    fireEvent.click(screen.getByText("Пригласить"));
+    expect(onCheckedChange).not.toHaveBeenCalled();
+    expect(checkbox).not.toBeChecked();
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    fireEvent.keyDown(trigger, { key: "Enter" });
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    rerender(<Form disabled={false} />);
+    expect(screen.getByRole("checkbox", { name: "Пригласить" })).toBe(checkbox);
+    expect(checkbox).toBeEnabled();
+    expect(checkbox).not.toHaveAttribute("aria-disabled");
+  });
+
+  it("keeps a disabled Button its own tab stop: aria-disabled, hover and focus open, no press", async () => {
+    const onClick = vi.fn();
+    const onSubmit = vi.fn((event: React.FormEvent) => event.preventDefault());
+    render(
+      <form onSubmit={onSubmit}>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <Button.Root type="submit" disabled onClick={onClick}>
+              Опубликовать
+            </Button.Root>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Заполните обязательные поля</Tooltip.Content>
+        </Tooltip.Root>
+      </form>,
+    );
+    const button = screen.getByRole("button", { name: "Опубликовать" });
+    expect(button.tagName).toBe("BUTTON");
+    expect(button).not.toBeDisabled();
+    expect(button).toHaveAttribute("aria-disabled", "true");
+    expect(button).toHaveAttribute("data-disabled", "true");
+    expect(button.closest("[data-disabled-host]")).toBeNull();
+    act(() => keyboardFocus(button));
+    await act(async () => {
+      vi.advanceTimersByTime(0);
+    });
+    expect(screen.getByRole("tooltip")).toHaveTextContent("Заполните обязательные поля");
+    expect(button).toHaveAttribute("aria-describedby", screen.getByRole("tooltip").id);
+    fireEvent.click(button);
+    expect(onClick).not.toHaveBeenCalled();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("a Button whose label changes as it turns disabled keeps its node and morphs the label", () => {
+    vi.stubGlobal("matchMedia", (query: string) => ({
+      matches: false,
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+    }));
+    function StartStop() {
+      const [running, setRunning] = React.useState(false);
+      const [pending, setPending] = React.useState(false);
+      return (
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            <Button.Root
+              disabled={pending}
+              onClick={() => {
+                setRunning((value) => !value);
+                setPending(true);
+              }}
+            >
+              {running ? "Стоп" : "Старт"}
+            </Button.Root>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Запуск расчёта</Tooltip.Content>
+        </Tooltip.Root>
+      );
+    }
+    render(<StartStop />);
+    const button = screen.getByRole("button", { name: "Старт" });
+    fireEvent.click(button);
+    const after = screen.getByRole("button", { name: "Стоп" });
+    expect(after).toBe(button);
+    expect(after).toHaveAttribute("aria-disabled", "true");
+    expect(after.querySelectorAll("[style*='--morph-i']").length).toBeGreaterThan(0);
   });
 
   it("makes a non-focusable trigger a tab stop; a focusable one stays as is", () => {

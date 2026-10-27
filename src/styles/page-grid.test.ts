@@ -13,10 +13,6 @@ import { describe, expect, it } from "vitest";
 const root = process.cwd();
 
 const ALLOWED_GRIDS: Record<string, string> = {
-  "src/components/drawer/examples/screen.module.css":
-    "short related fields side by side inside one form",
-  "src/layout/page/examples/screen.module.css":
-    "short related fields side by side inside one panel",
   "src/components/file-upload/examples/screen.module.css":
     "thumbnail tiles inside the library section, not page tiles",
 };

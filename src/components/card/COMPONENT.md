@@ -97,7 +97,7 @@ Card.Root size? selected? asChild?        the card; with no zone inside it is a 
 | `…rest` | `AnchorHTMLAttributes<HTMLAnchorElement>` | — | `href`, `children`, `className` and the other anchor attributes. |
 
 ### Card.Badges
-`ref` → `HTMLDivElement`. A `Badge.Group` after the title, on its line: one container for every badge of the record (status, role, counter; the meaning is the `tone` or `color` of a badge). Badges are `xs` · `xs` · `xs` · `s` · `s` by card size; what does not fit folds into «+N».
+`ref` → `HTMLDivElement`. A `Badge.Group` after the title, on its line: every badge of the record (status, role, counter). Badges are `xs` · `xs` · `s` · `m` · `m` by card size, as tall as the title's line; what does not fit folds into «+N».
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -228,7 +228,8 @@ Five steps of metrics, the kit's surface frame (`internal/surfaceFrame`; the hea
 - The header gives way in this order: the title shrinks down to its floor (its own text or 8em) and the badges fold into «+N»; the title never goes below the floor. When the mark, the floor and the controls no longer fit one row, the controls drop under the title onto a line of their own, and wrap only if that line is narrower than they are. The kit does not shrink a picker or move buttons into «Ещё» by itself; a card has no `Fields` row, so its header holds one picker at the controls' tier, and a card with two pickers moves the second into `Card.Footer` (which stacks on a narrow card) or the body.
 - The footer has no line and no fill; it stands off the content by the card padding (more than the zone gap). One thing at the start, up to two buttons at the end with the accent one last; `fullWidth` only when nothing stands at the start.
 - A header with a description holds its controls at the top; a one-line header, or a card that is only its header, centres them on the title line.
-- In `Card.Body` a `List` stands on the content edge: the body sets the public hook `--list-bleed` and the rows reach past the list's edges by their own padding, so their text lines up with the rest of the body.
+- In `Card.Body` a `List` stands on the content edge: the body sets the public hook `--list-bleed` and the rows reach past the list's edges by their own padding, so their text lines up with the rest of the body. A list that opens or closes the body bleeds its first and last row the same way along the block axis, so the text of those rows stands on the card's padding.
+- A `StatusDot` in `Card.Description` may come from your own component: the line finds it by its `data-status-dot` when it is the first element, and puts the «·» after it.
 - The cover is the kit `Carousel`, edge to edge; the card's corners shape it. On the photo stand only the photo's things — dots, arrows, a video's length, a count of photos (`Carousel.Overlay`). The status and the price go to the header.
 
 ## Accessibility

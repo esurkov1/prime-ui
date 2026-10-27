@@ -61,7 +61,9 @@
  * same reason the group exclusion is an attribute, never a `:not(:has())`. The label's parts dim
  * through `--label-dimmed` (Label).
  */
-.root:not([data-group="true"]):has(> .body :is(input, textarea, select):disabled)
+.root:not([data-group="true"]):has(
+  > .body :is(input, textarea, select):is(:disabled, [aria-disabled="true"])
+)
 :is(.label, .supportText:not([data-invalid="true"])) {
   --label-dimmed: var(--prime-color-text-disabled);
   color: var(--prime-color-text-disabled);

@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { useReachableDisabled } from "./disabledContext";
 
 type AnyProps = Record<string, unknown>;
 type Handler = (...args: unknown[]) => unknown;
@@ -86,7 +87,8 @@ export type SlotPartProps = { children: React.ReactElement };
  * - `on*` handlers — both fire, child first; a child `preventDefault()` skips the slot handler
  * - All other props — a defined child prop overrides the slot prop
  * - `ref` — merged with the child's ref
- * - `aria-disabled` on the slot — the child leaves the Tab order (`tabIndex -1`), a link loses its
+ * - `aria-disabled` on the slot — the child leaves the Tab order (`tabIndex -1`; under a tooltip's
+ *   trigger, `useReachableDisabled`, it stays reachable), a link loses its
  *   `href` (it stays a `link` by role), and clicks (pointer and keyboard-activated) are stopped in
  *   the capture phase, so the child's own `onClick` never runs and nothing navigates
  */
@@ -97,6 +99,7 @@ export function Slot<E extends HTMLElement = HTMLElement>({
 }: SlotProps<E>) {
   const child = React.isValidElement<SlotChildProps<E>>(children) ? children : null;
   const composedRef = useMergedRefs<E>(ref, child?.props.ref);
+  const reachable = useReachableDisabled();
 
   if (!child) return <>{children}</>;
 
@@ -107,7 +110,8 @@ export function Slot<E extends HTMLElement = HTMLElement>({
       merged.href = undefined;
       merged.role ??= "link";
     }
-    merged.tabIndex = -1;
+    // Under a tooltip's trigger the child stays reachable: the trigger makes it a tab stop.
+    if (!reachable) merged.tabIndex = -1;
     merged.onClickCapture = blockDisabledClick;
   }
 

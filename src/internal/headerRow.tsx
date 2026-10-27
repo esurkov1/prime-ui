@@ -159,13 +159,58 @@ export function SectionTitle({
 }
 
 /**
+ * Whether the line's DOM opens with a `StatusDot` (its `data-status-dot`) with more after it: the
+ * dot a consumer's own component rendered, which the element tree does not show.
+ */
+function leadsWithStatusDot(line: HTMLElement) {
+  const dot = line.firstElementChild;
+  if (!dot?.hasAttribute("data-status-dot")) return false;
+  let after = false;
+  let before = true;
+  for (const node of line.childNodes) {
+    if (node === dot) {
+      before = false;
+      continue;
+    }
+    const filled = node.nodeType === Node.ELEMENT_NODE || Boolean(node.textContent?.trim());
+    if (before && filled) return false;
+    if (!before && filled) after = true;
+  }
+  return after;
+}
+
+/**
+ * Marks the cut text of a line that opens with a `StatusDot` behind a wrapper (`data-lead-dot`):
+ * the CSS puts the «·» after that dot. Watched, so a wrapper that re-renders alone keeps it true.
+ */
+function useLeadDot(ref: React.RefObject<HTMLElement | null>, shown: boolean) {
+  const [lead, setLead] = React.useState(false);
+  React.useLayoutEffect(() => {
+    const line = ref.current;
+    if (!shown || !line) {
+      setLead(false);
+      return;
+    }
+    const check = () => setLead(leadsWithStatusDot(line));
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(line, { childList: true, subtree: true, characterData: true });
+    return () => observer.disconnect();
+  }, [ref, shown]);
+  return lead;
+}
+
+/**
  * The content of a description line: a `StatusDot` first states the state, the text after it
- * follows a «·» and is cut with an ellipsis.
+ * follows a «·» and is cut with an ellipsis. A dot written straight in the line is moved first by
+ * its element type; one the consumer's own component renders is found in the DOM by its marker.
  */
 export function HeaderLineContent({ children }: { children?: React.ReactNode }) {
   const items = flattenChildren(children);
   const dots: React.ReactNode[] = items.filter((part) => isPart(part, StatusDot));
   const text = items.filter((part) => !dots.includes(part));
+  const textRef = React.useRef<HTMLSpanElement>(null);
+  const lead = useLeadDot(textRef, text.length > 0);
   return (
     <>
       {dots}
@@ -174,7 +219,15 @@ export function HeaderLineContent({ children }: { children?: React.ReactNode }) 
           ·
         </span>
       ) : null}
-      {text.length > 0 ? <span className={styles.descriptionText}>{text}</span> : null}
+      {text.length > 0 ? (
+        <span
+          ref={textRef}
+          className={styles.descriptionText}
+          data-lead-dot={(dots.length === 0 && lead) || undefined}
+        >
+          {text}
+        </span>
+      ) : null}
     </>
   );
 }

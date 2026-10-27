@@ -6,7 +6,7 @@ import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { useInheritedDisabled } from "@/internal/disabledContext";
+import { useDisabledControl, useInheritedDisabled } from "@/internal/disabledContext";
 import {
   FieldActionButton,
   type FieldActionButtonProps,
@@ -135,6 +135,8 @@ function TextareaRoot({
   const tier = useHostTier(sizeProp);
   const { size } = tier;
   const disabled = useInheritedDisabled(disabledProp);
+  // Under a tooltip's trigger a disabled field stays reachable: read-only, out of the form.
+  const off = useDisabledControl(disabled);
   const ids = useFieldFrame(id, { label, hint, error, invalid, required }, ariaDescribedBy);
   const labels = useLabels(TEXTAREA_LABELS, labelsProp);
   const autofill = useAutofill(autoComplete);
@@ -187,7 +189,7 @@ function TextareaRoot({
   // so the counter and hints never leak into the accessible name).
   const focusFromPadding = (event: React.MouseEvent<HTMLDivElement>) => {
     const textarea = innerRef.current;
-    if (!textarea || event.target === textarea || textarea.disabled) return;
+    if (!textarea || event.target === textarea || disabled) return;
     if ((event.target as Element).closest("[data-field-action]")) return;
     event.preventDefault();
     textarea.focus();
@@ -200,9 +202,11 @@ function TextareaRoot({
       id={ids.controlId}
       rows={rows}
       className={cx(styles.textarea, autoResize && styles.textareaAutoResize)}
-      disabled={disabled}
-      readOnly={readOnly}
-      required={ids.required || undefined}
+      disabled={off.native}
+      aria-disabled={off.ariaDisabled}
+      readOnly={off.reachable || readOnly}
+      name={off.reachable ? undefined : rest.name}
+      required={(!off.reachable && ids.required) || undefined}
       aria-invalid={ids.invalid || undefined}
       aria-describedby={ids.describedBy}
       aria-busy={commit.state === "pending" || undefined}

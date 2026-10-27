@@ -29,9 +29,9 @@ const VALUE_PROPS: ApiProp[] = [
   },
   {
     name: "onValueChange",
-    type: "(value) => void",
-    en: "Called when a pick, a preset, Apply or Reset changes the value.",
-    ru: "Выбор дня, пресет, «Применить» или «Сбросить» меняют значение.",
+    type: "(value) => void | Promise<void>",
+    en: "Called when a pick, a preset, Apply or Reset changes the value. A promise: the value waits (`aria-busy`, a Spinner for the chevron); a controlled owner sets `value` before resolving; reject brings the previous one back.",
+    ru: "Выбор дня, пресет, «Применить» или «Сбросить» меняют значение. Промис: значение ждёт (`aria-busy`, спиннер вместо шеврона); управляемый владелец ставит `value` до resolve; при reject вернётся прежнее.",
   },
 ];
 
@@ -418,6 +418,10 @@ export const api: ComponentApi = {
       {
         en: "One polite live region announces the visible months («Сентябрь 2026 — Октябрь 2026») when they change; the step prompt is a polite live region too; on open the popover focuses the picked (or today's) day (`data-autofocus`); presets are a named group of buttons with `aria-pressed`.",
         ru: "Одна вежливая live-область объявляет видимые месяцы («Сентябрь 2026 — Октябрь 2026») при смене; подсказка шага — тоже вежливая live-область; при открытии поповер ставит фокус на выбранный (или сегодняшний) день (`data-autofocus`); пресеты — именованная группа кнопок с `aria-pressed`.",
+      },
+      {
+        en: "While a value is saved (a pending promise from `onValueChange`) the field button and the panel have `aria-busy`; the Spinner is hidden from assistive tech. A refused save puts the previous value back.",
+        ru: "Пока значение сохраняется (ожидающий промис из `onValueChange`), на кнопке поля и панели `aria-busy`, а спиннер скрыт от вспомогательных технологий; при отказе возвращается прежнее значение.",
       },
     ],
   },

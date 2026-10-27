@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { useControllableState } from "@/hooks/useControllableState";
+
 type Entry<Change> = { key: number; change: Change };
 
 /**
@@ -62,6 +64,39 @@ export function usePendingChanges<T, Change>(value: T, apply: (value: T, change:
   const pending = React.useMemo(() => entries.map((entry) => entry.change), [entries]);
 
   return { shown, pending, track };
+}
+
+const takeNext = <T>(_current: T, next: T) => next;
+
+/**
+ * A controllable value whose change handler may answer with a promise (the kit's async-event
+ * contract for one value: a segment, a pressed toggle). `value` is the stored value with a pending
+ * change drawn over it; `commit(next)` calls `onChange` — a plain answer stores `next` at once, a
+ * promise keeps it pending (`saving`) until it settles: resolve stores it, reject drops it and
+ * `value` shows the stored one again (`onReject` runs then). The host ignores commits while saving.
+ */
+export function usePendingValue<T>({
+  value,
+  defaultValue,
+  onChange,
+}: {
+  value?: T;
+  defaultValue: T;
+  onChange?: AsyncHandler<[T]>;
+}) {
+  const [stored, setStored] = useControllableState<T>({ value, defaultValue });
+  const changes = usePendingChanges<T, T>(stored, takeNext);
+
+  const commit = (next: T, handlers: { onReject?: (reason: unknown) => void } = {}) => {
+    const outcome = onChange?.(next);
+    if (!isPromiseLike(outcome)) {
+      setStored(next);
+      return;
+    }
+    changes.track(next, outcome, { onResolve: () => setStored(next), onReject: handlers.onReject });
+  };
+
+  return { value: changes.shown, saving: changes.pending.length > 0, commit };
 }
 
 /**

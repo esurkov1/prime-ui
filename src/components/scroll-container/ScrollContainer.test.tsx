@@ -12,6 +12,10 @@ const value = (selector: string, prop: string, parents?: string[]) =>
   cssValue(cssRule(CSS, selector, parents), prop);
 
 describe("ScrollContainer", () => {
+  it("stops a host's --list-bleed: a List inside never reaches past the scroller", () => {
+    expect(value(".root", "--list-bleed")).toBe("0");
+  });
+
   it("рендерит дочерний контент", () => {
     render(<ScrollContainer>scroll-me</ScrollContainer>);
     expect(screen.getByText("scroll-me")).toBeInTheDocument();

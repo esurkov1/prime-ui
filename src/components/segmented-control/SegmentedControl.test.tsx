@@ -1,8 +1,9 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type * as React from "react";
+import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { Tooltip } from "@/components/tooltip/Tooltip";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
 import { cssRule, cssRules, cssValue } from "@/test/css";
@@ -898,5 +899,166 @@ describe("SegmentedControl.Item asChild", () => {
     render(<Links onValueChange={onValueChange} />);
     fireEvent.click(screen.getByRole("link", { name: "Сотрудники" }));
     expect(onValueChange).toHaveBeenCalledWith("/");
+  });
+});
+
+describe("SegmentedControl — async onValueChange", () => {
+  function deferred() {
+    let resolve: () => void = () => {};
+    let reject: (reason: unknown) => void = () => {};
+    const promise = new Promise<void>((done, fail) => {
+      resolve = done;
+      reject = fail;
+    });
+    return { promise, resolve, reject };
+  }
+
+  function Period({ onValueChange }: { onValueChange: (value: string) => void | Promise<void> }) {
+    return (
+      <SegmentedControl.Root defaultValue="day" onValueChange={onValueChange} aria-label="Период">
+        <SegmentedControl.Item value="day">День</SegmentedControl.Item>
+        <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
+        <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
+      </SegmentedControl.Root>
+    );
+  }
+
+  it("shows the choice at once, waits busy, ignores presses and keys; resolve keeps it", async () => {
+    const save = deferred();
+    const onValueChange = vi.fn(() => save.promise);
+    render(<Period onValueChange={onValueChange} />);
+    const group = screen.getByRole("radiogroup");
+    const week = screen.getByRole("radio", { name: "Неделя" });
+    fireEvent.click(week);
+    expect(week).toHaveAttribute("aria-checked", "true");
+    expect(group).toHaveAttribute("aria-busy", "true");
+
+    fireEvent.click(screen.getByRole("radio", { name: "Месяц" }));
+    week.focus();
+    fireEvent.keyDown(week, { key: "ArrowRight" });
+    expect(week).toHaveFocus();
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+    expect(week).toHaveAttribute("aria-checked", "true");
+
+    await act(async () => {
+      save.resolve();
+    });
+    expect(week).toHaveAttribute("aria-checked", "true");
+    expect(group).not.toHaveAttribute("aria-busy");
+  });
+
+  it("reject puts the previous choice back", async () => {
+    const save = deferred();
+    render(<Period onValueChange={() => save.promise} />);
+    fireEvent.click(screen.getByRole("radio", { name: "Месяц" }));
+    expect(screen.getByRole("radio", { name: "Месяц" })).toHaveAttribute("aria-checked", "true");
+    await act(async () => {
+      save.reject(new Error("offline"));
+    });
+    expect(screen.getByRole("radio", { name: "День" })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("radio", { name: "Месяц" })).toHaveAttribute("aria-checked", "false");
+    expect(screen.getByRole("radiogroup")).not.toHaveAttribute("aria-busy");
+  });
+
+  it("async controlled: the owner sets the value before resolving", async () => {
+    function Controlled() {
+      const [period, setPeriod] = React.useState("day");
+      return (
+        <SegmentedControl.Root
+          value={period}
+          onValueChange={async (next) => {
+            await Promise.resolve();
+            setPeriod(next);
+          }}
+          aria-label="Период"
+        >
+          <SegmentedControl.Item value="day">День</SegmentedControl.Item>
+          <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
+        </SegmentedControl.Root>
+      );
+    }
+    render(<Controlled />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("radio", { name: "Неделя" }));
+    });
+    expect(screen.getByRole("radio", { name: "Неделя" })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("radiogroup")).not.toHaveAttribute("aria-busy");
+  });
+});
+
+describe("SegmentedControl — disabled keeps the segments in place", () => {
+  it("a titled segment stays the same element, out of any host, when the group turns disabled", () => {
+    const { rerender } = render(
+      <SegmentedControl.Root defaultValue="a" aria-label="Вид" fullWidth>
+        <SegmentedControl.Item value="a">Список</SegmentedControl.Item>
+        <SegmentedControl.Item value="b">Доска</SegmentedControl.Item>
+      </SegmentedControl.Root>,
+    );
+    const before = screen.getByRole("radio", { name: "Список" });
+    const list = before.parentElement;
+    rerender(
+      <SegmentedControl.Root defaultValue="a" aria-label="Вид" fullWidth disabled>
+        <SegmentedControl.Item value="a">Список</SegmentedControl.Item>
+        <SegmentedControl.Item value="b">Доска</SegmentedControl.Item>
+      </SegmentedControl.Root>,
+    );
+    const after = screen.getByRole("radio", { name: "Список" });
+    expect(after).toBe(before);
+    expect(after.parentElement).toBe(list);
+    expect(after).toHaveAttribute("aria-disabled", "true");
+    expect(after).toHaveAttribute("data-disabled", "true");
+    expect(after).toHaveAttribute("tabindex", "-1");
+  });
+});
+
+describe("SegmentedControl — a disabled item inside a Tooltip", () => {
+  function Wrapped({ disabled }: { disabled: boolean }) {
+    return (
+      <SegmentedControl.Root defaultValue="list" aria-label="Вид">
+        <SegmentedControl.Item value="list">Список</SegmentedControl.Item>
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            <SegmentedControl.Item value="board" disabled={disabled}>
+              Доска
+            </SegmentedControl.Item>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Доска доступна на тарифе «Команда»</Tooltip.Content>
+        </Tooltip.Root>
+        <SegmentedControl.Item value="table">Таблица</SegmentedControl.Item>
+      </SegmentedControl.Root>
+    );
+  }
+
+  it("stays the same node out of any host as disabled flips; hover still opens the tooltip", async () => {
+    vi.useFakeTimers();
+    try {
+      const { rerender } = render(<Wrapped disabled={false} />);
+      const board = screen.getByRole("radio", { name: "Доска" });
+      const list = board.parentElement;
+      rerender(<Wrapped disabled />);
+      expect(screen.getByRole("radio", { name: "Доска" })).toBe(board);
+      expect(board.parentElement).toBe(list);
+      expect(board).toHaveAttribute("aria-disabled", "true");
+      expect(board).not.toBeDisabled();
+
+      await act(async () => {
+        fireEvent.pointerEnter(board);
+        vi.runOnlyPendingTimers();
+      });
+      expect(screen.getByRole("tooltip")).toHaveTextContent("Доска доступна на тарифе «Команда»");
+
+      // A click selects nothing; arrows skip it as before.
+      fireEvent.click(board);
+      expect(board).toHaveAttribute("aria-checked", "false");
+      const first = screen.getByRole("radio", { name: "Список" });
+      first.focus();
+      fireEvent.keyDown(first, { key: "ArrowRight" });
+      expect(screen.getByRole("radio", { name: "Таблица" })).toHaveFocus();
+
+      rerender(<Wrapped disabled={false} />);
+      expect(screen.getByRole("radio", { name: "Доска" })).toBe(board);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

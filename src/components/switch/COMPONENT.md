@@ -100,7 +100,7 @@ No `variant` / `tone` / `color`.
 | off | `checked={false}` / default | `data-state="unchecked"`; track `fill-strong` (hover `fill-strong-hover`), thumb at the start |
 | on | `checked` / `defaultChecked` | `data-state="checked"`; accent track, the thumb glides to the end |
 | invalid | `invalid` or a non-empty `error` | `data-invalid="true"`, `aria-invalid`; danger ring on the off track and on focus; the row shakes once when an error arrives (`data-shake`) |
-| disabled | `disabled` | `data-disabled="true"`; off track `fill-muted`, on track `accent-soft`, thumb `control-thumb-disabled` without shadow, `cursor: not-allowed` |
+| disabled | `disabled`, or a disabled `Fieldset` around it | `data-disabled="true"`; off track `fill-muted`, on track `accent-soft`, thumb `control-thumb-disabled` without shadow, `cursor: not-allowed`; native `disabled` on the input — under a `Tooltip.Trigger` `aria-disabled="true"` with no `name` or `required`, the same node |
 | read-only | `readOnly` | `aria-readonly="true"` on the input, `data-readonly="true"` on the field; no hover or press, default cursor |
 | saving | `loading`, or `onCheckedChange` returned a pending promise | the thumb stands in the new position with a `Spinner` inside (accent when on, muted when off; it fades in by itself), `aria-busy` on the input, `data-loading` on the track, presses ignored; a rejection glides the thumb back (`base`, emphasized) |
 | pressed | pointer press | the track scales to the compact press scale (not when disabled or read-only) |
@@ -131,6 +131,7 @@ Root also carries `data-size`. Controlled: `checked` + `onCheckedChange`. Uncont
 - `aria-invalid`, `aria-readonly` and `aria-describedby` (your ids + the hint or the error) are set on the input.
 - Without visible text, name it with `aria-label` or `aria-labelledby` on `Switch.Root`.
 - While a change is saved (`loading` or a pending promise) the input has `aria-busy`; the thumb's spinner is hidden from assistive tech. A refused save puts the state back — say why with `error`.
+- Under a `Tooltip.Trigger` a disabled switch is `aria-disabled="true"` with no native `disabled`, `name` or `required`: it keeps its tab stop and its node, a press changes nothing, the form skips it.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

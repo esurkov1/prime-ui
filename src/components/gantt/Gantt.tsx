@@ -30,6 +30,7 @@ import {
 import { useControlSize, useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import { createEdgeAutoScroll } from "@/internal/edgeAutoScroll";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldTierClass } from "@/internal/fieldClasses";
@@ -368,7 +369,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
   today: todayProp,
   locale = ru,
   size: sizeProp,
-  readOnly = false,
+  readOnly: readOnlyProp = false,
   loading = false,
   empty,
   toolbar,
@@ -384,6 +385,9 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
   ref,
   ...rest
 }: GanttProps<Row, Bar>) {
+  // A disabled Fieldset around holds the chart as it is: nothing to drag, create or reorder.
+  const groupDisabled = useInheritedDisabled();
+  const readOnly = readOnlyProp || groupDisabled;
   const tier = useHostTier(sizeProp);
   const size = tier.size;
   const labels = useLabels(GANTT_LABELS, labelsProp);

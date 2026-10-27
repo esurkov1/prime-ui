@@ -151,6 +151,7 @@ export const PART_REFS = {
   "Dnd.Sortable": ["HTMLElement"],
   "Dnd.SortableItem": ["HTMLElement"],
   "Dnd.Handle": ["HTMLButtonElement", "HTMLSpanElement"],
+  "Dnd.AddButton": ["HTMLButtonElement"],
   "Dnd.Draggable": ["HTMLElement"],
   "Dnd.DropZone": ["HTMLElement"],
   "Drawer.Root": null,

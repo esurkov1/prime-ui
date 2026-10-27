@@ -490,6 +490,10 @@ export const api: ComponentApi = {
         en: '`Input.Counter` shows `14/40` visually and announces `labels.counter` through `aria-live="polite"`.',
         ru: '`Input.Counter` показывает `14/40`, а скринридер читает `labels.counter` через `aria-live="polite"`.',
       },
+      {
+        en: 'Under a `Tooltip.Trigger` a disabled `Input.Field` is `aria-disabled="true"` and `readOnly` with no native `disabled`, `name` or `required`: it keeps its tab stop, its node and its text, the form skips it.',
+        ru: 'В `Tooltip.Trigger` выключенный `Input.Field` — `aria-disabled="true"` и `readOnly` без нативного `disabled`, `name` и `required`: остаётся точкой Tab и тем же узлом с текстом, форма его пропускает.',
+      },
     ],
   },
 };

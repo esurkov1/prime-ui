@@ -7,6 +7,12 @@
   /* `overscrollBehavior="auto"`: see the overscroll rules below. */
   --overscroll-block: auto;
   --overscroll-inline: none;
+  /*
+   * A List inside never bleeds past the scroller: the scroller clips whatever reaches beyond its
+   * edges (the rows' side padding, the first row's top and the last row's bottom), so a host's
+   * `--list-bleed` stops here.
+   */
+  --list-bleed: 0;
 
   box-sizing: border-box;
   /* Lets the region shrink inside a flex/grid parent instead of growing with its content. */

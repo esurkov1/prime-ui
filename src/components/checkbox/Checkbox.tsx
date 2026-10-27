@@ -15,11 +15,12 @@ import {
 import { useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { useInheritedDisabled } from "@/internal/disabledContext";
+import { useDisabledControl, useInheritedDisabled } from "@/internal/disabledContext";
 import { useFieldFrame } from "@/internal/FieldFrame";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
+import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
 
 import styles from "./Checkbox.module.css";
 
@@ -38,7 +39,7 @@ export type CheckboxRootProps = Omit<
 > & {
   checked?: boolean;
   defaultChecked?: boolean;
-  onCheckedChange?: (checked: boolean) => void;
+  onCheckedChange?: (checked: boolean) => void | Promise<void>;
   indeterminate?: boolean;
   invalid?: boolean;
   hint?: React.ReactNode;
@@ -77,13 +78,26 @@ function CheckboxRoot({
 }: CheckboxRootProps) {
   const size = useControlSize(sizeProp);
   const disabled = useInheritedDisabled(disabledProp);
+  const off = useDisabledControl(disabled);
   const labels = useLabels(CHECKBOX_LABELS, labelsProp);
   const ids = useFieldFrame(id, { hint, error, invalid }, ariaDescribedBy);
-  const [checked, setChecked] = useControllableState<boolean>({
+  const [stored, setStored] = useControllableState<boolean>({
     value: checkedProp,
     defaultValue: defaultChecked,
-    onChange: onCheckedChange,
   });
+  // A state the owner is still saving is drawn ahead of its answer.
+  const changes = usePendingChanges(stored, takeNext);
+  const checked = changes.shown;
+  const busy = changes.pending.length > 0;
+
+  const toggle = (next: boolean) => {
+    const outcome = onCheckedChange?.(next);
+    if (!isPromiseLike(outcome)) {
+      setStored(next);
+      return;
+    }
+    changes.track(next, outcome, { onResolve: () => setStored(next) });
+  };
 
   const internalRef = React.useRef<HTMLInputElement>(null);
   const mergedRef = useMergedRefs(internalRef, ref);
@@ -101,6 +115,7 @@ function CheckboxRoot({
       state={indeterminate ? "indeterminate" : checked ? "checked" : "unchecked"}
       disabled={disabled}
       readOnly={readOnly}
+      busy={busy}
       required={inputRest.required}
       optional={optional}
       optionalLabel={labels.optional}
@@ -116,16 +131,22 @@ function CheckboxRoot({
             id={ids.controlId}
             type="checkbox"
             className={choiceInputClass}
-            disabled={disabled}
+            name={off.reachable ? undefined : inputRest.name}
+            required={off.reachable ? undefined : inputRest.required}
+            disabled={off.native}
+            aria-disabled={off.ariaDisabled}
             checked={checked}
             onChange={(event) => {
               // The click cleared the native mixed flag; the prop decides it.
               event.target.indeterminate = indeterminate;
               // A native checkbox ignores `readOnly`: the state stays, focus and the value submit.
-              if (!readOnly) setChecked(event.target.checked);
+              // While a change is saving, presses wait for its answer; a reachable disabled box
+              // takes none.
+              if (!readOnly && !busy && !disabled) toggle(event.target.checked);
             }}
             aria-invalid={ids.invalid || undefined}
             aria-readonly={readOnly || undefined}
+            aria-busy={busy || undefined}
             aria-describedby={ids.describedBy}
           />
           <span
@@ -145,6 +166,8 @@ function CheckboxRoot({
   );
 }
 CheckboxRoot.displayName = "Checkbox.Root";
+
+const takeNext = (_current: boolean, next: boolean) => next;
 
 export type CheckboxLabelProps = ChoiceLabelProps;
 

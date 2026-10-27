@@ -33,7 +33,7 @@
           :has(:is(input, textarea):focus-visible),
           :disabled,
           [data-disabled="true"],
-          :has(:is(input, textarea):disabled),
+          :has(:is(input, textarea):is(:disabled, [aria-disabled="true"])),
           [data-readonly="true"],
           :has(> input:read-only)
         )
@@ -67,7 +67,11 @@
   outline-color: var(--prime-color-danger-border);
 }
 
-.surface:is(:disabled, [data-disabled="true"], :has(:is(input, textarea):disabled)) {
+.surface:is(
+    :disabled,
+    [data-disabled="true"],
+    :has(:is(input, textarea):is(:disabled, [aria-disabled="true"]))
+  ) {
   background: var(--prime-color-field-bg-disabled);
   box-shadow: none;
   color: var(--prime-color-text-disabled);

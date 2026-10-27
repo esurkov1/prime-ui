@@ -6,6 +6,7 @@ import { Tooltip } from "@/components/tooltip/Tooltip";
 import { prefersReducedMotion } from "@/hooks/usePresence";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { NativeButton } from "@/internal/disabledContext";
 import { DRAG_HOLD_MS, DRAG_THRESHOLD_PX, useLongPress } from "@/internal/longPress";
 import { type MotionDurationToken, motionTiming } from "@/internal/motionTiming";
 import palette from "@/internal/palette.module.css";
@@ -394,9 +395,8 @@ export function GanttBarView({
         onOpenChange={(open) => setTipOpen(open && canShowTip(bar.id))}
       >
         <Tooltip.Trigger>
-          <button
+          <NativeButton
             ref={setNode}
-            type="button"
             tabIndex={active ? 0 : -1}
             className={cx(
               palette.hue,
@@ -489,7 +489,7 @@ export function GanttBarView({
                 <span className={styles.handle} data-handle="end" aria-hidden="true" />
               </>
             ) : null}
-          </button>
+          </NativeButton>
         </Tooltip.Trigger>
         {tipMounted ? (
           <Tooltip.Content>

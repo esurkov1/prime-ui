@@ -3,7 +3,7 @@
  * `--prime-color-layer-current`, the raised whisper on the page; deeper it is a flat step). No
  * border, no lines inside: zones are parted by air. Its metrics are the surface frame of its tier
  * (internal/surfaceFrame, xs · s · m · l · xl: padding 12 · 16 · 20 · 24 · 28, radius 12 · 12 · 16 ·
- * 16 · 16, zone gap 8 · 12 · 16 · 20 · 24, mark 32 · 40 · 48 · 56 · 64 — a switch row a step
+ * 16 · 16, zone gap 8 · 12 · 16 · 20 · 24, mark 32 · 32 · 40 · 48 · 56 — a switch row a step
  * smaller), its header the kit's header row (internal/headerRow).
  * The cover (`Card.Media`) stands edge to edge on top or as a column at the start.
  */

@@ -16,6 +16,7 @@ import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
@@ -483,7 +484,7 @@ function labelOf(children: React.ReactNode): React.ReactNode {
 
 function TabsItem({
   value,
-  disabled = false,
+  disabled: disabledProp = false,
   onRemove,
   children,
   className,
@@ -493,6 +494,7 @@ function TabsItem({
   ref,
   ...rest
 }: TabsItemProps) {
+  const disabled = useInheritedDisabled(disabledProp);
   const { activeValue, select, size, rootId, labels, panels } = useTabsContext();
   const collapse = React.useContext(CollapseContext);
   const [tooltipOpen, setTooltipOpen] = React.useState(false);
@@ -583,10 +585,16 @@ function TabsItem({
               state: isActive ? "active" : "inactive",
               disabled: disabled || undefined,
               "two-line": twoLine || undefined,
+              // The Tooltip around it keeps a disabled tab as it is: no host of its own.
+              "reachable-disabled": disabled || undefined,
             })}
-            disabled={disabled}
+            // `aria-disabled`, not native `disabled`: the tab stays the same element in the same
+            // place as `disabled` flips (the Tooltip around it would host a natively disabled one).
+            aria-disabled={disabled || undefined}
             className={cx(styles.tab, press.pressHost, className)}
-            onClick={() => select(value)}
+            onClick={() => {
+              if (!disabled) select(value);
+            }}
             onKeyDown={(event) => {
               onKeyDown?.(event);
               if (event.defaultPrevented || !removable) return;

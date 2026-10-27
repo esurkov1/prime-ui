@@ -331,50 +331,10 @@
 
 /* ─── The add tile (`trigger="tile"`) ─── */
 
-/* A drop slot, not a file: the dashed «put it here» line of Dnd's gap, no fill. */
+/* The cell's own hook for the selectors here; its look is the shared add tile
+   (`internal/addTile`, joined in TSX). */
 .add {
-  container-type: inline-size;
-  list-style: none;
-  border-radius: var(--prime-radius-l);
-}
-
-/* A small cell keeps the «+»; the word goes. */
-@container (width < 6rem) {
-  .addText {
-    display: none;
-  }
-}
-
-.addTarget {
-  box-sizing: border-box;
-  display: grid;
-  place-content: center;
-  justify-items: center;
-  align-items: center;
-  gap: var(--prime-space-1);
-  block-size: 100%;
-  padding: var(--prime-space-2);
-  border: var(--prime-border-width) dashed var(--prime-color-fill-strong);
-  border-radius: inherit;
-  color: var(--prime-color-text-muted);
-  text-align: center;
-  cursor: pointer;
-  transition:
-    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    border-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
-}
-
-.addTarget:has(input:focus-visible):not(:where([data-focus-ring="false"] *)) {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
-}
-
-@media (hover: hover) {
-  .addTarget:hover {
-    background: var(--prime-color-fill-subtle);
-  }
+  min-width: 0;
 }
 
 /* Files over the set: the add tile turns into the target. */
@@ -382,23 +342,6 @@
   border-color: var(--prime-color-accent-default);
   background: var(--prime-color-accent-soft);
   color: var(--prime-color-accent-text);
-}
-
-.addIcon {
-  --prime-icon-size: var(--prime-icon-xs);
-
-  display: grid;
-  place-items: center;
-  inline-size: var(--field-h);
-  block-size: var(--field-h);
-  border-radius: var(--prime-radius-m);
-  background: var(--prime-color-fill-muted);
-}
-
-/* Quiet text: the tile is an offer, not a heading — the caption role (textRole). */
-.addText {
-  margin-block-start: var(--prime-space-1);
-  font-weight: var(--prime-font-weight-medium);
 }
 
 /* An empty set: the add tile is the whole row, a drop zone. */

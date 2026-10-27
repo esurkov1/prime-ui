@@ -8,6 +8,7 @@ import { Forward } from "@/icons/glyphs/forward";
 import { cx } from "@/internal/cx";
 import { Disclosure } from "@/internal/Disclosure";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { NativeButton } from "@/internal/disabledContext";
 import { formatLabel } from "@/internal/formatLabel";
 import { HighlightMatch } from "@/internal/HighlightMatch";
 import { InteractiveElement } from "@/internal/interactiveElement";
@@ -640,8 +641,7 @@ function ReactionChip({ reaction, labels, pending, toggle }: ReactionChipProps) 
   const { emoji } = reaction;
   return (
     <span className={styles.chipSlot} data-morph-item="">
-      <button
-        type="button"
+      <NativeButton
         data-message-chip=""
         data-morph-pop=""
         data-reaction={emoji}
@@ -661,7 +661,7 @@ function ReactionChip({ reaction, labels, pending, toggle }: ReactionChipProps) 
           {emoji}
         </span>
         <ReactionTail reaction={reaction} />
-      </button>
+      </NativeButton>
     </span>
   );
 }

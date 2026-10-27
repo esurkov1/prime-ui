@@ -52,6 +52,7 @@ import {
   MediaViewer,
   Message,
   Modal,
+  NativeSelect,
   ScrollContainer,
   Select,
   Sheet,
@@ -241,6 +242,15 @@ const CASES: Case[] = [
     ),
   ],
   ["ScrollContainer", "DIV", (ref) => <ScrollContainer ref={ref} data-testid="part" />],
+  [
+    "NativeSelect",
+    "SELECT",
+    (ref) => (
+      <NativeSelect ref={ref} data-testid="part" aria-label="Язык">
+        <option value="ru">Русский</option>
+      </NativeSelect>
+    ),
+  ],
   [
     "Accordion.Content",
     "SECTION",

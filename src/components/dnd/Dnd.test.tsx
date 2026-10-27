@@ -4,7 +4,9 @@ import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { DRAG_HOLD_MS } from "@/internal/longPress";
+import press from "@/internal/press.module.css";
 import { RollingNumber } from "@/internal/RollingNumber";
+import { cssRule, cssValue } from "@/test/css";
 import { withMotion } from "@/test/motion";
 import { DND_CARRYING_ATTRIBUTE, Dnd, DndLock, moveBefore } from "./Dnd";
 import { insertionBefore } from "./geometry";
@@ -2301,5 +2303,172 @@ describe("drag state on the list", () => {
     expect(onClick).not.toHaveBeenCalled();
     fireEvent.click(screen.getByTestId("right-a"));
     expect(onClick).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("Dnd.AddButton", () => {
+  function WithAdd({
+    initial,
+    onAdd,
+    onReorder,
+    as,
+    axis,
+    label,
+    disabled,
+  }: {
+    initial: Row[];
+    onAdd?: () => void;
+    onReorder?: (id: string, before: string | null) => void;
+    as?: "ul" | "div";
+    axis?: "y" | "grid";
+    label?: string;
+    disabled?: boolean;
+  }) {
+    const [items, setItems] = React.useState(initial);
+    return (
+      <Dnd.Root>
+        <Dnd.Sortable
+          aria-label="list"
+          as={as ?? "ul"}
+          axis={axis ?? "y"}
+          items={items}
+          getId={(row) => row.id}
+          getLabel={(row) => `Row ${row.id}`}
+          onReorder={(id, before) => {
+            onReorder?.(id, before);
+            setItems((current) => moveBefore(current, id, before, (row) => row.id));
+          }}
+          renderItem={(row) => (
+            <Dnd.SortableItem id={row.id} data-testid={`row-${row.id}`}>
+              {row.id}
+            </Dnd.SortableItem>
+          )}
+        >
+          <Dnd.AddButton label={label} disabled={disabled} onClick={onAdd} />
+        </Dnd.Sortable>
+      </Dnd.Root>
+    );
+  }
+
+  it("is the last cell of the list, a named button that is no item", () => {
+    render(<WithAdd initial={rows("a", "b")} />);
+    const button = screen.getByRole("button", { name: "Добавить" });
+    expect(button).toHaveAttribute("type", "button");
+    expect(button).toHaveTextContent("Добавить");
+    const cell = button.parentElement as HTMLElement;
+    expect(cell.tagName).toBe("LI");
+    expect(cell).toHaveAttribute("data-dnd-add");
+    expect(cell).not.toHaveAttribute("data-dnd-item");
+    expect(screen.getByLabelText("list").lastElementChild).toBe(cell);
+    expect(order()).toEqual(["a", "b"]);
+  });
+
+  it("a `div` list takes a `div` cell; `label` sets the word and the name", () => {
+    render(<WithAdd initial={rows("a")} as="div" axis="grid" label="Модуль" />);
+    const button = screen.getByRole("button", { name: "Модуль" });
+    expect(button).toHaveTextContent("Модуль");
+    expect(button.parentElement?.tagName).toBe("DIV");
+  });
+
+  it("Tab reaches it after the items; Enter and Space press it", async () => {
+    const user = userEvent.setup();
+    const onAdd = vi.fn();
+    render(<WithAdd initial={rows("a", "b")} onAdd={onAdd} />);
+    await user.tab();
+    await user.tab();
+    expect(screen.getByTestId("row-b")).toHaveFocus();
+    await user.tab();
+    const button = screen.getByRole("button", { name: "Добавить" });
+    expect(button).toHaveFocus();
+    await user.keyboard("{Enter}");
+    await user.keyboard(" ");
+    expect(onAdd).toHaveBeenCalledTimes(2);
+  });
+
+  it("Alt+arrows on the last item never step past it", () => {
+    const onReorder = vi.fn();
+    render(<WithAdd initial={rows("a", "b")} onReorder={onReorder} />);
+    fireEvent.keyDown(screen.getByTestId("row-b"), { key: "ArrowDown", altKey: true });
+    expect(onReorder).not.toHaveBeenCalled();
+    const button = screen.getByRole("button", { name: "Добавить" });
+    expect(screen.getByLabelText("list").lastElementChild).toBe(button.parentElement);
+  });
+
+  it("a drag past the last item opens the gap in front of it and lands last", () => {
+    const onReorder = vi.fn();
+    render(<WithAdd initial={rows("a", "b", "c")} onReorder={onReorder} />);
+    pressOn(screen.getByTestId("row-a"), 10, 5);
+    moveTo(10, 100);
+    const cell = screen.getByRole("button", { name: "Добавить" }).parentElement;
+    expect(document.querySelector("[data-dnd-gap]")?.nextElementSibling).toBe(cell);
+    releaseAt(10, 100);
+    expect(onReorder).toHaveBeenCalledWith("a", null);
+    expect(order()).toEqual(["b", "c", "a"]);
+    expect(screen.getByLabelText("list").lastElementChild).toBe(cell);
+  });
+
+  it("a press on it never starts a drag", () => {
+    render(<WithAdd initial={rows("a", "b")} />);
+    pressOn(screen.getByRole("button", { name: "Добавить" }), 10, 5);
+    moveTo(10, 60);
+    expect(document.documentElement).not.toHaveAttribute("data-dnd-active");
+    releaseAt(10, 60);
+  });
+
+  it("`disabled` stops it and it gives under a press", async () => {
+    const user = userEvent.setup();
+    const onAdd = vi.fn();
+    render(<WithAdd initial={rows("a")} onAdd={onAdd} disabled />);
+    const button = screen.getByRole("button", { name: "Добавить" });
+    expect(button).toBeDisabled();
+    await user.click(button);
+    expect(onAdd).not.toHaveBeenCalled();
+    expect(button).toHaveClass(press.press);
+  });
+
+  it("in a grid every row is as tall as the tallest, so the tile matches its neighbours", () => {
+    const CSS = "src/components/dnd/Dnd.module.css";
+    expect(
+      cssValue(cssRule(CSS, ':where(.sortable[data-axis="grid"]:has(> .add))'), "grid-auto-rows"),
+    ).toBe("1fr");
+    expect(cssValue(cssRule(CSS, ".addButton"), "flex")).toBe("1 1 auto");
+  });
+
+  it("leaving while focused hands focus to the last item", async () => {
+    function Filling() {
+      const [items, setItems] = React.useState(rows("a"));
+      return (
+        <Dnd.Root>
+          <Dnd.Sortable
+            aria-label="list"
+            items={items}
+            getId={(row) => row.id}
+            onReorder={() => {}}
+            renderItem={(row) => (
+              <Dnd.SortableItem id={row.id} data-testid={`row-${row.id}`}>
+                {row.id}
+              </Dnd.SortableItem>
+            )}
+          >
+            {items.length < 2 ? (
+              <Dnd.AddButton onClick={() => setItems((current) => [...current, { id: "b" }])} />
+            ) : null}
+          </Dnd.Sortable>
+        </Dnd.Root>
+      );
+    }
+    const user = userEvent.setup();
+    render(<Filling />);
+    await user.tab();
+    await user.tab();
+    await user.keyboard("{Enter}");
+    expect(screen.queryByRole("button", { name: "Добавить" })).toBeNull();
+    await act(async () => {});
+    expect(screen.getByTestId("row-b")).toHaveFocus();
+  });
+
+  it("must stand inside a Dnd.Sortable", () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(() => render(<Dnd.AddButton />)).toThrow("Dnd.AddButton must be rendered inside");
   });
 });

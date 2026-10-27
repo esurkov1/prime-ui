@@ -16,7 +16,7 @@ import { Paperclip } from "@/icons/glyphs/paperclip";
 import { Plus } from "@/icons/glyphs/plus";
 import { RefreshCw } from "@/icons/glyphs/refresh-cw";
 import { Trash2 } from "@/icons/glyphs/trash-2";
-
+import addTileStyles from "@/internal/addTile.module.css";
 import {
   AttachmentStripScroller,
   AttachmentTile,
@@ -1399,16 +1399,16 @@ function FileUploadField({
   const addTile = canAdd ? (
     <li
       ref={addTileRef}
-      className={cx(styles.add, addPresence.className)}
+      className={cx(addTileStyles.cell, styles.add, addPresence.className)}
       data-empty={empty || undefined}
     >
       {/* biome-ignore lint/a11y/noLabelWithoutControl: the file input (`input`) is its first child */}
-      <label className={styles.addTarget}>
+      <label className={cx(addTileStyles.target, styles.addTarget)}>
         {input}
-        <span className={cx(fieldTierClass, styles.addIcon)} data-size="xs" aria-hidden="true">
+        <span className={cx(fieldTierClass, addTileStyles.icon)} data-size="xs" aria-hidden="true">
           <Plus />
         </span>
-        <span className={cx(textRole.caption, styles.addText)}>
+        <span className={cx(textRole.caption, addTileStyles.text, styles.addText)}>
           <MorphText>{empty ? labels.empty : labels.add}</MorphText>
         </span>
       </label>

@@ -11,6 +11,7 @@ import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useResizeEffect } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { readCssLengthPx } from "@/hooks/usePosition";
 import { usePresence } from "@/hooks/usePresence";
 import { ChevronLeft } from "@/icons/glyphs/chevron-left";
 import { ChevronRight } from "@/icons/glyphs/chevron-right";
@@ -40,6 +41,7 @@ import { tierMappings } from "@/internal/states";
 import { stickySurfaceClass } from "@/internal/sticky";
 import { ToolChips, ToolRow } from "@/internal/ToolRow";
 import textRole from "@/internal/textRole.module.css";
+import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
 import { useAppShellNav } from "@/layout/app-shell/AppShell";
 
 import styles from "./Page.module.css";
@@ -246,10 +248,35 @@ const px = (value: string) => Number.parseFloat(value) || 0;
 const widthOf = (node: Element | null) =>
   node ? Math.ceil(node.getBoundingClientRect().width) : 0;
 
+type WidthGlide = Animation & {
+  transitionProperty?: string;
+  effect: (AnimationEffect & { target?: Element | null; getKeyframes?: () => Keyframe[] }) | null;
+};
+
+/**
+ * The width an action settles at. A label that changes in place glides its width from the old
+ * label to the new one (a `width` transition in the action); a read during the glide counts where
+ * it lands, so a re-render mid-change never plans from the transient width.
+ */
+function settledWidthOf(item: HTMLElement): number {
+  let width = item.getBoundingClientRect().width;
+  const animations = (item.getAnimations?.({ subtree: true }) ?? []) as WidthGlide[];
+  for (const animation of animations) {
+    if (animation.transitionProperty !== "width") continue;
+    const target = animation.effect?.target;
+    const end = animation.effect?.getKeyframes?.().at(-1)?.width;
+    if (!target || typeof end !== "string") continue;
+    width += px(end) - target.getBoundingClientRect().width;
+  }
+  return Math.ceil(width);
+}
+
 /**
  * The natural widths of the bar's groups. The row is switched to its measuring layout for the
  * read — every group at its natural width on one line, every action whole and labelled — and
- * back, inside one layout effect, so the measuring layout is never painted.
+ * back, inside one layout effect, so the measuring layout is never painted. The heading counts
+ * its title line only (or the echoed title): the description truncates in the room the line
+ * leaves, so its data never moves the plan.
  */
 function measureBar(row: HTMLElement): BarWidths {
   const gap = px(getComputedStyle(row).columnGap);
@@ -271,18 +298,23 @@ function measureBar(row: HTMLElement): BarWidths {
     actionsNode?.querySelectorAll<HTMLElement>(`:scope > .${styles.actionItem}[data-role]`) ?? [],
   );
   const square = Math.max(0, ...items.map((item) => item.offsetHeight));
+  const heading = row.querySelector<HTMLElement>(`:scope > .${styles.heading}`);
   const widths: BarWidths = {
-    heading: widthOf(row.querySelector(`:scope > .${styles.heading}`)),
-    path: row.querySelector(`:scope > .${styles.heading} .${styles.path}`) !== null,
+    heading: Math.max(
+      widthOf(heading?.querySelector(`:scope > .${styles.headingLine}`) ?? null),
+      widthOf(heading?.querySelector(`:scope > .${styles.echo} > .${styles.barTitle}`) ?? null),
+    ),
+    path: heading?.querySelector(`.${styles.path}`) != null,
     tools: widthOf(tools),
     actions: items.map((item) => ({
       role: item.dataset.role as BarAction["role"],
-      full: widthOf(item),
+      full: settledWidthOf(item),
       icon: item.dataset.iconable === "true" ? square : null,
     })),
     more: square,
     gap,
     actionGap: actionsNode ? px(getComputedStyle(actionsNode).columnGap) : 0,
+    margin: readCssLengthPx("--prime-space-6", TOKEN_DEFAULTS["--prime-space-6"], row) * 2,
   };
 
   for (const node of iconed) node.setAttribute("data-button-label", "icon");
@@ -295,7 +327,8 @@ function measureBar(row: HTMLElement): BarWidths {
 /**
  * The bar's plan: measured at natural widths after every render (a changed heading, tool or
  * action re-measures), re-chosen from those widths alone when the bar resizes, and re-measured
- * once web fonts load.
+ * once web fonts load. Each choice starts from the plan the bar has, so it holds within the
+ * plan's margin (`planBar`).
  */
 function useBarPlan(
   rowRef: React.RefObject<HTMLDivElement | null>,
@@ -304,11 +337,13 @@ function useBarPlan(
   const [plan, setPlan] = React.useState<BarPlan>("one");
   const [stacked, setStacked] = React.useState(false);
   const widths = React.useRef<BarWidths | null>(null);
+  const planned = React.useRef<BarPlan | undefined>(undefined);
 
   const decide = React.useCallback(() => {
     const rows = rowsRef.current;
     if (!widths.current || !rows) return;
-    const next = planBar(widths.current, rows.clientWidth);
+    const next = planBar(widths.current, rows.clientWidth, planned.current);
+    planned.current = next;
     setPlan((current) => (current === next ? current : next));
     setStacked(stackHeading(widths.current, rows.clientWidth, next));
   }, [rowsRef]);

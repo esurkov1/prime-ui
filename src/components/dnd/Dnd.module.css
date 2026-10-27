@@ -237,6 +237,39 @@ th.draggable[data-lifted] > * {
   height: auto;
 }
 
+/* The add tile (`Dnd.AddButton`): a cell after the items whose button fills it (the look is
+   `internal/addTile`). In a grid every row takes the height of the tallest, so the tile alone in
+   the last row is as tall as the cells above it; zero specificity, a host's own rows win. */
+:where(.sortable[data-axis="grid"]:has(> .add)) {
+  grid-auto-rows: 1fr;
+}
+
+.add {
+  display: flex;
+}
+
+.addButton {
+  flex: 1 1 auto;
+}
+
+/* In a row the tile is as wide as its content: no size container (it would measure it as 0). */
+.sortable[data-axis="x"] > .add {
+  flex: none;
+  container-type: normal;
+}
+
+/* In a column the tile is a row: the «+» before the word, as tall as a control row. */
+.sortable[data-axis="y"] > .add > .addButton {
+  grid-auto-flow: column;
+  justify-content: start;
+  min-block-size: calc(var(--prime-control-m-height) + var(--prime-space-3) * 2);
+  padding: var(--prime-space-3);
+}
+
+.sortable[data-axis="y"] > .add .addText {
+  margin-block-start: 0;
+}
+
 /* The grip is a ghost icon-only Button; it only says "hold me" with the cursor. Touch keeps
    `manipulation`: a touch drag waits out a hold, so the list still scrolls. */
 .handle[data-size] {

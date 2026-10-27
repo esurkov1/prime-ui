@@ -44,6 +44,12 @@ export const page: ComponentPageConfig = {
         "Только кружок на плитках тарифов: `selected` на карточке отмечает её кнопку, а кружок лишь показывает это — `Card.Indicator`, `selected`.",
     },
     {
+      scenario: "saving",
+      title: "Сохранение на сервере",
+      description:
+        "Настройка применяется на сервере сразу: выбранный вариант стоит, пока идёт сохранение, а отказ сервера возвращает прежний и объясняет причину — `onValueChange`, `error`.",
+    },
+    {
       slot: "controlled",
       description:
         "Выбранным тарифом владеет родитель и показывает его в подсказке — `value`, `onValueChange`.",

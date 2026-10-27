@@ -95,6 +95,11 @@ import { applyTheme } from "prime-ui-kit";
 applyTheme("light"); // sets data-theme on <html>; "dark" for the dark theme
 ```
 
+`fonts.css` loads the faces from Google Fonts, so an app that runs offline or under a strict CSP (a
+desktop app with `default-src 'self'`, a device's panel) leaves it out and self-hosts them —
+`@fontsource/golos-text` (400, 500, 600) and `@fontsource/jetbrains-mono` (400, 500), which the
+token stacks pick up by name — or keeps the system font.
+
 Wrap the app in `NotificationProvider` if it shows toasts. Styles, `applyTheme`, `NotificationProvider`
 and `AppShell` belong to the app root, once. A screen component you deliver renders its page — one
 `Page.Root` with its `Page.TopBar` and its `Page.Body` — and assumes the root exists. If the project has no app
@@ -110,7 +115,10 @@ frontend runs:
   measured in megabytes): one small single-page app on Vite, the system font (no `fonts.css`), no
   router package when two or three tabs do, no `prime-ui-kit/color-picker`; compress the output
   (`.gz` or `.br` beside each file) and serve it with `Content-Encoding`; keep the asset count low
-  (no code splitting) when the device's web server handles few connections.
+  (no code splitting) when the device's web server handles few connections. Set a gzip budget from
+  the free flash and read it on every build (Vite prints the gzip sizes): React itself is about
+  60 KB of it, and the heavy kit parts are DataTable, Gantt, Kanban, Chat, MediaViewer, Datepicker
+  and the color picker — a settings screen of fields, switches and cards needs none of them.
 - **An app or a site**: the framework's own build as is — code-split by route (`React.lazy` or the
   router's lazy routes), so a page loads only its components; heavy optional parts (`color-picker`,
   charts, the chat) load on the routes that use them.

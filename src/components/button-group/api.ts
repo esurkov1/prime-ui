@@ -52,8 +52,20 @@ export const api: ComponentApi = {
         {
           name: "pressed",
           type: "boolean",
-          en: 'Toggle state: `aria-pressed` and `data-state="active" | "inactive"`. Leave it out for a plain action segment.',
-          ru: 'Состояние переключателя: `aria-pressed` и `data-state="active" | "inactive"`. Не задавайте для обычного действия.',
+          en: 'Toggle state (controlled): `aria-pressed` and `data-state="active" | "inactive"`. Leave the whole triad out for a plain action segment.',
+          ru: 'Состояние переключателя (управляемый режим): `aria-pressed` и `data-state="active" | "inactive"`. Для обычного действия не задавайте ни одного свойства тройки.',
+        },
+        {
+          name: "defaultPressed",
+          type: "boolean",
+          en: "The initial state of an uncontrolled toggle segment; a press flips it.",
+          ru: "Начальное состояние неуправляемого сегмента-переключателя; нажатие меняет его.",
+        },
+        {
+          name: "onPressedChange",
+          type: "(pressed: boolean) => void | Promise<void>",
+          en: "The new state on a press (after `onClick`). A promise: the state shows at once, the segment is `aria-busy`, presses wait; a controlled owner sets `pressed` before resolving; reject turns it back.",
+          ru: "Новое состояние при нажатии (после `onClick`). Промис: состояние встаёт сразу, сегмент — `aria-busy`, нажатия ждут; управляемый владелец ставит `pressed` до resolve; reject возвращает прежнее.",
         },
         {
           name: "disabled",
@@ -120,12 +132,16 @@ export const api: ComponentApi = {
         ru: 'Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid="true"`, `required` — `aria-required="true"`.',
       },
       {
-        en: "Toggle segments expose `aria-pressed`; in a toggle set pass `pressed={false}` to the inactive ones.",
-        ru: "Сегменты-переключатели объявляют `aria-pressed`; в наборе переключателей передайте `pressed={false}` остальным.",
+        en: "Toggle segments expose `aria-pressed`; in a toggle set pass `pressed={false}` to the inactive ones. While an `onPressedChange` promise is pending the segment is `aria-busy`.",
+        ru: "Сегменты-переключатели объявляют `aria-pressed`; в наборе переключателей передайте `pressed={false}` остальным. Пока сохраняется промис из `onPressedChange`, сегмент — `aria-busy`.",
       },
       {
         en: "Icon-only segments need `aria-label`; `ButtonGroup.Icon` is `aria-hidden`.",
         ru: "Сегменту только с иконкой нужен `aria-label`; `ButtonGroup.Icon` скрыт (`aria-hidden`).",
+      },
+      {
+        en: 'Under a `Tooltip.Trigger` a disabled `ButtonGroup.Item` is `aria-disabled="true"` with no native `disabled`: it keeps its tab stop and its node, the press and a form submit are blocked.',
+        ru: 'В `Tooltip.Trigger` выключенный `ButtonGroup.Item` — `aria-disabled="true"` без нативного `disabled`: остаётся точкой Tab и тем же узлом, нажатие и отправка формы заблокированы.',
       },
     ],
   },

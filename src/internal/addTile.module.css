@@ -1,0 +1,84 @@
+/*
+ * The add tile: the last cell of a set that offers a new member (FileUpload `trigger="tile"`,
+ * `Dnd.AddButton`). A slot, not a member: the dashed «put it here» line of Dnd's gap, no fill;
+ * a «+» on a small muted tile and a quiet word under it. Joined in TSX:
+ *
+ *   .cell    the cell in the set's grid or row (a size container, the radius)
+ *   .target  what is pressed: a `<button>`, or a `<label>` around a file input — the line, the
+ *            hover fill, the focus ring (its own, or its input's)
+ *   .icon    the «+» box (with `fieldTierClass` + `data-size="xs"`)
+ *   .text    the word (with `textRole.caption`); a cell under 6rem keeps only the «+»
+ */
+
+.cell {
+  container-type: inline-size;
+  min-width: 0;
+  list-style: none;
+  border-radius: var(--prime-radius-l);
+}
+
+.target {
+  box-sizing: border-box;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  align-items: center;
+  gap: var(--prime-space-1);
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  padding: var(--prime-space-2);
+  border: var(--prime-border-width) dashed var(--prime-color-fill-strong);
+  border-radius: inherit;
+  background: none;
+  color: var(--prime-color-text-muted);
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    border-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.target:is(:focus-visible, :has(input:focus-visible)):not(:where([data-focus-ring="false"] *)) {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.target:disabled {
+  opacity: var(--prime-opacity-disabled);
+  cursor: not-allowed;
+}
+
+@media (hover: hover) {
+  .target:hover:where(:not(:disabled, [aria-disabled="true"])) {
+    background: var(--prime-color-fill-subtle);
+  }
+}
+
+.icon {
+  --prime-icon-size: var(--prime-icon-xs);
+
+  display: grid;
+  place-items: center;
+  inline-size: var(--field-h);
+  block-size: var(--field-h);
+  border-radius: var(--prime-radius-m);
+  background: var(--prime-color-fill-muted);
+}
+
+/* Quiet text: the tile is an offer, not a heading. */
+.text {
+  margin-block-start: var(--prime-space-1);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+/* A small cell keeps the «+»; the word goes. */
+@container (width < 6rem) {
+  .text {
+    display: none;
+  }
+}

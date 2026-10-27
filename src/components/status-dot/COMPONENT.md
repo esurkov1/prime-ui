@@ -53,10 +53,11 @@ StatusDot has one look: a dot half the height of the text (`0.5em`) before the w
 | State | Driven by | DOM |
 |---|---|---|
 | tone | `tone` | `data-tone` |
+| marker | always | `data-status-dot` on the root: a description line finds the dot by it |
 
 ## Layout & spacing
 - Inline-flex on one line, never wraps or shrinks below its text; the dot is centred on the line and scales with the type, 6px from the word.
-- In a [Card](../card/COMPONENT.md) description put it first; the card inserts a «·» after it.
+- In a [Card](../card/COMPONENT.md) description put it first; the card inserts a «·» after it. Your own component that renders the `StatusDot` first works the same; the dot is found by its `data-status-dot`.
 
 ## Accessibility
 

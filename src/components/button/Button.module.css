@@ -391,8 +391,10 @@
   --btn-bg: color-mix(in srgb, currentColor var(--prime-tint-soft), transparent);
 }
 
-/* asChild: non-button hosts cannot be natively disabled. */
-.root[aria-disabled="true"] {
+/* asChild: non-button hosts cannot be natively disabled. A `<button>` with `aria-disabled` (a
+   disabled one under a tooltip's trigger) keeps its pointer events: hover opens the tooltip, the
+   button itself blocks the press. */
+.root[aria-disabled="true"]:not(button) {
   pointer-events: none;
 }
 

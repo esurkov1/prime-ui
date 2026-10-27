@@ -5,8 +5,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Badge.Root",
-      en: "`ref` → `HTMLSpanElement`. The chip: a read-only badge is one `<span>`, the `pressed` triad makes the body a toggle `<button>`, `onRemove` adds a remove segment; inside a `Dropdown.Trigger` the body is the opener with a chevron.",
-      ru: "Чип: без действий — один `<span>`, триада `pressed` делает тело переключателем `<button>`, `onRemove` добавляет сегмент удаления; внутри `Dropdown.Trigger` тело — кнопка-открывашка с шевроном.",
+      en: "`ref` → `HTMLSpanElement`. The chip: a read-only badge is one `<span>`, the `pressed` triad makes the body a toggle `<button>`, `onRemove` adds a remove segment; inside a `Dropdown.Trigger` or `Popover.Trigger` the body is the opener with a chevron and keeps its tone.",
+      ru: "Чип: без действий — один `<span>`, триада `pressed` делает тело переключателем `<button>`, `onRemove` добавляет сегмент удаления; внутри `Dropdown.Trigger` или `Popover.Trigger` тело — открывашка с шевроном, тон сохраняется.",
       props: [
         {
           name: "color",
@@ -58,8 +58,8 @@ export const api: ComponentApi = {
           name: "loading",
           type: "boolean",
           default: "false",
-          en: "The badge waits on a request (a value its owner is still creating): dimmed, `aria-busy`, a spinner in the remove segment, which takes no press. A promise from `onRemove` does the same on its own.",
-          ru: "Бейдж ждёт запроса (значение, которое владелец ещё создаёт): приглушён, `aria-busy`, спиннер в сегменте удаления, нажатие не действует. Промис из `onRemove` делает то же сам.",
+          en: "The badge waits on a request (a value its owner is still creating): dimmed, `aria-busy`, a spinner in the remove segment, no press. A promise from `onRemove` or `onPressedChange` does the same.",
+          ru: "Бейдж ждёт запроса (значение, которое владелец ещё создаёт): приглушён, `aria-busy`, спиннер в сегменте удаления, нажатия не действуют. Промис из `onRemove` или `onPressedChange` делает то же.",
         },
         {
           name: "pressed",
@@ -75,9 +75,9 @@ export const api: ComponentApi = {
         },
         {
           name: "onPressedChange",
-          type: "(pressed: boolean) => void",
-          en: "Fires with the new state when the toggle chip is pressed.",
-          ru: "Вызывается с новым состоянием при нажатии чипа-переключателя.",
+          type: "(pressed: boolean) => void | Promise<void>",
+          en: "The new state on a press. A promise: the state shows at once, the chip waits dimmed (`aria-busy`); a controlled owner sets `pressed` before resolving; reject turns it back.",
+          ru: "Новое состояние при нажатии. Промис: состояние встаёт сразу, чип ждёт приглушённым (`aria-busy`); управляемый владелец ставит `pressed` до resolve; reject возвращает прежнее.",
         },
         {
           name: "disabled",
@@ -119,9 +119,12 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          defaultNote: { en: "the host tier, one step down", ru: "ярус контейнера на шаг ниже" },
-          en: "Tier of every badge in the group; a badge's own `size` wins. Small tiers stand closer.",
-          ru: "Ярус всех бейджей группы; собственный `size` бейджа важнее. Малые ярусы стоят теснее.",
+          defaultNote: {
+            en: "the tier of a lone badge",
+            ru: "ярус одиночного бейджа",
+          },
+          en: "Tier of every badge; a badge's own `size` wins. Without it a lone badge's tier: in a control one step down, on a sized surface (`Card.Root`) its tier, else `m`. Small tiers stand closer.",
+          ru: "Ярус всех бейджей; собственный `size` бейджа важнее. Без него — как у одиночного: в контроле на ступень ниже, на поверхности с ярусом (`Card.Root`) — её ярус, иначе `m`. Малые стоят теснее.",
         },
         {
           name: "overflow",

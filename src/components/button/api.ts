@@ -216,8 +216,8 @@ export const api: ComponentApi = {
       },
       {
         keys: "Tab",
-        en: "Moves focus; a disabled button is skipped, the `asChild` child too (`tabIndex=-1`, `aria-disabled`).",
-        ru: "Переводит фокус; неактивная кнопка пропускается, ребёнок `asChild` тоже (`tabIndex=-1`, `aria-disabled`).",
+        en: "Moves focus; a disabled button is skipped, the `asChild` child too (`tabIndex=-1`, `aria-disabled`); under a `Tooltip.Trigger` a disabled button stays a tab stop (`aria-disabled`) so its tooltip is reachable.",
+        ru: "Переводит фокус; неактивная кнопка пропускается, ребёнок `asChild` тоже (`tabIndex=-1`, `aria-disabled`); в `Tooltip.Trigger` неактивная кнопка остаётся точкой Tab (`aria-disabled`), чтобы подсказка была доступна.",
       },
     ],
     aria: [
@@ -244,6 +244,10 @@ export const api: ComponentApi = {
       {
         en: "`holdToConfirm` describes the gesture through `aria-describedby` (`labels.holdHint`); `Space` / `Enter` hold like a pointer.",
         ru: "`holdToConfirm` описывает жест через `aria-describedby` (`labels.holdHint`); `Space` / `Enter` удерживаются как указатель.",
+      },
+      {
+        en: 'A disabled button under a `Tooltip.Trigger` is `aria-disabled="true"` with no native `disabled`: it keeps its tab stop and hover, the press and a form submit are blocked.',
+        ru: 'Неактивная кнопка в `Tooltip.Trigger` — `aria-disabled="true"` без нативного `disabled`: остаётся точкой Tab и получает наведение, нажатие и отправка формы заблокированы.',
       },
       {
         en: "A changed label is announced once: the animated letters are hidden, the name is the new text.",

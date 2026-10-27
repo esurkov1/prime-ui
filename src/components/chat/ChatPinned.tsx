@@ -5,6 +5,7 @@ import { Pin } from "@/icons/glyphs/pin";
 import { X } from "@/icons/glyphs/x";
 
 import { cx } from "@/internal/cx";
+import { NativeButton } from "@/internal/disabledContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
@@ -98,8 +99,7 @@ export function ChatPinned({
   return (
     <SurfaceDepthProvider value={depth}>
       <div {...rest} className={cx(styles.root, chatStyles.pinned, className)} data-depth={depth}>
-        <button
-          type="button"
+        <NativeButton
           className={cx(touchTargetBlockClass, styles.main, press.press)}
           onClick={() => {
             jump(current.value);
@@ -133,7 +133,7 @@ export function ChatPinned({
               {current.text}
             </span>
           </span>
-        </button>
+        </NativeButton>
         {onRemove ? (
           <Button.Root
             variant="ghost"

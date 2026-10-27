@@ -51,9 +51,11 @@ A layout inside a page needs no breakpoint: it takes its columns from the room i
   `Page.Cell span` per tile: it folds by its own width (below 30rem every tile takes the row,
   then small tiles pair up, from 64rem each its span). Write a wide tile (`span` 7–11) next to a
   narrow one (4–5): between 40 and 64rem the two pair up as 2/3 + 1/3, so an 8 + 4 row keeps no hole.
-- A grid inside one block (thumbnails, short fields of one record) is the block's own
+- A grid of tiles inside one block (thumbnails, files) is the block's own
   `grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--prime-layout-tile-min-width)), 1fr))`
   — `auto-fill`, so a lone item keeps its column width instead of stretching across the row.
+  Fields are no tiles: they stand two to a row at most in `Fieldset layout="pair"`
+  ([forms](composition.md#7-forms)).
 - A main column with a side column: flex-wrap with a large `flex-grow` on the main one; the side one
   drops below when the main one runs out of room.
 
@@ -233,6 +235,42 @@ export function DealsPage() {
   </Tabs.List>
 </Tabs.Root>
 ```
+- **A group fits its column by meaning, not by scrolling.** Scrolling saves a phone; it is no
+  layout. A `ButtonGroup` or a `SegmentedControl` with more segments than its column shows at its
+  usual width (six toggles in a side card of 18rem) is split by meaning into groups that fit (two
+  of two or three: the image's flips, its rotation), or its options become a `Select` when they are
+  one choice of many.
+
+```tsx partial
+// bad — six toggles in one group of a narrow card: the row scrolls, half of it out of sight
+<ButtonGroup.Root aria-label="Изображение">
+  <ButtonGroup.Item>…</ButtonGroup.Item>
+  {/* five more */}
+</ButtonGroup.Root>
+```
+
+```tsx good
+// good — two groups by meaning, each fits the column
+<>
+  <ButtonGroup.Root aria-label="Отражение">
+    <ButtonGroup.Item aria-label="Отразить по горизонтали" defaultPressed={false}>
+      <ButtonGroup.Icon>
+        <Icon name="action.flipHorizontal" />
+      </ButtonGroup.Icon>
+    </ButtonGroup.Item>
+    <ButtonGroup.Item aria-label="Отразить по вертикали" defaultPressed={false}>
+      <ButtonGroup.Icon>
+        <Icon name="action.flipVertical" />
+      </ButtonGroup.Icon>
+    </ButtonGroup.Item>
+  </ButtonGroup.Root>
+  <ButtonGroup.Root aria-label="Поворот">
+    <ButtonGroup.Item aria-label="Повернуть влево">−90°</ButtonGroup.Item>
+    <ButtonGroup.Item aria-label="Повернуть вправо">+90°</ButtonGroup.Item>
+  </ButtonGroup.Root>
+</>
+```
+
 - Your duty as its host: give the switcher a bounded width. A flex or grid child that holds one sets
   `min-width: 0`, otherwise the switcher grows the row instead of scrolling
   ([foundation §9](../docs/foundation.md#9-layout-and-responsiveness)).
@@ -257,8 +295,9 @@ by breakpoint is not. Never ask to rotate the phone.
 **Card grids.** [Intrinsic grids](#intrinsic-grids), never a breakpoint. Tiles of a row share one
 height; a card with a list shows up to 6 rows and scrolls inside (`ScrollContainer`); a card's photo is a `Card.Media` `Carousel` of one `ratio` per grid.
 
-**Forms.** One column on phones. Pairs («от / до», two buttons) wrap with
-`flex: 1 1 calc(var(--prime-space-24) * 2)` instead of shrinking. Labels above fields (the kit's
+**Forms.** One column on phones: a pair of fields («от / до») in `Fieldset layout="pair"` stacks by
+the group's own width; two buttons of your own wrap with `flex: 1 1 calc(var(--prime-space-24) * 2)`
+instead of shrinking. Labels above fields (the kit's
 `label` prop), never inside next to the value. Right `type`, `inputMode` and `autoComplete` on every
 `Input.Field`.
 

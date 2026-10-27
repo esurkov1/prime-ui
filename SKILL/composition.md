@@ -15,7 +15,7 @@ playground page. What each screen teaches is in [Screen rules](#screen-rules) at
 |---|---|---|---|
 | [List page](#list-page) | data-table | [screen.tsx](../src/components/data-table/examples/screen.tsx) | the title, a line of figures, export and one primary action in the page's top bar; its SmartFilter search and filters and «Вид» in `Page.Tools`, the chips in `Page.Chips`, the table without a toolbar; statuses, pages, filtered empty state |
 | [Detail page](#detail-page) | description-list | [screen.tsx](../src/components/description-list/examples/screen.tsx) | a nested record: the path ending in the title, status and due date and the record's actions by weight in the top bar; main column + side column of Cards, Timeline |
-| [Settings page](#settings-page) | page | [screen.tsx](../src/layout/page/examples/screen.tsx) | the path in a collapsing top bar, the large title in the flow, a card with its own header per section, form with its own save, Switches that apply at once, danger zone with a confirm |
+| [Settings page](#settings-page) | page | [screen.tsx](../src/layout/page/examples/screen.tsx) | the path in a collapsing top bar, the large title in the flow, a card with its own header per section, form with its own save and a pair of fields, Switches that apply at once, danger zone with a confirm |
 | [Form in a Drawer](#form-in-a-drawer) | drawer | [screen.tsx](../src/components/drawer/examples/screen.tsx) | the title, counts and the Drawer trigger in the top bar, the search in `Page.Tools`; Drawer form: groups, errors on submit, focus on the first invalid field, loading, toast |
 | [Record editor](#record-editor) | field-list | [screen.tsx](../src/components/field-list/examples/screen.tsx) | a document page (a long form): the title and a line of description in `Page.Heading`, «Сохранить тариф» in `Page.Actions`, both in a `Page.Header` in the flow; a plan card edited in card sections: name and description, specs in a `FieldList` (icon-only `Select` and `ColorPresets` in compact columns, pinned rows, reorder), the price and its changes by month in one list with the base row pinned, a setup fee in three currencies in one row under one heading, save with «Сохранено» on the button |
 | [Dashboard](#dashboard) | card | [screen.tsx](../src/components/card/examples/screen.tsx) | an overview titled in its `Page.TopBar`: the title + a line of data, the period switch and the report; KPI row that cross-fades to the new period, a Sparkline revenue trend, invoiced vs paid in a ChartFrame, panels with progress and a split, short table + link to the list |
@@ -420,6 +420,69 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
   The controls in the header and footer of a surface take the surface's own letter. A sized kit host ([the host tier](api-contract.md#size-and-the-host-tier))
   sizes the kit controls inside it itself.
 
+### Many of a kind start small
+
+What a screen holds many of — modules, sensors, ports, slots, tags, the metrics of each device —
+starts at the smallest size that still reads, because the set, not one item, is what the person
+looks at: six modules fit one row, not two. The criteria:
+
+- **One tier for the set**: `ControlSizeProvider value="xs"` around the region of tiles, so the
+  tiles and their buttons take it — never `size="xs"` written on every button.
+- **The number is the name**: a tile's number is its title, at most `title-m`, never a display
+  figure; a word that only repeats the order («Место 3») is for screen readers (`VisuallyHidden`).
+- **Short readings are chips**: a value that names itself with its unit («42 °C», «12,1 В»,
+  «60 к/с») is a `Badge.Root` in one `Badge.Group` row; a fact that needs its label to read
+  («Источник — Студия 2») is a `DescriptionList` row. Never four `DescriptionList` lines or a row of
+  `Kpi` for the readings of one item.
+
+```tsx partial
+// bad — «Место N» over a large number, xs on every button, the readings as lines of pairs
+<Card.Root>
+  <Typography variant="caption">Место 3</Typography>
+  <Typography variant="display-m">3</Typography>
+  <Button.Root size="xs">…</Button.Root>
+  <DescriptionList.Root>
+    <DescriptionList.Item label="Температура">42 °C</DescriptionList.Item>
+    <DescriptionList.Item label="Напряжение">12,1 В</DescriptionList.Item>
+  </DescriptionList.Root>
+</Card.Root>
+```
+
+```tsx good
+// declare: const modules: { id: string; slot: number; temperature: string; voltage: string }[]
+// good — one tier for the set, the number as the title, the readings as one row of chips
+<ControlSizeProvider value="xs">
+  {modules.map((item) => (
+    <Card.Root key={item.id}>
+      <Card.Header>
+        <Card.Title>
+          <VisuallyHidden>Место </VisuallyHidden>
+          {item.slot}
+        </Card.Title>
+        <Card.Actions>
+          <Tooltip.Root>
+            <Tooltip.Trigger>
+              <Button.Root variant="soft" tone="neutral" aria-label={`Настроить место ${item.slot}`}>
+                <Button.Icon>
+                  <Icon name="action.settings" />
+                </Button.Icon>
+              </Button.Root>
+            </Tooltip.Trigger>
+            <Tooltip.Content>Настроить</Tooltip.Content>
+          </Tooltip.Root>
+        </Card.Actions>
+      </Card.Header>
+      <Card.Body>
+        <Badge.Group>
+          <Badge.Root>{item.temperature}</Badge.Root>
+          <Badge.Root>{item.voltage}</Badge.Root>
+        </Badge.Group>
+      </Card.Body>
+    </Card.Root>
+  ))}
+</ControlSizeProvider>
+```
+
 ## 6. Actions
 
 - **One primary per area** (the page, card, dialog, form): `solid`, last in its row.
@@ -503,6 +566,73 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
   confirm is a `ConfirmDialog` (its `onConfirm` returns the request's Promise).
 - Going somewhere is a link (`LinkButton`, `Button.Root asChild` + `<a>`), doing something is a Button.
   One action — one label on the whole screen.
+
+### An action stands with what it acts on
+
+Ask of every button what it changes, and put it in that thing's place — the same place on every
+card of the app:
+
+- **The whole page** → `Page.Actions`: create a record, export the list, save a document page.
+  A button that acts on one block («Найти сети» for the networks card) is never the page's.
+- **A card's applying actions** («Сохранить», «Перезагрузить», «Обновить прошивку») →
+  `Card.Actions` of its `Card.Footer`, at the end edge, the primary last — never in `Card.Body`,
+  never at the start of a row.
+- **A helper of one block** (find, refresh, «⋯» with the block's rare actions) → `Card.Actions` of
+  its `Card.Header`, at the header's end.
+- **Unrelated groups are two cards.** A card whose actions fall into groups that act on different
+  things (restart the device; reset the network) splits into a card per group, each with its own
+  footer.
+
+```tsx partial
+// bad — the card's scan in the page's bar, the card's buttons at the start of its body
+<Page.Actions>
+  <Button.Root variant="soft" tone="neutral">Найти сети</Button.Root>
+</Page.Actions>
+<Card.Root>
+  <Card.Header>
+    <Card.Title as="h2">Обслуживание</Card.Title>
+  </Card.Header>
+  <Card.Body>
+    <Button.Root variant="soft" tone="neutral">Перезагрузить</Button.Root>
+  </Card.Body>
+</Card.Root>
+```
+
+```tsx good
+// good — the scan is the networks card's helper in its header, the apply action ends its footer
+<>
+  <Card.Root>
+    <Card.Header>
+      <Card.Title as="h2">Wi-Fi</Card.Title>
+      <Card.Actions>
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            <Button.Root variant="soft" tone="neutral" aria-label="Найти сети">
+              <Button.Icon>
+                <Icon name="action.refresh" />
+              </Button.Icon>
+            </Button.Root>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Найти сети</Tooltip.Content>
+        </Tooltip.Root>
+      </Card.Actions>
+    </Card.Header>
+    <Card.Body>…</Card.Body>
+  </Card.Root>
+  <Card.Root>
+    <Card.Header>
+      <Card.Title as="h2">Обслуживание</Card.Title>
+    </Card.Header>
+    <Card.Footer>
+      <Card.Actions>
+        <Button.Root variant="soft" tone="neutral">
+          Перезагрузить
+        </Button.Root>
+      </Card.Actions>
+    </Card.Footer>
+  </Card.Root>
+</>
+```
 
 ### An icon button takes its neighbours' fill
 
@@ -700,10 +830,49 @@ screen keeps the same count ([a narrow header](responsive.md#a-narrow-header)). 
   (`inputMode="decimal"` and an end `Input.InlineAffix`) ends at the field's end, and its column's
   total follows it there by itself. Return the save's promise from
   its `onValueChange` when each edit saves at once.
-- Fields 20 apart; related short fields side by side in an
-  [intrinsic grid](responsive.md#intrinsic-grids) with `align-items: start`
-  (`reserveSupportRow` on Input / Textarea keeps neighbours aligned); groups 32 apart, each a
-  `Fieldset label` (its `title-s` heading 16 above the fields, no frame); no dividers between groups.
+- Fields 20 apart; groups 32 apart, each a `Fieldset label` (its `title-s` heading 16 above the
+  fields, no frame); no dividers between groups.
+- **Fields stand two to a row at most.** Related short fields side by side (ИНН and КПП, the
+  network's name and password) are `Fieldset layout="pair"` — a nested one without `label` for a
+  part of a group: two columns however wide the card, a field left alone in the last row spans it,
+  one column under 27.5rem of the group (`reserveSupportRow` on Input / Textarea keeps neighbours
+  aligned). Never a grid of your own for fields: `auto-fill` gives a wide card three or four
+  columns, and a long label or value is cut.
+
+```tsx partial
+// bad — an auto-fill grid of settings: three columns on a wide card, «Скан» cut to «Ск…»
+<div className={styles.grid}>
+  <Select.Root label="Скан">…</Select.Root>
+  <Select.Root label="Частота кадров">…</Select.Root>
+  <Input.Root label="Яркость, %">…</Input.Root>
+</div>
+```
+
+```tsx good
+// good — two to a row, the lone last field across it, one column on a narrow card
+<Fieldset layout="pair">
+  <Select.Root label="Развёртка" defaultValue="progressive">
+    <Select.Trigger>
+      <Select.Value />
+    </Select.Trigger>
+    <Select.Content>
+      <Select.Item value="progressive">Построчная</Select.Item>
+      <Select.Item value="interlaced">Чересстрочная</Select.Item>
+    </Select.Content>
+  </Select.Root>
+  <Select.Root label="Частота кадров" defaultValue="60">
+    <Select.Trigger>
+      <Select.Value />
+    </Select.Trigger>
+    <Select.Content>
+      <Select.Item value="30">30 к/с</Select.Item>
+      <Select.Item value="60">60 к/с</Select.Item>
+    </Select.Content>
+  </Select.Root>
+  <Slider label="Яркость" defaultValue={80} />
+</Fieldset>
+```
+
 - Form column width: one column up to ~65ch; never stretch a form across a wide panel.
 - Where: ≤ 4 fields → `Modal`; long create / edit → `Drawer` or a page; settings → a panel Card per
   section, the whole `Card.Root` inside `<form>`, buttons in `Card.Footer`.
@@ -1014,6 +1183,55 @@ Build a list of records or places from `List` parts; never a row of your own.
 | a list of cards with nothing in it yet (the vehicles of a deal, the contacts of a client) | `EmptyPage size="s"` inside a `Card.Root` in the list's place, the add button under it ([an empty list of cards](#an-empty-list-of-cards)) |
 
 Stale data beats an empty block: show the last known values and say when they are from.
+
+### The normal state needs no block
+
+When things are as they should be, the main content already says so: the connected network is
+the first row of the networks list with its address in its description, the running device the
+first card with its status. Only a state off the normal — not in the venue's network, connecting,
+a failed sync — gets a block, and that block is a `Banner` as the first block of `Page.Body`,
+gone once the state is normal again. Never a side column for a status: its place would follow the
+length of the main column beside it, and it would repeat what the list shows
+([one fact, one place](ux.md#11-one-fact-one-place)).
+
+```tsx partial
+// bad — a side block «Подключение» that repeats the first network and slides down as the list grows
+<div className={styles.columns}>
+  <List.Root aria-label="Сети">…</List.Root>
+  <Card.Root>
+    <Card.Header>
+      <Card.Title as="h2">Подключение</Card.Title>
+      <Card.Description>Studio-5G · 192.168.1.40</Card.Description>
+    </Card.Header>
+  </Card.Root>
+</div>
+```
+
+```tsx good
+// declare: const online: boolean
+// good — the normal state is the list's first row; only the abnormal one is a banner over it
+<>
+  {online ? null : (
+    <Banner.Root tone="warning">
+      <Banner.Content>
+        <Banner.Title>Устройство не в сети площадки</Banner.Title>
+        <Banner.Description>Подключите его к Studio-5G.</Banner.Description>
+      </Banner.Content>
+    </Banner.Root>
+  )}
+  <List.Root aria-label="Сети">
+    <List.Item value="studio">
+      <List.ItemText>Studio-5G</List.ItemText>
+      <List.ItemDescription>
+        <StatusDot tone="success">Подключено</StatusDot> · 192.168.1.40
+      </List.ItemDescription>
+    </List.Item>
+    <List.Item value="guest">
+      <List.ItemText>Guest</List.ItemText>
+    </List.Item>
+  </List.Root>
+</>
+```
 
 ### An empty list of cards
 
@@ -1550,6 +1768,78 @@ app: one look per kind of block, never a weight per screen.
 </DescriptionList.Root>
 ```
 
+### A list of devices with previews
+
+Records of one kind that each carry a picture of their own state — cameras, screens, controllers,
+printers with a live preview — are worked on one at a time and compared at a glance, so the list
+shows as many as fit the height:
+
+- **One card per row, across the width.** Never a grid of two columns: the previews shrink, the
+  settings open under each other and a screen holds one and a half devices.
+- **The most current on top**: the preview in `Card.Media`, edge to edge over the card in the
+  source's ratio (`ratio="16:9"` for a video source), no padding of its own; then the header with
+  the name and the status in `Card.Badges`.
+- **The settings folded**: one `Accordion` item per group, closed by default, its
+  `Accordion.Description` a line of the current values («NDI · 60 к/с · яркость 80 %»), so the
+  folded card already says how it is set.
+- **The readings last**: one `Badge.Group` row of short figures
+  ([many of a kind](#many-of-a-kind-start-small)).
+
+```tsx partial
+// bad — two columns of cards, each with its settings open
+<div className={styles.twoColumns}>
+  {devices.map((device) => (
+    <Card.Root key={device.id}>
+      <Card.Body>
+        <Select.Root label="Режим">…</Select.Root>
+        <Slider label="Яркость" />
+        <Select.Root label="Частота кадров">…</Select.Root>
+      </Card.Body>
+    </Card.Root>
+  ))}
+</div>
+```
+
+```tsx good
+// declare: const devices: { id: string; name: string; preview: string; summary: string; fps: string }[]
+// good — one card per row: preview and status first, the settings folded with their values, readings last
+<>
+  {devices.map((device) => (
+    <Card.Root key={device.id}>
+      <Card.Media>
+        <Carousel.Root
+          items={[{ src: device.preview, alt: `Кадр ${device.name}` }]}
+          ratio="16:9"
+          aria-label={`Превью ${device.name}`}
+        />
+      </Card.Media>
+      <Card.Header>
+        <Card.Title as="h2">{device.name}</Card.Title>
+        <Card.Badges>
+          <Badge.Root tone="success">В эфире</Badge.Root>
+        </Card.Badges>
+      </Card.Header>
+      <Card.Body>
+        <Accordion.Root>
+          <Accordion.Item value="output">
+            <Accordion.Header>
+              <Accordion.Trigger>
+                Вывод
+                <Accordion.Description>{device.summary}</Accordion.Description>
+              </Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Content>…</Accordion.Content>
+          </Accordion.Item>
+        </Accordion.Root>
+        <Badge.Group>
+          <Badge.Root>{device.fps}</Badge.Root>
+        </Badge.Group>
+      </Card.Body>
+    </Card.Root>
+  ))}
+</>
+```
+
 ## Screen rules
 
 What each screen in [the index](#screens) demonstrates — keep these when you start from it.
@@ -1584,10 +1874,10 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 - A document page: `Page.Root maxWidth="wide"`, the large `Page.Title` with a sentence of `Page.Description` in the `Page.Heading` of a `Page.Header` in the flow, and a `Page.TopBar collapse` whose `Page.Heading` holds only the path and repeats the title once it scrolls away.
 - A section is a `Card` with its own `Card.Header` (`Card.Title as="h2"` + a line of `Card.Description`), the cards stacked in the flow ([a titled block](#4-surfaces)).
 - The form wraps the whole `Card.Root` in `<form noValidate>`; the buttons are in `Card.Footer`: «Отменить изменения» `soft` + `neutral`, then the primary «Сохранить». While the request runs — `loading` on the button, and one `Fieldset disabled` turns the fields off; the form stays on screen, so success is the button text «Сохранено» for two seconds, without a notification.
-- Fields are 20 px apart; two short related fields side by side while there is width, with `align-items: start` and `reserveSupportRow`, so an error does not shift the neighbour.
+- Fields are 20 px apart; two short related fields side by side are a nested `Fieldset layout="pair"` without `label` (one column on a narrow card), with `reserveSupportRow`, so an error does not shift the neighbour.
 - An error comes through the field's `error` after submit, not while typing; a format hint goes in `hint`.
 - A `Switch` applies at once — its section has no «Сохранить» button; the explanation is in the switch's own `hint`.
-- The danger zone is the last section: a `soft` + `tone="danger"` button in `ConfirmDialog.Trigger`; `onConfirm` returns the delete Promise — the dialog holds `loading` itself, disables cancel and does not close while the request runs.
+- The danger zone is the last section: a `soft` + `tone="danger"` button in `ConfirmDialog.Trigger` at the end of its `Card.Footer`, where a card's applying actions stand; `onConfirm` returns the delete Promise — the dialog holds `loading` itself, disables cancel and does not close while the request runs.
 
 ### Form in a Drawer
 

@@ -46,6 +46,12 @@ export const page: ComponentPageConfig = {
       description: "Группа заполняет колонку, сегменты делят ширину поровну — `fullWidth`.",
     },
     {
+      scenario: "saving",
+      title: "Сохранение на сервере",
+      description:
+        "Фильтры ленты сохраняются в профиле на сервере: переключатель сразу показывает новое состояние, а отказ сервера возвращает его и объясняет причину — `defaultPressed`, `onPressedChange`, `error`.",
+    },
+    {
       slot: "controlled",
       description: "Один из нескольких: активный сегмент хранит родитель — `pressed`.",
     },

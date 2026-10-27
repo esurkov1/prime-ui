@@ -195,7 +195,7 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 - The root is a `<figure>` named by `ChartFrame.Title` and described by `ChartFrame.Description`; `aria-busy` while loading.
-- A legend entry is a button with `aria-pressed` — pressed while its series is shown; the legend list is named by `labels.legend`. A hidden series differs by the swatch's shape (a ring) and a quiet name, never by color alone.
+- A legend entry is a `role="button"` with `aria-pressed` — pressed while its series is shown; `readOnly` takes the role away in place; the legend list is named by `labels.legend`. A hidden series differs by the swatch's shape (a ring) and a quiet name, never by color alone.
 - The root renders `rows` as a visually hidden table with the chart's data, named by the title: a row header per point, a column per shown series, values through each series' `formatValue`.
 - A `ChartFrame.Tooltip` with `point` is `aria-hidden` and passive (no focus, no presses; `Escape` hides it until the point moves): it repeats what the plot speaks — give a focusable plot an `aria-valuetext`, like the slider in the tooltip example.
 - The empty state is `role="status"`, the error `role="alert"` with the retry button.

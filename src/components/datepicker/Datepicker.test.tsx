@@ -1,8 +1,15 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
-import { Datepicker, datepickerPresets, formatDateValue, YEARLESS_YEAR } from "./Datepicker";
+import {
+  Datepicker,
+  type DatepickerRange,
+  datepickerPresets,
+  formatDateValue,
+  YEARLESS_YEAR,
+} from "./Datepicker";
 import {
   DEFAULT_DATEPICKER_PRESETS,
   matchPreset,
@@ -725,5 +732,117 @@ describe("Datepicker form value", () => {
     expect(data.get("due")).toBe("2026-10-07");
     expect(data.getAll("period")).toEqual(["", "2026-10-31"]);
     expect(data.get("empty")).toBe("");
+  });
+});
+
+describe("Datepicker — async onValueChange", () => {
+  /** A promise the test settles by hand. */
+  function deferred() {
+    let resolve: () => void = () => {};
+    let reject: (reason: unknown) => void = () => {};
+    const promise = new Promise<void>((done, fail) => {
+      resolve = done;
+      reject = fail;
+    });
+    return { promise, resolve, reject };
+  }
+
+  it("Root: the picked day shows at once with a Spinner, not disabled; resolve keeps it", async () => {
+    const user = userEvent.setup();
+    const save = deferred();
+    const onValueChange = vi.fn(() => save.promise);
+    render(
+      <Datepicker.Root
+        mode="single"
+        defaultValue={new Date(2026, 9, 7)}
+        onValueChange={onValueChange}
+        today={TODAY}
+        aria-label="Срок оплаты"
+      />,
+    );
+    const trigger = screen.getByRole("button", { name: /Срок оплаты/ });
+    await user.click(trigger);
+    await user.click(screen.getByRole("button", { name: "9 октября 2026" }));
+    expect(onValueChange).toHaveBeenCalledWith(new Date(2026, 9, 9, 0, 0, 0, 0));
+    expect(trigger).toHaveTextContent("9 окт");
+    expect(trigger).toHaveAttribute("aria-busy", "true");
+    expect(trigger).toHaveAttribute("data-loading", "true");
+    expect(trigger).not.toBeDisabled();
+    expect(trigger.querySelector("[role='status']")).not.toBeNull();
+
+    // The keyboard still opens the field; a pick waits for the answer.
+    trigger.focus();
+    await user.keyboard("{Enter}");
+    await user.click(screen.getByRole("button", { name: "12 октября 2026" }));
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+    expect(trigger).toHaveTextContent("9 окт");
+
+    await act(async () => {
+      save.resolve();
+    });
+    expect(trigger).toHaveTextContent("9 окт");
+    expect(trigger).not.toHaveAttribute("aria-busy");
+    expect(trigger).not.toHaveAttribute("data-loading");
+  });
+
+  it("Root: reject puts the previous date back", async () => {
+    const user = userEvent.setup();
+    const save = deferred();
+    render(
+      <Datepicker.Root
+        mode="single"
+        defaultValue={new Date(2026, 9, 7)}
+        onValueChange={() => save.promise}
+        today={TODAY}
+        aria-label="Срок оплаты"
+      />,
+    );
+    const trigger = screen.getByRole("button", { name: /Срок оплаты/ });
+    const before = trigger.textContent;
+    await user.click(trigger);
+    await user.click(screen.getByRole("button", { name: "9 октября 2026" }));
+    expect(trigger).toHaveTextContent("9 окт");
+    await act(async () => {
+      save.reject(new Error("offline"));
+    });
+    expect(trigger.textContent).toBe(before);
+    expect(trigger).not.toHaveAttribute("aria-busy");
+  });
+
+  it("Panel: a range shows at once, aria-busy while saving; controlled owner's value wins", async () => {
+    const user = userEvent.setup();
+    const save = deferred();
+    function Controlled() {
+      const [range, setRange] = React.useState<DatepickerRange>({ from: null, to: null });
+      return (
+        <Datepicker.Panel
+          mode="range"
+          value={range}
+          onValueChange={async (next) => {
+            await save.promise;
+            setRange(next);
+          }}
+          today={TODAY}
+          data-testid="panel"
+        />
+      );
+    }
+    render(<Controlled />);
+    await user.click(screen.getByRole("button", { name: "5 октября 2026" }));
+    await user.click(screen.getByRole("button", { name: "12 октября 2026" }));
+    const panel = screen.getByTestId("panel");
+    expect(panel).toHaveAttribute("aria-busy", "true");
+    expect(screen.getByRole("button", { name: "12 октября 2026" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await act(async () => {
+      save.resolve();
+    });
+    expect(panel).not.toHaveAttribute("aria-busy");
+    expect(screen.getByRole("button", { name: "12 октября 2026" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   });
 });

@@ -3,7 +3,7 @@ import type * as React from "react";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { useInheritedDisabled } from "@/internal/disabledContext";
+import { useDisabledControl, useInheritedDisabled } from "@/internal/disabledContext";
 import {
   FieldFrame,
   type FieldFrameProps,
@@ -17,6 +17,7 @@ import { useLabels } from "@/internal/labels";
 import { press } from "@/internal/press";
 import { SwitcherScroller } from "@/internal/SwitcherScroller";
 import type { ControlSize } from "@/internal/states";
+import { usePendingValue } from "@/internal/usePendingChanges";
 
 import styles from "./ButtonGroup.module.css";
 
@@ -117,36 +118,63 @@ ButtonGroupRoot.displayName = "ButtonGroup.Root";
 
 export type ButtonGroupItemProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   pressed?: boolean;
+  defaultPressed?: boolean;
+  onPressedChange?: (pressed: boolean) => void | Promise<void>;
   ref?: React.Ref<HTMLButtonElement>;
 };
 
 function ButtonGroupItem({
   className,
-  pressed,
+  pressed: pressedProp,
+  defaultPressed,
+  onPressedChange,
   type = "button",
   disabled: disabledProp,
+  onClick,
   children,
   ref,
   ...rest
 }: ButtonGroupItemProps) {
   const disabled = useInheritedDisabled(disabledProp);
+  const off = useDisabledControl(disabled);
   // Icon placement drives optical padding and the square icon-only segment (as in Button).
   const layout = iconLayout(children, ButtonGroupIcon);
+  // A toggle when any part of the pressed triad is given; a plain action segment otherwise. A
+  // state the owner is still saving is drawn ahead of its answer.
+  const toggle =
+    pressedProp !== undefined || defaultPressed !== undefined || onPressedChange !== undefined;
+  const state = usePendingValue({
+    value: pressedProp,
+    defaultValue: defaultPressed ?? false,
+    onChange: onPressedChange,
+  });
+  const pressed = toggle ? state.value : undefined;
 
   return (
     <button
+      {...rest}
       ref={ref}
       type={type}
-      disabled={disabled || undefined}
+      disabled={off.native || undefined}
+      aria-disabled={off.ariaDisabled ?? rest["aria-disabled"]}
       className={cx(styles.item, layout.iconOnly ? press.pressCompact : press.press, className)}
       aria-pressed={pressed}
+      aria-busy={state.saving || undefined}
       {...toDataAttributes({
         state: pressed === undefined ? undefined : pressed ? "active" : "inactive",
         "icon-only": layout.iconOnly || undefined,
         "leading-icon": layout.leadingIcon || undefined,
         "trailing-icon": layout.trailingIcon || undefined,
       })}
-      {...rest}
+      onClick={(event) => {
+        // A reachable disabled segment (under a tooltip's trigger) takes no press, nor submits.
+        if (off.reachable) {
+          event.preventDefault();
+          return;
+        }
+        onClick?.(event);
+        if (toggle && !state.saving && !event.defaultPrevented) state.commit(!state.value);
+      }}
     >
       {children}
     </button>

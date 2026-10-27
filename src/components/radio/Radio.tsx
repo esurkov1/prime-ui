@@ -14,11 +14,12 @@ import { useControlSize, useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { useInheritedDisabled } from "@/internal/disabledContext";
+import { useDisabledControl, useInheritedDisabled } from "@/internal/disabledContext";
 import { FieldFrame, type FieldRootDomProps, useFieldFrame } from "@/internal/FieldFrame";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
+import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
 
 import styles from "./Radio.module.css";
 
@@ -37,6 +38,8 @@ type RadioGroupContextValue = {
   setValue: (value: string) => void;
   size: ControlSize;
   disabled: boolean;
+  /** A pick is saving (a promise from `onValueChange`): the options take no press. */
+  busy: boolean;
   invalid: boolean;
   required: boolean;
 };
@@ -47,7 +50,7 @@ const [RadioGroupProvider, useRadioGroupContext] =
 export type RadioGroupProps = Omit<FieldRootDomProps, "dir"> & {
   value?: string;
   defaultValue?: string;
-  onValueChange?: (value: string) => void;
+  onValueChange?: (value: string) => void | Promise<void>;
   name?: string;
   size?: ControlSize;
   disabled?: boolean;
@@ -98,21 +101,32 @@ function RadioGroup({
   const disabled = useInheritedDisabled(disabledProp);
   const ids = useFieldFrame(id, { label, hint, error, invalid }, ariaDescribedBy);
   const name = nameProp ?? ids.controlId;
-  const reportChange = React.useCallback(
-    (next: string | undefined) => {
-      if (next !== undefined) onValueChange?.(next);
-    },
-    [onValueChange],
-  );
-  const [value, setValue] = useControllableState<string | undefined>({
+  const [stored, setStored] = useControllableState<string | undefined>({
     value: valueProp,
     defaultValue,
-    onChange: reportChange,
   });
+  // A value the owner is still saving is drawn ahead of its answer.
+  const changes = usePendingChanges(stored, takeNext);
+  const value = changes.shown;
+  const busy = changes.pending.length > 0;
+
+  /** Hands the pick to the owner; a promise holds it pending, picks wait until it settles. */
+  const commit = (next: string) => {
+    if (busy || next === value) return;
+    const outcome = onValueChange?.(next);
+    if (!isPromiseLike(outcome)) {
+      setStored(next);
+      return;
+    }
+    changes.track(next, outcome, { onResolve: () => setStored(next) });
+  };
+  const commitRef = React.useRef(commit);
+  commitRef.current = commit;
+  const setValue = React.useCallback((next: string) => commitRef.current(next), []);
 
   const ctxValue = React.useMemo(
-    () => ({ name, value, setValue, size, disabled, invalid: ids.invalid, required }),
-    [name, value, setValue, size, disabled, ids.invalid, required],
+    () => ({ name, value, setValue, size, disabled, busy, invalid: ids.invalid, required }),
+    [name, value, setValue, size, disabled, busy, ids.invalid, required],
   );
 
   return (
@@ -141,8 +155,11 @@ function RadioGroup({
             aria-describedby={ids.describedBy}
             aria-invalid={ids.invalid || undefined}
             aria-required={required || undefined}
+            aria-busy={busy || undefined}
             aria-orientation={orientation}
             className={styles.group}
+            // While a pick is saving the focus stays with it: the native arrows wait.
+            onKeyDown={busy ? holdArrows : undefined}
             {...toDataAttributes({ size, orientation })}
           >
             {children}
@@ -153,6 +170,12 @@ function RadioGroup({
   );
 }
 RadioGroup.displayName = "Radio.Group";
+
+const takeNext = (_current: string | undefined, next: string | undefined) => next;
+
+const holdArrows = (event: React.KeyboardEvent) => {
+  if (event.key.startsWith("Arrow")) event.preventDefault();
+};
 
 // ─── Item ────────────────────────────────────────────────────────────────────
 
@@ -182,6 +205,7 @@ function RadioRoot({
   const group = useRadioGroupContext();
   const ids = useFieldFrame(id, { hint, invalid: group.invalid }, ariaDescribedBy);
   const disabled = group.disabled || disabledProp;
+  const off = useDisabledControl(disabled);
   const checked = group.value === value;
 
   return (
@@ -190,6 +214,7 @@ function RadioRoot({
       size={group.size}
       state={checked ? "checked" : "unchecked"}
       disabled={disabled}
+      busy={group.busy}
       groupOption
       hint={hint}
       hintTone={hintTone}
@@ -201,13 +226,18 @@ function RadioRoot({
             ref={ref}
             id={ids.controlId}
             type="radio"
-            name={group.name}
+            // A reachable disabled option leaves the named group: the arrows skip it and the
+            // form neither submits nor validates it.
+            name={off.reachable ? undefined : group.name}
             value={value}
             checked={checked}
-            onChange={() => group.setValue(value)}
-            required={group.required || undefined}
+            onChange={() => {
+              if (!disabled) group.setValue(value);
+            }}
+            required={(!off.reachable && group.required) || undefined}
             className={choiceInputClass}
-            disabled={disabled}
+            disabled={off.native}
+            aria-disabled={off.ariaDisabled}
             aria-invalid={ids.invalid || undefined}
             aria-describedby={ids.describedBy}
           />

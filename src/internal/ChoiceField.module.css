@@ -47,6 +47,11 @@
   cursor: default;
 }
 
+/* A change is saving (a promise from the handler): the state stands, presses wait. */
+.row[data-loading="true"] {
+  cursor: progress;
+}
+
 .field[data-disabled="true"] .row {
   color: var(--prime-color-text-disabled);
   cursor: not-allowed;

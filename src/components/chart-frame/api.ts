@@ -294,8 +294,8 @@ export const api: ComponentApi = {
         ru: "Корень — `<figure>` с именем из `ChartFrame.Title` и описанием из `ChartFrame.Description`; во время загрузки `aria-busy`.",
       },
       {
-        en: "A legend entry is a button with `aria-pressed` — pressed while its series is shown; the legend list is named by `labels.legend`. A hidden series differs by the swatch's shape (a ring) and a quiet name, never by color alone.",
-        ru: "Запись легенды — кнопка с `aria-pressed`: нажата, когда ряд показан; список легенды назван `labels.legend`. Скрытый ряд отличается формой образца (кольцо) и приглушённым названием, а не только цветом.",
+        en: 'A legend entry is a `role="button"` with `aria-pressed` — pressed while its series is shown; `readOnly` takes the role away in place; the legend list is named by `labels.legend`. A hidden series differs by the swatch\'s shape (a ring) and a quiet name, never by color alone.',
+        ru: 'Запись легенды — `role="button"` с `aria-pressed`: нажата, когда ряд показан; `readOnly` снимает роль на месте; список легенды назван `labels.legend`. Скрытый ряд отличается формой образца (кольцо) и приглушённым названием, а не только цветом.',
       },
       {
         en: "The root renders `rows` as a visually hidden table with the chart's data, named by the title: a row header per point, a column per shown series, values through each series' `formatValue`.",

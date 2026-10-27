@@ -23,9 +23,9 @@ export const api: ComponentApi = {
         },
         {
           name: "onValueChange",
-          type: "(value: string) => void",
-          en: "Called with the value of the newly chosen option.",
-          ru: "Значение нового выбранного варианта.",
+          type: "(value: string) => void | Promise<void>",
+          en: "Called with the value of the newly chosen option. Return the save's promise: the group waits (`aria-busy`); a controlled owner sets `value` before resolving; reject brings the previous option back (say why with `error`).",
+          ru: "Значение нового выбранного варианта. Верните промис сохранения: группа ждёт (`aria-busy`); управляемый владелец ставит `value` до resolve; при reject вернётся прежний вариант (причину покажите в `error`).",
         },
         {
           name: "name",
@@ -234,8 +234,8 @@ export const api: ComponentApi = {
       },
       {
         keys: "ArrowDown · ArrowRight · ArrowUp · ArrowLeft",
-        en: "Selects the next or previous option of the group (native radio behaviour).",
-        ru: "Выбирает следующий или предыдущий вариант группы (нативное поведение radio).",
+        en: "Selects the next or previous option of the group (native radio behaviour); while a pick is saving they wait.",
+        ru: "Выбирает следующий или предыдущий вариант группы (нативное поведение radio); пока выбор сохраняется, ждут.",
       },
       { keys: "Space", en: "Selects the focused option.", ru: "Выбирает вариант в фокусе." },
     ],
@@ -253,8 +253,16 @@ export const api: ComponentApi = {
         ru: 'Каждый вариант — нативный `<input type="radio">` с общим `name`; описание варианта (`hint`) связано через `aria-describedby`.',
       },
       {
+        en: "While a pick is saved (a pending promise from `onValueChange`) the group has `aria-busy`. A refused save puts the previous option back — say why with `error`.",
+        ru: "Пока выбор сохраняется (ожидающий промис из `onValueChange`), на группе `aria-busy`; при отказе возвращается прежний вариант, причину покажите через `error`.",
+      },
+      {
         en: '`Radio.Indicator` is `aria-hidden`; the host element carries `role="radio"` and `aria-checked`.',
         ru: '`Radio.Indicator` скрыт (`aria-hidden`); состояние несёт элемент-хозяин (`role="radio"`, `aria-checked`).',
+      },
+      {
+        en: 'Under a `Tooltip.Trigger` a disabled option is `aria-disabled="true"` with no native `disabled`, `name` or `required`: it keeps its node, a press picks nothing, the arrows and the form skip it.',
+        ru: 'В `Tooltip.Trigger` выключенный вариант — `aria-disabled="true"` без нативного `disabled`, `name` и `required`: остаётся тем же узлом, нажатие ничего не выбирает, стрелки и форма его пропускают.',
       },
     ],
   },

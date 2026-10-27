@@ -577,6 +577,10 @@ export const api: ComponentApi = {
         en: "An outside press closes the list without moving focus back: focus follows the pointer (foundation §8).",
         ru: "Клик снаружи закрывает список без возврата фокуса: фокус остаётся там, куда нажали.",
       },
+      {
+        en: 'Under a `Tooltip.Trigger` a disabled `Select.Trigger` is `aria-disabled="true"` with no native `disabled`: it keeps its tab stop and its node, a press or a key opens nothing.',
+        ru: 'В `Tooltip.Trigger` выключенный `Select.Trigger` — `aria-disabled="true"` без нативного `disabled`: остаётся точкой Tab и тем же узлом, нажатие и клавиши ничего не открывают.',
+      },
     ],
   },
 };

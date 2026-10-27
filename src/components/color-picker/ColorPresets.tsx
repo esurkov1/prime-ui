@@ -12,7 +12,7 @@ import {
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
-import { useInheritedDisabled } from "@/internal/disabledContext";
+import { NativeButton, useInheritedDisabled } from "@/internal/disabledContext";
 import { FieldFrame, useFieldFrame } from "@/internal/FieldFrame";
 import { useFieldCell } from "@/internal/fieldCell";
 import { fieldLabelTextClass, fieldTierClass } from "@/internal/fieldClasses";
@@ -278,14 +278,13 @@ export type ColorPresetsSwatchButtonProps = Omit<
 function SwatchButton({ className, ...rest }: ColorPresetsSwatchButtonProps) {
   const { value, size } = useColorPresetsContext();
   return (
-    <button
-      type="button"
+    <NativeButton
       {...rest}
       data-size={size}
       className={cx(fieldTierClass, swatchTriggerClass, className)}
     >
       <SwatchFill value={value} />
-    </button>
+    </NativeButton>
   );
 }
 SwatchButton.displayName = "ColorPresets.SwatchButton";

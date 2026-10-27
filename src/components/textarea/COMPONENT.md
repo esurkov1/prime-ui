@@ -133,7 +133,7 @@ Textarea has no `variant` or `tone`: one field treatment (fill, no visible borde
 | focus | keyboard focus | focus fill and inset focus ring on the field box; clicking the box padding focuses the textarea |
 | no focus ring | `focusRing={false}` | `data-focus-ring="false"` on the field box |
 | invalid | `invalid` or non-empty `error` | `data-invalid="true"` on the outer wrapper and the field box, `aria-invalid="true"`, danger ring; the control shakes once when an error arrives (`data-shake` on the frame) |
-| disabled | `disabled`, or a disabled `Fieldset` around it | `data-disabled="true"` on the field box, disabled fill and text; label and hint dimmed |
+| disabled | `disabled`, or a disabled `Fieldset` around it | `data-disabled="true"` on the field box, disabled fill and text; label and hint dimmed; under a `Tooltip.Trigger` the textarea is `aria-disabled="true"` and `readOnly` with no `name` or `required`, the same node |
 | capped | `autoResize` with `maxRows` | `data-capped="true"` on the field box; the box grows line by line up to `maxRows` lines, then the textarea scrolls inside with the thin scrollbar |
 | read-only | `readOnly` | `data-readonly="true"` on the field box, no hover, default cursor |
 | reserved support row | `reserveSupportRow` | `data-reserve="true"` on the support row |
@@ -179,6 +179,7 @@ Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+E
 - `Textarea.Action` and `Textarea.CopyButton` are buttons (or a link with `asChild`) named by their label, with a tooltip; copying announces `labels.copied`. A press on them never moves focus into the textarea.
 - With `onCommit` the textarea carries `aria-busy="true"` while saving; a polite live region says `labels.saving`, then `labels.saved`.
 - The formatting toolbar is `role="toolbar"` named `labels.formatting`, `aria-controls` the textarea, with one Tab stop and arrow keys; every button has `aria-keyshortcuts` and a tooltip with its keys (`⌘B` on Apple systems, `Ctrl+B` elsewhere). A press on a tool keeps the focus and the selection in the field.
+- Under a `Tooltip.Trigger` a disabled field is `aria-disabled="true"` and `readOnly` with no native `disabled`, `name` or `required`: it keeps its tab stop, its node and its text, the form skips it.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

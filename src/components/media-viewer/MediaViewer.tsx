@@ -19,6 +19,7 @@ import { X } from "@/icons/glyphs/x";
 import { ZoomIn } from "@/icons/glyphs/zoom-in";
 import { ZoomOut } from "@/icons/glyphs/zoom-out";
 import { cx } from "@/internal/cx";
+import { NativeButton } from "@/internal/disabledContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
@@ -1146,8 +1147,7 @@ function Filmstrip({ engine, items, index, labels, onSelect }: FilmstripProps) {
         style={{ insetInlineStart: `${pad + at * metrics.pitch}px` }}
         data-thumb={at}
       >
-        <button
-          type="button"
+        <NativeButton
           aria-label={formatLabel(labels.show, { name: nameOf(entry, labels) })}
           aria-current={at === index ? "true" : undefined}
           onClick={() => onSelect(at)}
@@ -1156,7 +1156,7 @@ function Filmstrip({ engine, items, index, labels, onSelect }: FilmstripProps) {
           <Thumbnail.Fallback>
             <FallbackGlyph />
           </Thumbnail.Fallback>
-        </button>
+        </NativeButton>
       </Thumbnail.Root>,
     );
   }

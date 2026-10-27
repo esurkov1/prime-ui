@@ -10,6 +10,7 @@ import { type AnchorPoint, ChartTooltip } from "@/internal/ChartTooltip";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatNumber } from "@/internal/formatNumber";
 import { HeaderLineContent, HeaderRowContent, headerRowStyles } from "@/internal/headerRow";
@@ -497,7 +498,9 @@ export type ChartFrameLegendProps = React.HTMLAttributes<HTMLUListElement> & {
 function ChartFrameLegend({ readOnly = false, className, ...rest }: ChartFrameLegendProps) {
   const { state, series, toggle, labels } = useChartFrame("ChartFrame.Legend");
   const [focusIndex, setFocusIndex] = React.useState(0);
-  const buttons = React.useRef<Array<HTMLButtonElement | null>>([]);
+  const buttons = React.useRef<Array<HTMLSpanElement | null>>([]);
+  // A disabled Fieldset around takes the toggles out, as it does every control.
+  const disabled = useInheritedDisabled();
   const loading = state === "loading";
   // A legend value sits in a button (phrasing content only): it fades in place.
   const valueSwap = useSwapIn(loading ? "loading" : "data");
@@ -506,7 +509,12 @@ function ChartFrameLegend({ readOnly = false, className, ...rest }: ChartFrameLe
 
   if (series.length === 0) return null;
 
-  const onKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+  const onKeyDown = (event: React.KeyboardEvent<HTMLSpanElement>, index: number, id: string) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      if (!disabled) toggle(id);
+      return;
+    }
     const next = rovingIndex(event.key, index, series.length, "both");
     if (next === null) return;
     event.preventDefault();
@@ -552,42 +560,37 @@ function ChartFrameLegend({ readOnly = false, className, ...rest }: ChartFrameLe
         );
         return (
           <li key={item.id} className={styles.legendItem}>
-            {readOnly ? (
-              <span
-                className={cx(listRowStyles.row, listRowStyles.hit, styles.entry)}
-                data-plain=""
-              >
-                {content}
-              </span>
-            ) : (
-              // A legend entry names a series and toggles it; Button's command look would read as
-              // an action, so the entry is the plain list row on a button.
-              <button
-                ref={(node) => {
-                  buttons.current[index] = node;
-                }}
-                type="button"
-                className={cx(
-                  listRowStyles.row,
-                  listRowStyles.hit,
-                  styles.entry,
-                  styles.toggle,
-                  press.press,
-                  touchTargetClass,
-                )}
-                data-plain=""
-                aria-pressed={!item.hidden}
-                tabIndex={index === active ? 0 : -1}
-                onClick={() => {
-                  setFocusIndex(index);
-                  toggle(item.id);
-                }}
-                onFocus={() => setFocusIndex(index)}
-                onKeyDown={(event) => onKeyDown(event, index)}
-              >
-                {content}
-              </button>
-            )}
+            {/* One element whatever the mode: `readOnly` turns the toggle into plain text in
+                place (a span with the button role, since a <button> could not lose its role). */}
+            <span
+              ref={(node) => {
+                buttons.current[index] = node;
+              }}
+              className={cx(
+                listRowStyles.row,
+                listRowStyles.hit,
+                styles.entry,
+                !readOnly && cx(styles.toggle, press.press, touchTargetClass),
+              )}
+              data-plain=""
+              {...(readOnly
+                ? null
+                : {
+                    role: "button",
+                    "aria-pressed": !item.hidden,
+                    "aria-disabled": disabled || undefined,
+                    tabIndex: index === active ? 0 : -1,
+                    onClick: () => {
+                      setFocusIndex(index);
+                      if (!disabled) toggle(item.id);
+                    },
+                    onFocus: () => setFocusIndex(index),
+                    onKeyDown: (event: React.KeyboardEvent<HTMLSpanElement>) =>
+                      onKeyDown(event, index, item.id),
+                  })}
+            >
+              {content}
+            </span>
           </li>
         );
       })}

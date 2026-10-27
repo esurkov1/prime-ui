@@ -50,3 +50,28 @@
   gap: var(--prime-space-5);
   min-width: 0;
 }
+
+/*
+ * layout="pair": the fields two to a row, 20 apart both ways, each column the same width. A field
+ * left alone in the last row spans it — never a hole beside it. Below 27.5rem of group width
+ * (`--prime-layout-form-width-s`: two fields under ~13rem each would clip their values) the
+ * fields stack in one column again.
+ */
+.root[data-layout="pair"] .body {
+  container: prime-fieldset / inline-size;
+}
+
+.root[data-layout="pair"] .fields {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.root[data-layout="pair"] .fields > :last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+@container prime-fieldset (width < 27.5rem) {
+  .root[data-layout="pair"] .fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

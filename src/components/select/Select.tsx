@@ -20,7 +20,7 @@ import { useHostTier } from "@/internal/ControlSizeContext";
 import chipTier from "@/internal/chipTier.module.css";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { useInheritedDisabled } from "@/internal/disabledContext";
+import { useDisabledControl, useInheritedDisabled } from "@/internal/disabledContext";
 import {
   type FieldFocusRingProps,
   FieldFrame,
@@ -440,6 +440,7 @@ function SelectTrigger({
     multiple,
   } = useSelectContext();
   const mergedRef = useMergedRefs(triggerRef, ref);
+  const off = useDisabledControl(disabled);
   // The picked option's hue paints the trigger: the field's fill, or the `status` chip (gray with
   // none), at the chip tier of the size.
   const status = variant === "status" && !segment;
@@ -477,7 +478,8 @@ function SelectTrigger({
       aria-describedby={[ariaDescribedBy, describedBy].filter(Boolean).join(" ") || undefined}
       aria-busy={busy || undefined}
       aria-label={segmentName ?? rest["aria-label"]}
-      disabled={disabled}
+      disabled={off.native}
+      aria-disabled={off.ariaDisabled}
       className={cx(
         segment
           ? styles.segmentTrigger
@@ -487,12 +489,14 @@ function SelectTrigger({
         className,
       )}
       onClick={(event) => {
+        // A reachable disabled trigger (under a tooltip's trigger) opens nothing.
+        if (off.reachable) return;
         onClick?.(event);
         if (!event.defaultPrevented) toggle.onClick();
       }}
       onKeyDown={(event) => {
         onKeyDown?.(event);
-        if (event.defaultPrevented) return;
+        if (event.defaultPrevented || off.reachable) return;
         toggle.onKeyDown?.(event);
         if (event.defaultPrevented) return;
         if (event.key === " " || event.key === "Enter") {

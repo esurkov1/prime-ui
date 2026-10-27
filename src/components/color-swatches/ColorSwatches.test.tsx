@@ -1,5 +1,6 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { COLOR_SWATCHES_LABELS, ColorSwatches } from "./ColorSwatches";
@@ -145,5 +146,99 @@ describe("ColorSwatches", () => {
     const { container } = render(<ColorSwatches presets={presets} label="Цвет" size="xl" />);
     expect(screen.getByRole("radiogroup")).toHaveAttribute("data-size", "xl");
     expect(container.firstElementChild).toHaveAttribute("data-size", "m");
+  });
+});
+
+describe("ColorSwatches — async onValueChange", () => {
+  /** A promise the test settles by hand. */
+  function deferred() {
+    let resolve: () => void = () => {};
+    let reject: (reason: unknown) => void = () => {};
+    const promise = new Promise<void>((done, fail) => {
+      resolve = done;
+      reject = fail;
+    });
+    return { promise, resolve, reject };
+  }
+
+  it("shows the pick busy, not disabled; picks and arrows wait; resolve keeps it", async () => {
+    const user = userEvent.setup();
+    const save = deferred();
+    const onValueChange = vi.fn((): void | Promise<void> => save.promise);
+    render(
+      <ColorSwatches
+        presets={presets}
+        defaultValue="#ef4444"
+        aria-label="Цвет этапа"
+        onValueChange={onValueChange}
+      />,
+    );
+    const group = screen.getByRole("radiogroup");
+    const green = screen.getByRole("radio", { name: "Зелёный" });
+    await user.click(green);
+    expect(green).toHaveAttribute("aria-checked", "true");
+    expect(group).toHaveAttribute("aria-busy", "true");
+    for (const radio of screen.getAllByRole("radio")) {
+      expect(radio).not.toBeDisabled();
+      expect(radio).toHaveAttribute("data-loading", "true");
+    }
+    await user.click(screen.getByRole("radio", { name: "Синий" }));
+    green.focus();
+    await user.keyboard("{ArrowRight}");
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+    expect(green).toHaveAttribute("aria-checked", "true");
+    expect(green).toHaveFocus();
+
+    await act(async () => {
+      save.resolve();
+    });
+    expect(green).toHaveAttribute("aria-checked", "true");
+    expect(group).not.toHaveAttribute("aria-busy");
+    expect(green).not.toHaveAttribute("data-loading");
+    // The arrows select again once the save is answered.
+    onValueChange.mockImplementation(() => undefined);
+    await user.keyboard("{ArrowRight}");
+    expect(screen.getByRole("radio", { name: "Синий" })).toHaveAttribute("aria-checked", "true");
+    expect(onValueChange).toHaveBeenLastCalledWith("#5068f5");
+  });
+
+  it("reject puts the previous color back", async () => {
+    const save = deferred();
+    render(
+      <ColorSwatches presets={presets} defaultValue="#ef4444" onValueChange={() => save.promise} />,
+    );
+    fireEvent.click(screen.getByRole("radio", { name: "Синий" }));
+    expect(screen.getByRole("radio", { name: "Синий" })).toHaveAttribute("aria-checked", "true");
+    await act(async () => {
+      save.reject(new Error("offline"));
+    });
+    expect(screen.getByRole("radio", { name: "Красный" })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("radiogroup")).not.toHaveAttribute("aria-busy");
+  });
+
+  it("controlled: shown ahead of the owner, then the owner's value wins", async () => {
+    const save = deferred();
+    function Controlled() {
+      const [color, setColor] = React.useState<string | null>("#ef4444");
+      return (
+        <ColorSwatches
+          presets={presets}
+          value={color}
+          onValueChange={async (next) => {
+            await save.promise;
+            setColor(next);
+          }}
+        />
+      );
+    }
+    render(<Controlled />);
+    const blue = screen.getByRole("radio", { name: "Синий" });
+    fireEvent.click(blue);
+    expect(blue).toHaveAttribute("aria-checked", "true");
+    await act(async () => {
+      save.resolve();
+    });
+    expect(blue).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("radiogroup")).not.toHaveAttribute("aria-busy");
   });
 });

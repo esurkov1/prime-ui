@@ -195,6 +195,12 @@
   color: var(--prime-color-text-muted);
 }
 
+/* Disabled by a Fieldset around: the toggle stays in place and takes no press. */
+.legend .toggle[aria-disabled="true"] {
+  color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
+}
+
 .toggle[aria-pressed="false"] .swatch {
   background: transparent;
   box-shadow: inset 0 0 0 calc(var(--prime-border-width) * 1.5) var(--chart-frame-swatch);

@@ -18,6 +18,7 @@ import { Volume2 } from "@/icons/glyphs/volume-2";
 import { VolumeX } from "@/icons/glyphs/volume-x";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabledControl } from "@/internal/disabledContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { formatClock } from "@/internal/formatClock";
 import { formatLabel } from "@/internal/formatLabel";
@@ -474,6 +475,9 @@ function CarouselRoot({
     axis: "inline",
   });
 
+  // The dots are controls of their own: a disabled Fieldset around takes them out (its Buttons
+  // read the same context).
+  const dotsOff = useInheritedDisabledControl();
   const dots = dotted ? (
     <div ref={dotsRef} className={styles.dots}>
       {items.map((_, at) => (
@@ -488,9 +492,14 @@ function CarouselRoot({
           aria-label={slideName(at)}
           aria-current={at === current ? true : undefined}
           className={cx(styles.dot, touchTargetBlockClass)}
+          disabled={dotsOff.native}
+          aria-disabled={dotsOff.ariaDisabled}
+          data-reachable-disabled={dotsOff.reachable || undefined}
           data-carousel-dot=""
           {...{ [CONTROL]: "" }}
-          onClick={() => request(at, "dot")}
+          onClick={() => {
+            if (!dotsOff.disabled) request(at, "dot");
+          }}
         >
           <span className={cx(pill.inkMuted, styles.mark)} />
         </button>

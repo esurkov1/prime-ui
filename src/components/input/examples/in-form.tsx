@@ -1,5 +1,5 @@
 /** Company details form: required fields checked on submit, each error leaves as its field is fixed and a saved form turns the button green; neighbours keep their bottoms aligned — `required`, `error`, `reserveSupportRow`. */
-import { Button, Input } from "prime-ui-kit";
+import { Button, Fieldset, Input } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -32,51 +32,49 @@ export default function InputInFormExample() {
 
   return (
     <form className={styles.form} noValidate onSubmit={submit}>
-      <div className={styles.formFields}>
-        <div className={styles.formWide}>
-          <Input.Root label="Название организации" required error={errors.name}>
+      <Fieldset>
+        <Input.Root label="Название организации" required error={errors.name}>
+          <Input.Wrapper>
+            <Input.Field
+              name="name"
+              onValueChange={() => edit("name")}
+              defaultValue="ООО «Северный ветер»"
+            />
+          </Input.Wrapper>
+        </Input.Root>
+        <Fieldset layout="pair">
+          <Input.Root label="ИНН" required error={errors.inn} reserveSupportRow>
             <Input.Wrapper>
               <Input.Field
-                name="name"
-                onValueChange={() => edit("name")}
-                defaultValue="ООО «Северный ветер»"
+                name="inn"
+                defaultValue="78123"
+                inputMode="numeric"
+                onValueChange={() => edit("inn")}
               />
             </Input.Wrapper>
           </Input.Root>
-        </div>
-        <Input.Root label="ИНН" required error={errors.inn} reserveSupportRow>
-          <Input.Wrapper>
-            <Input.Field
-              name="inn"
-              defaultValue="78123"
-              inputMode="numeric"
-              onValueChange={() => edit("inn")}
-            />
-          </Input.Wrapper>
-        </Input.Root>
-        <Input.Root label="КПП" optional reserveSupportRow>
-          <Input.Wrapper>
-            <Input.Field
-              name="kpp"
-              placeholder="9 цифр"
-              inputMode="numeric"
-              onValueChange={() => edit()}
-            />
-          </Input.Wrapper>
-        </Input.Root>
-        <div className={styles.formWide}>
-          <Input.Root label="Почта для счетов" hint="Сюда придут счета и акты">
+          <Input.Root label="КПП" optional reserveSupportRow>
             <Input.Wrapper>
               <Input.Field
-                name="email"
-                type="email"
-                placeholder="buh@company.ru"
+                name="kpp"
+                placeholder="9 цифр"
+                inputMode="numeric"
                 onValueChange={() => edit()}
               />
             </Input.Wrapper>
           </Input.Root>
-        </div>
-      </div>
+        </Fieldset>
+        <Input.Root label="Почта для счетов" hint="Сюда придут счета и акты">
+          <Input.Wrapper>
+            <Input.Field
+              name="email"
+              type="email"
+              placeholder="buh@company.ru"
+              onValueChange={() => edit()}
+            />
+          </Input.Wrapper>
+        </Input.Root>
+      </Fieldset>
       <div className={styles.formActions}>
         <Button.Root
           variant="soft"

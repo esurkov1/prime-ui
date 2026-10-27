@@ -272,6 +272,7 @@ export { DigitInput } from "./digit-input/DigitInput";
 export type { DividerAlign, DividerOrientation, DividerProps } from "./divider/Divider";
 export { Divider } from "./divider/Divider";
 export type {
+  DndAddButtonProps,
   DndDraggableProps,
   DndDropZoneProps,
   DndHandleProps,

@@ -1,5 +1,5 @@
 /** Regional settings form: the required country is checked on submit, the error shakes the field and leaves once a country is picked, a calm note confirms the save — `required`, `error`, `hint`. */
-import { Button, Select, Typography } from "prime-ui-kit";
+import { Button, Fieldset, Select, Typography } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -25,7 +25,7 @@ export default function SelectInFormExample() {
           Влияют на валюту, формат дат и время в отчётах.
         </Typography>
       </div>
-      <div className={styles.formFields}>
+      <Fieldset layout="pair">
         <Select.Root
           label="Страна"
           required
@@ -62,7 +62,7 @@ export default function SelectInFormExample() {
             <Select.Item value="ekb">Екатеринбург, UTC+5</Select.Item>
           </Select.Content>
         </Select.Root>
-      </div>
+      </Fieldset>
       <div className={styles.formActions}>
         {saved ? (
           <Typography as="p" variant="body-s" tone="secondary">

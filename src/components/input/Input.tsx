@@ -11,7 +11,7 @@ import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { useInheritedDisabled } from "@/internal/disabledContext";
+import { useDisabledControl, useInheritedDisabled } from "@/internal/disabledContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import {
   FieldActionButton,
@@ -478,6 +478,8 @@ function InputField({
   const setRefs = useMergedRefs(inputRef, ref);
   const highlighted = useStoreSlice(suggest?.highlight ?? NO_HIGHLIGHT, (value) => value);
   const disabled = useInheritedDisabled(disabledProp);
+  // Under a tooltip's trigger a disabled field stays reachable: read-only, out of the form.
+  const off = useDisabledControl(disabled);
   const autofill = useAutofill(autoComplete);
 
   const fieldType = type === "password" && revealed ? "text" : type;
@@ -518,8 +520,11 @@ function InputField({
       className={cx(styles.field, className)}
       aria-invalid={invalid || undefined}
       aria-describedby={resolvedDescribedBy}
-      disabled={disabled || undefined}
-      required={required ?? (requiredCtx || undefined)}
+      disabled={off.native || undefined}
+      aria-disabled={off.ariaDisabled}
+      readOnly={off.reachable || rest.readOnly}
+      name={off.reachable ? undefined : rest.name}
+      required={off.reachable ? undefined : (required ?? (requiredCtx || undefined))}
       type={fieldType}
       aria-busy={commit.state === "pending" || undefined}
       {...autofill}

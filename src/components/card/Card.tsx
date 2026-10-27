@@ -275,7 +275,7 @@ CardHeader.displayName = "Card.Header";
 export type CardIconProps = DivProps;
 
 /**
- * The mark that leads the header, as tall as the title with its description (32 · 40 · 48 · 56 · 64): the
+ * The mark that leads the header, as tall as the title with its description (32 · 32 · 40 · 48 · 56): the
  * accent tile of one icon, or the record's picture (an `Avatar.Root` or a `Thumbnail.Root`
  * anywhere inside) or its state ring (a `ProgressCircle`) with no tile. A one-line card with a
  * switch takes it a step smaller; under a top cover it is the owner's avatar on the cover's edge.

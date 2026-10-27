@@ -11,6 +11,7 @@
 - A must-finish step tied to a button (a note, a reason) that closes only from its own buttons.
 - An explanation with more than one sentence, or with a link, next to a term.
 - A hint or a person card that opens on hover yet holds a link or a button (`openOn="hover"`) — what a Tooltip cannot hold.
+- The details behind a status chip (a sync state, a record's health): a `Badge.Root` with its `tone` is the child of `Popover.Trigger` — the badge becomes the opener with a chevron, keeps its tone while open and takes `Badge.Description` for a second line.
 
 ## When not to use
 - A one-line hint on hover → use [Tooltip](../tooltip/COMPONENT.md).
@@ -200,6 +201,7 @@ No `labels`.
 | [flush.tsx](examples/flush.tsx) | A notification list whose rows and dividers reach the panel edges; each row brings its own padding — `flush`. |
 | [from-menu.tsx](examples/from-menu.tsx) | A menu command opens a panel at the same button: the rename item shows a form anchored to the menu button and focus lands in its field, not back on that button — `Popover.Anchor`, `initialFocus`. |
 | [hover-card.tsx](examples/hover-card.tsx) | A hint that holds a link and a person card open on hover and keyboard focus, and Tab moves into them — `openOn`. |
+| [status-chip.tsx](examples/status-chip.tsx) | A status chip that opens its details: the badge is the trigger, keeps its tone while the panel is open and shows the time on a second line — `Popover.Trigger`, `Badge.Description`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A note being typed is not lost to a stray click: the panel closes only from its buttons, and not at all while the note is saved — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the open state: another button opens the panel from code, and the panel's own button in `Popover.Close` closes it — `open`, `onOpenChange`. |
 | [in-form.tsx](examples/in-form.tsx) | An invite form in a panel: Tab stays inside, the role list does not count as an outside click, an invalid email shakes the field and keeps the panel open until it is fixed — `trapFocus`, `error`. |
@@ -209,6 +211,7 @@ No `labels`.
 - A hint of a few words in a Popover → use Tooltip (hover / focus, no interactive content).
 - A link or a button inside a Tooltip → a Popover with `openOn="hover"`: the pointer reaches it and Tab moves into it.
 - A hover panel whose trigger is not focusable (a plain `<span>`) → keyboard users never open it; the trigger is a button or a link.
+- A status chip as the opener through `Popover.Anchor` and the badge's `pressed` triad → put the badge in `Popover.Trigger`: it gets `aria-expanded` and keeps its status tone; pressed is a toggle's selected look, not an open state.
 - A form without `trapFocus` → add it so Tab stays in the panel.
 - Closing from inside through your own `open` state only → wrap the button in `Popover.Close`.
 - A menu of actions built from buttons in a Popover → use Dropdown (roving focus, menu roles).

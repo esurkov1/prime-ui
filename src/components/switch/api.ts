@@ -169,6 +169,10 @@ export const api: ComponentApi = {
         en: "While a change is saved (`loading` or a pending promise) the input has `aria-busy`; the thumb's spinner is hidden from assistive tech. A refused save puts the state back — say why with `error`.",
         ru: "Пока изменение сохраняется (`loading` или ожидающий промис), на input `aria-busy`, а спиннер в бегунке скрыт от вспомогательных технологий; при отказе состояние возвращается, причину покажите через `error`.",
       },
+      {
+        en: 'Under a `Tooltip.Trigger` a disabled switch is `aria-disabled="true"` with no native `disabled`, `name` or `required`: it keeps its tab stop and its node, a press changes nothing, the form skips it.',
+        ru: 'В `Tooltip.Trigger` выключенный переключатель — `aria-disabled="true"` без нативного `disabled`, `name` и `required`: остаётся точкой Tab и тем же узлом, нажатие ничего не меняет, форма его пропускает.',
+      },
     ],
   },
 };

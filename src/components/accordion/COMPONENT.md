@@ -142,7 +142,7 @@ Accordion.Root                frame (grouped) or column of cards (separate)
 |---|---|---|
 | open / closed | `value` / `defaultValue` + `onValueChange` | `data-state="open" \| "closed"` on Item, Trigger and Content; `aria-expanded` on Trigger; `inert` on a Content while it closes, then `hidden="until-found"` on its inner clip |
 | found in page | find in page matches text in a closed Content (`beforematch`) | the item opens at once (no fold motion in that frame), the browser scrolls to and marks the match |
-| disabled | `disabled` on Item | `data-disabled` on Item and Trigger, native `disabled`, `text-disabled`, `cursor: not-allowed` |
+| disabled | `disabled` on Item, or a disabled `Fieldset` around it | `data-disabled` on Item and Trigger, native `disabled` (under a `Tooltip.Trigger` `aria-disabled="true"`, the same node), `text-disabled`, `cursor: not-allowed` |
 | hover / active | pointer | trigger `fill-muted-hover` (two ladder steps off the accordion's layer, so it never lands on the host's color at the edges) / `fill-strong` |
 | focus-visible | keyboard | inset focus ring inside the trigger |
 
@@ -154,6 +154,7 @@ Root: `data-size`, `data-layout`. The panel is the kit fold (`Disclosure`): its 
 - The root is a layer of the surface ladder (`data-depth`): fields inside panels take that layer's fill automatically.
 - Stack several accordions or an accordion and other blocks with the page gap between groups.
 - On a coarse pointer a trigger is at least the touch target high.
+- A `StatusDot` in `Accordion.Description` may come from your own component: the line finds it by its `data-status-dot` when it is the first element, and puts the «·» after it.
 
 ## Accessibility
 
@@ -171,6 +172,7 @@ Root: `data-size`, `data-layout`. The panel is the kit fold (`Disclosure`): its 
 - The trigger is a native `<button>` inside a heading (`<h3>`, or the level of `as`) with `aria-expanded` and `aria-controls`.
 - The panel is a `<section>` with `aria-labelledby`; closed content is `inert` while it closes, then `hidden="until-found"`: out of the tab order and the accessibility tree, yet find in page reaches it and opens the item at once.
 - The chevron and `Accordion.Icon` are `aria-hidden`.
+- Under a `Tooltip.Trigger` a disabled `Accordion.Trigger` is `aria-disabled="true"` with no native `disabled`: it keeps its tab stop and its node, a press neither opens nor closes it.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

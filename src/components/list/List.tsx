@@ -10,6 +10,7 @@ import { Check } from "@/icons/glyphs/check";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
@@ -561,7 +562,7 @@ export type ListItemProps = ListItemOwnProps &
 function ListItem({
   value,
   current = false,
-  disabled = false,
+  disabled: disabledProp = false,
   locked = false,
   asChild = false,
   href,
@@ -576,6 +577,7 @@ function ListItem({
   rel,
   ...rest
 }: ListItemProps) {
+  const disabled = useInheritedDisabled(disabledProp);
   const list = React.useContext(ListContext);
   const size = list?.size ?? "m";
   const selection = list?.selection ?? null;
@@ -656,6 +658,8 @@ function ListItem({
         aria-selected={checked}
         aria-disabled={disabled || undefined}
         tabIndex={value !== undefined && selection.active === value ? 0 : -1}
+        // Its `tabIndex={-1}` is the roving model: a tooltip's trigger never hosts it.
+        data-reachable-disabled={disabled || undefined}
         className={hitClass}
         data-interactive={disabled ? undefined : ""}
         onClick={(event) => {

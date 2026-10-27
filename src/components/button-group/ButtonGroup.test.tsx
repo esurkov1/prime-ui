@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
@@ -276,5 +276,82 @@ describe("ButtonGroup field frame", () => {
       '.item[aria-pressed="true"]',
     );
     expect(cssValue(rule, "background")).toBe("var(--prime-color-accent-soft)");
+  });
+});
+
+describe("ButtonGroup.Item pressed triad", () => {
+  function deferred() {
+    let resolve: () => void = () => {};
+    let reject: (reason: unknown) => void = () => {};
+    const promise = new Promise<void>((done, fail) => {
+      resolve = done;
+      reject = fail;
+    });
+    return { promise, resolve, reject };
+  }
+
+  it("uncontrolled: a press flips the state and reports it; Space presses too", async () => {
+    const user = userEvent.setup();
+    const onPressedChange = vi.fn();
+    render(
+      <ButtonGroup.Root aria-label="Фильтр">
+        <ButtonGroup.Item defaultPressed={false} onPressedChange={onPressedChange}>
+          Мои
+        </ButtonGroup.Item>
+      </ButtonGroup.Root>,
+    );
+    const item = screen.getByRole("button", { name: "Мои" });
+    expect(item).toHaveAttribute("aria-pressed", "false");
+    await user.click(item);
+    expect(item).toHaveAttribute("aria-pressed", "true");
+    expect(item).toHaveAttribute("data-state", "active");
+    expect(onPressedChange).toHaveBeenLastCalledWith(true);
+    await user.keyboard(" ");
+    expect(item).toHaveAttribute("aria-pressed", "false");
+    expect(onPressedChange).toHaveBeenLastCalledWith(false);
+  });
+
+  it("async: the new state shows at once, presses wait; resolve keeps it", async () => {
+    const user = userEvent.setup();
+    const save = deferred();
+    const onPressedChange = vi.fn(() => save.promise);
+    render(
+      <ButtonGroup.Root aria-label="Фильтр">
+        <ButtonGroup.Item defaultPressed={false} onPressedChange={onPressedChange}>
+          Мои
+        </ButtonGroup.Item>
+      </ButtonGroup.Root>,
+    );
+    const item = screen.getByRole("button", { name: "Мои" });
+    await user.click(item);
+    expect(item).toHaveAttribute("aria-pressed", "true");
+    expect(item).toHaveAttribute("aria-busy", "true");
+    await user.click(item);
+    expect(onPressedChange).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      save.resolve();
+    });
+    expect(item).toHaveAttribute("aria-pressed", "true");
+    expect(item).not.toHaveAttribute("aria-busy");
+  });
+
+  it("async: reject turns the state back", async () => {
+    const user = userEvent.setup();
+    const save = deferred();
+    render(
+      <ButtonGroup.Root aria-label="Фильтр">
+        <ButtonGroup.Item defaultPressed onPressedChange={() => save.promise}>
+          Мои
+        </ButtonGroup.Item>
+      </ButtonGroup.Root>,
+    );
+    const item = screen.getByRole("button", { name: "Мои" });
+    await user.click(item);
+    expect(item).toHaveAttribute("aria-pressed", "false");
+    await act(async () => {
+      save.reject(new Error("offline"));
+    });
+    expect(item).toHaveAttribute("aria-pressed", "true");
+    expect(item).not.toHaveAttribute("aria-busy");
   });
 });

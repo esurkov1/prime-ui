@@ -262,6 +262,10 @@ export const api: ComponentApi = {
         en: 'The formatting toolbar is `role="toolbar"` named `labels.formatting`, `aria-controls` the textarea, with one Tab stop and arrow keys; every button has `aria-keyshortcuts` and a tooltip with its keys (`⌘B` on Apple systems, `Ctrl+B` elsewhere). A press on a tool keeps the focus and the selection in the field.',
         ru: 'Панель форматирования — `role="toolbar"` с именем `labels.formatting` и `aria-controls` на поле, с одной точкой Tab и стрелками; у кнопок `aria-keyshortcuts` и подсказка с клавишами (`⌘B` на системах Apple, `Ctrl+B` на остальных). Нажатие на кнопку оставляет фокус и выделение в поле.',
       },
+      {
+        en: 'Under a `Tooltip.Trigger` a disabled field is `aria-disabled="true"` and `readOnly` with no native `disabled`, `name` or `required`: it keeps its tab stop, its node and its text, the form skips it.',
+        ru: 'В `Tooltip.Trigger` выключенное поле — `aria-disabled="true"` и `readOnly` без нативного `disabled`, `name` и `required`: остаётся точкой Tab и тем же узлом с текстом, форма его пропускает.',
+      },
     ],
   },
 };

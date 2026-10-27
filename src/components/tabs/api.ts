@@ -124,8 +124,8 @@ export const api: ComponentApi = {
           name: "disabled",
           type: "boolean",
           default: "false",
-          en: "Disables the tab; clicks and arrow keys skip it.",
-          ru: "Отключает вкладку; клик и стрелки её пропускают.",
+          en: "Disables the tab (`aria-disabled`, the same element in the same place); clicks and arrow keys skip it.",
+          ru: "Отключает вкладку (`aria-disabled`, тот же элемент на том же месте); клик и стрелки её пропускают.",
         },
         {
           name: "onRemove",
@@ -332,6 +332,10 @@ export const api: ComponentApi = {
       {
         en: "`Tabs.Icon` and `Tabs.Separator` are `aria-hidden`.",
         ru: "`Tabs.Icon` и `Tabs.Separator` скрыты (`aria-hidden`).",
+      },
+      {
+        en: "A disabled tab is `aria-disabled` rather than natively `disabled`: it keeps its node and its `Tooltip` as `disabled` flips, takes hover, and selection never lands on it.",
+        ru: "Неактивная вкладка — `aria-disabled`, а не нативный `disabled`: при смене `disabled` она остаётся тем же узлом со своим `Tooltip`, принимает наведение, а выбор на неё не попадает.",
       },
       {
         en: "When only icons are left, a `VisuallyHidden` copy of the label names the tab and the label shows in a `Tooltip` on hover and focus.",

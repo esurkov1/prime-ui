@@ -8,6 +8,7 @@ import { useResizeEffect } from "@/hooks/useElementSize";
 import { prefersReducedMotion } from "@/hooks/usePresence";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import { iconSlotClass } from "@/internal/iconBox";
 import { InteractiveElement } from "@/internal/interactiveElement";
 import { useLabels } from "@/internal/labels";
@@ -294,7 +295,7 @@ export type BottomNavItemProps = BottomNavItemOwnProps &
  */
 function BottomNavItem({
   current = false,
-  disabled = false,
+  disabled: disabledProp = false,
   asChild = false,
   href,
   target,
@@ -303,6 +304,7 @@ function BottomNavItem({
   children,
   ...rest
 }: BottomNavItemProps) {
+  const disabled = useInheritedDisabled(disabledProp);
   const { iconOnly, floating } = React.useContext(LookContext);
   const shared = {
     ...rest,

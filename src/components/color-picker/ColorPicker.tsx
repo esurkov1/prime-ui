@@ -493,7 +493,9 @@ function Swatches(props: ColorPickerSwatchesProps) {
     <ColorSwatches
       {...props}
       value={state.color.toString("hex")}
-      onValueChange={(next) => next && state.setColor(parseColor(next))}
+      onValueChange={(next) => {
+        if (next) state.setColor(parseColor(next));
+      }}
     />
   );
 }

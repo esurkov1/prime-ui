@@ -15,11 +15,12 @@ export type StatusDotProps = React.HTMLAttributes<HTMLSpanElement> & {
 /**
  * A state in a line of text: a dot of the tone and the word that names it («● Работает»). The
  * word carries the meaning, the dot only repeats it; it takes the type and the color of the text
- * around it.
+ * around it. `data-status-dot` marks it in the DOM, so a description line finds it behind the
+ * consumer's own wrapper component (internal/headerRow).
  */
 export function StatusDot({ tone = "neutral", className, children, ...rest }: StatusDotProps) {
   return (
-    <span {...rest} className={cx(styles.root, className)} data-tone={tone}>
+    <span {...rest} className={cx(styles.root, className)} data-tone={tone} data-status-dot="">
       <span aria-hidden="true" className={styles.dot} />
       {children}
     </span>

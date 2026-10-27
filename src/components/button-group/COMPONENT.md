@@ -7,7 +7,7 @@
 
 ## When to use
 - A few related actions shown as one control (Undo / Redo, Submit / Reset, export formats).
-- Toolbar toggles: independent on/off segments with `pressed`.
+- Toolbar toggles: independent on/off segments with the pressed triad (`pressed` / `defaultPressed` / `onPressedChange`, a promise for a save on the server).
 - A one-of-several switch that behaves like toolbar buttons (period, view mode), with `pressed` on the active segment.
 - A vertical stack of related options (`orientation="vertical"`).
 
@@ -61,7 +61,9 @@ The root is a field root: `className`, `ref` and the native attributes land on t
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `pressed` | `boolean` | — | Toggle state: `aria-pressed` and `data-state="active" \| "inactive"`. Leave it out for a plain action segment. |
+| `pressed` | `boolean` | — | Toggle state (controlled): `aria-pressed` and `data-state="active" \| "inactive"`. Leave the whole triad out for a plain action segment. |
+| `defaultPressed` | `boolean` | — | The initial state of an uncontrolled toggle segment; a press flips it. |
+| `onPressedChange` | `(pressed: boolean) => void \| Promise<void>` | — | The new state on a press (after `onClick`). A promise: the state shows at once, the segment is `aria-busy`, presses wait; a controlled owner sets `pressed` before resolving; reject turns it back. |
 | `disabled` | `boolean` | — | Native disabled; a disabled `Fieldset` around the group sets it too. |
 | `children` | `ReactNode` | — | Label and `ButtonGroup.Icon`. Only icons → square segment; give it `aria-label`. |
 | `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `type` (`"button"` unless set: `"submit"` / `"reset"` in a form), `onClick`, `className`, `aria-*` and the other button attributes. |
@@ -114,8 +116,9 @@ Do not mix action segments and toggle segments in one group, and do not put the 
 | State | Driven by | DOM |
 |---|---|---|
 | hover / press | pointer | hover `fill-muted-hover` + primary text; a press gives the segment in by `--prime-motion-press-distance` (`-compact` for icon-only segments, `internal/press`) and keeps its fill; disabled never scales |
-| pressed | `pressed` | `aria-pressed` (the look is styled from it), `data-state="active" \| "inactive"` |
-| disabled | `disabled` on an Item, or a disabled `Fieldset` around the group | native `:disabled`: `fill-muted` + `text-disabled`, `cursor: not-allowed` |
+| pressed | `pressed` / `defaultPressed` (a press flips it and calls `onPressedChange`) | `aria-pressed` (the look is styled from it), `data-state="active" \| "inactive"` |
+| saving | `onPressedChange` returned a pending promise | the segment shows its new state at once, `aria-busy`, `cursor: progress`, keeps its size and colors; presses wait; a rejection turns the state back |
+| disabled | `disabled` on an Item, or a disabled `Fieldset` around the group | native `:disabled` (under a `Tooltip.Trigger` `aria-disabled="true"`, the same node): `fill-muted` + `text-disabled`, `cursor: not-allowed` |
 | focus-visible | keyboard | in a row the ring is inside the segment (the row scrolls, it clips); in a column the outer ring; the segment is raised above its neighbours |
 | invalid | `invalid` or non-empty `error` | group `data-invalid="true"` + `aria-invalid="true"`, an inset danger ring on every segment; the error replaces the hint; the segments shake once when an error arrives |
 | required | `required` | red `*` after the label, `aria-required="true"` on the group |
@@ -123,7 +126,7 @@ Do not mix action segments and toggle segments in one group, and do not put the 
 | support row reserved | `reserveSupportRow` | the support row stays rendered while empty, so an error arriving shifts nothing |
 | overflow | a row wider than its container | the row scrolls inside itself with faded edges (`data-overflow-start` / `data-overflow-end`), never wraps or truncates |
 
-Group attributes: `data-size`, `data-orientation="vertical"` (only when vertical), `data-full-width`. Item attributes: `data-icon-only`, `data-leading-icon`, `data-trailing-icon` (optical padding `padX − 4px` on the icon side). Selection is always owned by the parent: keep the value in state and set `pressed`.
+Group attributes: `data-size`, `data-orientation="vertical"` (only when vertical), `data-full-width`. Item attributes: `data-icon-only`, `data-leading-icon`, `data-trailing-icon` (optical padding `padX − 4px` on the icon side). A toggle segment takes the pressed triad (`pressed` / `defaultPressed` / `onPressedChange`); a set of segments where one is active keeps its value in the parent and sets `pressed` on each. A `disabled` segment keeps its size: disabled changes only colors and the cursor.
 
 ## Layout & spacing
 - Groups in a toolbar: one tier gap between controls; push the primary Button to the end with a flexible spacer.
@@ -144,8 +147,9 @@ Group attributes: `data-size`, `data-orientation="vertical"` (only when vertical
 
 - The group element is `role="group"`, named by `label` (`aria-labelledby`); without a label give the root `aria-label`. Set `role="toolbar"` on the outer container of several groups.
 - Hint and error are linked through `aria-describedby`; an error sets `aria-invalid="true"`, `required` sets `aria-required="true"`.
-- Toggle segments expose `aria-pressed`; in a toggle set pass `pressed={false}` to the inactive ones.
+- Toggle segments expose `aria-pressed`; in a toggle set pass `pressed={false}` to the inactive ones. While an `onPressedChange` promise is pending the segment is `aria-busy`.
 - Icon-only segments need `aria-label`; `ButtonGroup.Icon` is `aria-hidden`.
+- Under a `Tooltip.Trigger` a disabled `ButtonGroup.Item` is `aria-disabled="true"` with no native `disabled`: it keeps its tab stop and its node, the press and a form submit are blocked.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -163,6 +167,7 @@ Group attributes: `data-size`, `data-orientation="vertical"` (only when vertical
 | [with-icon.tsx](examples/with-icon.tsx) | An icon before the label and square icon-only segments — `ButtonGroup.Icon`, `aria-label`. |
 | [orientation.tsx](examples/orientation.tsx) | A row of segments and a column of related options — `orientation`. |
 | [full-width.tsx](examples/full-width.tsx) | The group fills its column and the segments share the width equally — `fullWidth`. |
+| [saving.tsx](examples/saving.tsx) | Feed filters saved to the profile on the server: a toggle shows its new state at once, and a refused save turns it back and says why — `defaultPressed`, `onPressedChange`, `error`. |
 | [controlled.tsx](examples/controlled.tsx) | One of several: the active segment lives in parent state — `pressed`. |
 | [in-form.tsx](examples/in-form.tsx) | A task form: the priority toggles are a labelled field checked on submit, an optional reminder, and native submit and reset segments in one group — `label`, `required`, `hint`, `error`, `optional`, `type`. |
 
@@ -172,6 +177,7 @@ Group attributes: `data-size`, `data-orientation="vertical"` (only when vertical
 - Expecting `value` / `onValueChange` → ButtonGroup has none; keep the value in state and set `pressed`, or use SegmentedControl.
 - `pressed` only on the active segment of a toggle set → pass `pressed={false}` to the others so they announce as toggles.
 - Icon-only segment without `aria-label` → add it.
+- `disabled` on a toggle segment for the time of a save → return the request's promise from `onPressedChange`; the segment waits `aria-busy` and turns back on a refusal.
 - A `Label` + `Hint` pair wired by hand around a toggle set in a form → `label`, `hint`, `error` on the root.
 
 ## Related

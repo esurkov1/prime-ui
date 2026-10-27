@@ -23,7 +23,7 @@ import type { ControlSize, PaletteColor, TextTone, Tone, Variant } from "prime-u
 | Validation | `invalid`, `hint`, `error` | Props, never parts. A non-empty `error` implies `invalid`; sets `aria-invalid`, `data-invalid`. |
 | Value | `value` / `defaultValue` / `onValueChange(value)` | Accordion, Chat.Pinned, ChatList, ColorField, ColorPicker, ColorPresets, ColorSwatches, Composer, Datepicker, Datepicker.Panel, DigitInput, FieldList, FileUpload, FileUpload.Queue, Kanban, List, NativeSelect, Pagination, Radio.Group, SegmentedControl, Select, Slider, SmartFilter, Stepper, Tabs, TagSelect. |
 | Text value | native `value` / `onChange` + `onValueChange(string)` | Input (`Input.Field`), Textarea. |
-| Other state | `x` / `defaultX` / `onXChange(x)` | Badge `pressed`; Button `pressed`; Carousel `index`; ChartFrame `hiddenSeries`; Chat `selected`, `search`; ChatList `search`; ColorPicker `format`; CommandMenu `search`; Composer `recordMode`; DataTable `hiddenColumns`, `columnOrder`, `page`, `sort`, `selected`, `expanded`, `collapsedGroups`; DataTableColumnsMenu `hiddenColumns`; ExampleFrame `viewport`, `colorScheme`; Gallery `index`; Gantt `zoom`; GanttCategoriesMenu `hiddenCategories`; Kanban `columnOrder`; KanbanFieldsMenu `hiddenFields`, `fieldOrder`; MediaViewer `index`; Message.Media `index`; Select `search`; SmartFilter `search`; Sparkline `point`, `grain`; VideoNote `playing`, `transcriptExpanded`; VoicePlayer `rate`, `playing`, `transcriptExpanded`; Sidebar `mode`. |
+| Other state | `x` / `defaultX` / `onXChange(x)` | Badge `pressed`; Button `pressed`; ButtonGroup.Item `pressed`; Carousel `index`; ChartFrame `hiddenSeries`; Chat `selected`, `search`; ChatList `search`; ColorPicker `format`; CommandMenu `search`; Composer `recordMode`; DataTable `hiddenColumns`, `columnOrder`, `page`, `sort`, `selected`, `expanded`, `collapsedGroups`; DataTableColumnsMenu `hiddenColumns`; ExampleFrame `viewport`, `colorScheme`; Gallery `index`; Gantt `zoom`; GanttCategoriesMenu `hiddenCategories`; Kanban `columnOrder`; KanbanFieldsMenu `hiddenFields`, `fieldOrder`; MediaViewer `index`; Message.Media `index`; Select `search`; SmartFilter `search`; Sparkline `point`, `grain`; VideoNote `playing`, `transcriptExpanded`; VoicePlayer `rate`, `playing`, `transcriptExpanded`; Sidebar `mode`. |
 | Checked | `checked` / `defaultChecked` / `onCheckedChange(checked)` | Checkbox, Dropdown.CheckboxItem, Switch, Thumbnail. |
 | Open | `open` / `defaultOpen` / `onOpenChange(open)` | ColorPresets, CommandMenu, Composer.Keyboard, ConfirmDialog, Datepicker, Drawer, Dropdown, Gallery, MediaViewer, Message.Media, Modal, Popover, Select, Sheet, TagSelect, Tooltip, Page.Split, Sidebar, Sidebar.Group, Sidebar.Sub. |
 | Dismiss | `closeOnOutsideClick` (default `true`), `closeOnEscape` (default `true`) | Both on every overlay that opens a layer: the dialogs, the floating panels, the panels of Select, TagSelect, Datepicker and ColorPresets, the `suggestions` list of Input, the off-canvas Sidebar and the reaction bar of a message. `ConfirmDialog` takes both with `closeOnOutsideClick` default `false` (Escape is held while `onConfirm` runs). Tooltip and Notification take neither. A form holds closing with `Modal.Guard` / `Drawer.Guard` / `Sheet.Guard`. |
@@ -44,6 +44,39 @@ a Popover or Dropdown `Content`, a Banner, a LoginForm, the DataTable `toolbar`,
 `m`. Set the tier once on the region (`<ControlSizeProvider value="s">` around a dense toolbar), never
 `size` on one control to make it fit. A control nested in another component's row is one tier down
 by hand: buttons and menus in table cells `s`; the header and footer of a surface (Card, Modal, Drawer) set their controls' tier themselves.
+
+Every `size` you write has a reason you can name — a dialog's width, a control in a table cell, the
+tier of a whole region on `ControlSizeProvider`, a chip two steps above `xs` fields — or it goes.
+Inside a Popover, a Modal, a Drawer, a Sheet or a LoginForm no kit control takes one, and nothing in
+`Page.Tools` or `Page.Actions` stands taller than the bar's controls.
+
+```tsx partial
+// bad — a 28px badge beside 36px buttons in the bar, a list resized inside a sized popover,
+// xs written on every button of a set
+<Page.Actions>
+  <Badge.Root size="l" tone="success">В эфире</Badge.Root>
+</Page.Actions>
+<Popover.Content size="s">
+  <DescriptionList.Root size="xs">…</DescriptionList.Root>
+</Popover.Content>
+<Button.Root size="xs">…</Button.Root>
+<Button.Root size="xs">…</Button.Root>
+```
+
+```tsx good
+// good — the host gives the tier; a set of small controls takes one tier for its region
+<>
+  <Popover.Content size="s">
+    <DescriptionList.Root>
+      <DescriptionList.Item label="Источник">Студия 2</DescriptionList.Item>
+    </DescriptionList.Root>
+  </Popover.Content>
+  <ControlSizeProvider value="xs">
+    <Button.Root variant="soft" tone="neutral">Тест</Button.Root>
+    <Button.Root variant="soft" tone="neutral">Сброс</Button.Root>
+  </ControlSizeProvider>
+</>
+```
 
 ## Controlled vs uncontrolled
 
@@ -84,7 +117,9 @@ export function PeriodFilter() {
   return `true` / `false` (or `{ ok }`) from an event. A controlled owner applies the new value before
   resolving. The async events: Input / Textarea `onCommit`, ConfirmDialog `onConfirm`,
   `EmptyPage.RetryButton` and CommandMenu `onRetry`, Button `onConfirm` (`holdToConfirm`), Slider
-  `onCommit`, DigitInput `onComplete`, Tabs `onRemove`, Switch `onCheckedChange`, Badge `onRemove`,
+  `onCommit`, DigitInput `onComplete`, Tabs `onRemove`, Switch and Checkbox `onCheckedChange`,
+  Select, NativeSelect, Datepicker, `Radio.Group`, `SegmentedControl.Root` and ColorSwatches
+  `onValueChange`, `Badge.Root` and `ButtonGroup.Item` `onPressedChange`, Badge `onRemove`,
   FileUpload and FieldList `onValueChange`, TagSelect `onCreate` / `onOptionUpdate` / `onOptionDelete`, DataTable
   and Dnd `onReorder`, Kanban `onValueChange` / `onColumnOrderChange`, Gantt `onBarChange` /
   `onBarCreate`, Composer `onSend` / `onSendVoice` / `onSendVideoNote`, `Message.Root`
@@ -108,6 +143,30 @@ export function PeriodFilter() {
   save there.
 - Verbs: `onSelect` activates a menu or command item, `onRemove` takes a value out of a selection,
   `onDelete` destroys an entity, `onDismiss` closes a message.
+
+### A control that applies at once
+
+A setting that applies without a form — a switch, a choice, a toggle, a slider — shows the new value
+the moment it is touched; the request runs behind it, and a refusal puts the old value back and says
+why (`error`, or a `notify` for a failure that is not the field's). The screen never freezes for a
+request: no `disabled` on the control or on its neighbours for the time of a save, no spinner of
+your own, no label that changes only after the answer — another control stays usable while one
+saves. Return the request's Promise from the component's async event above; a control of your own
+with no such event keeps an optimistic local value (set at once, put back on a rejection). A form
+with a submit is the other case: its fields wait in `Fieldset disabled` ([forms](#forms)).
+
+```tsx partial
+// bad — the switch freezes for the request and shows the new state only after the answer
+<Switch.Root disabled={saving} checked={confirmed} onCheckedChange={send}>…</Switch.Root>
+```
+
+```tsx good
+// declare: const saveTestSignal: (on: boolean) => Promise<void>
+// good — the state shows at once, the switch stays enabled (`aria-busy`); a rejection rolls it back
+<Switch.Root defaultChecked={false} onCheckedChange={saveTestSignal}>
+  <Switch.Label>Тестовый сигнал</Switch.Label>
+</Switch.Root>
+```
 
 ## Forms
 
@@ -135,8 +194,9 @@ export function PeriodFilter() {
   button outside the form (Modal / Drawer footer) points at it with `form={formId}`.
 - A form inside a Card: wrap the whole `Card.Root` in the `<form>` (Card parts are styled as direct
   children of Root — never put a wrapper between `Card.Root` and `Card.Body` / `Card.Footer`).
-- Fields side by side in a grid row: `align-items: start`. Input and Textarea have `reserveSupportRow`
-  to keep bottoms aligned when only one shows an error; other fields do not.
+- Fields side by side are `Fieldset layout="pair"` ([forms](composition.md#7-forms)). Input and
+  Textarea have `reserveSupportRow` to keep bottoms aligned when only one shows an error; other
+  fields do not.
 
 ```tsx
 import { Button, Input, Select } from "prime-ui-kit";
@@ -378,7 +438,7 @@ crumb of your own.
 <!-- icons:start -->
 `<Icon name="…" />` names:
 - `nav.*`: `chevronDown`, `chevronLeft`, `arrowRight`, `chevronRight`, `chevronUp`, `chevronsLeft`, `chevronsUpDown`, `dashboard`, `home`, `itemDot`, `layoutGrid`, `menu`, `sidebarCollapse`, `sidebarExpand`;
-- `action.*`: `add`, `addContact`, `attach`, `check`, `close`, `copy`, `delete`, `download`, `drag`, `edit`, `externalLink`, `eyedropper`, `filter`, `forward`, `login`, `logout`, `more`, `openApp`, `pause`, `pin`, `play`, `power`, `powerOff`, `react`, `refresh`, `report`, `remove`, `reply`, `search`, `send`, `settings`, `transcribe`, `upload`, `video`, `voice`, `zoomIn`, `zoomOut`;
+- `action.*`: `add`, `addContact`, `attach`, `check`, `close`, `copy`, `delete`, `download`, `drag`, `edit`, `externalLink`, `eyedropper`, `filter`, `flipHorizontal`, `flipVertical`, `forward`, `login`, `logout`, `more`, `openApp`, `pause`, `pin`, `play`, `power`, `powerOff`, `react`, `refresh`, `report`, `remove`, `reply`, `search`, `send`, `settings`, `transcribe`, `upload`, `video`, `voice`, `zoomIn`, `zoomOut`;
 - `field.*`: `calendar`, `email`, `password.show`, `password.hide`;
 - `format.*`: `bold`, `code`, `italic`, `link`, `list`, `quote`, `spoiler`, `strikethrough`, `underline`;
 - `object.*`: `activity`, `bell`, `bike`, `book`, `cart`, `chart`, `crown`, `disc`, `document`, `file`, `fuel`, `funnel`, `globe`, `bot`, `headset`, `image`, `inbox`, `key`, `mapPin`, `megaphone`, `message`, `motorbike`, `package`, `phone`, `receipt`, `rocket`, `scale`, `storage`, `tasks`, `trophy`, `truck`, `user`, `users`, `wallet`;

@@ -45,16 +45,24 @@
   color: var(--prime-color-text-placeholder);
 }
 
+/* The chevron, or the Spinner while a value is saving, in one icon-wide slot. */
 .chevron {
   position: absolute;
   inset-block: 0;
   inset-inline-end: var(--field-px);
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  width: var(--field-icon);
   color: var(--prime-color-text-muted);
   pointer-events: none;
 }
 
-.select:disabled + .chevron {
+/* A value is saving: it stands, picks wait for the answer. */
+.select[data-loading="true"] {
+  cursor: progress;
+}
+
+.select:is(:disabled, [aria-disabled="true"]) + .chevron {
   color: var(--prime-color-text-disabled);
 }

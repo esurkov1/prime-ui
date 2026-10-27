@@ -8,18 +8,6 @@
   width: min(100%, var(--prime-layout-form-width-m));
 }
 
-.formFields {
-  display: grid;
-  /* Two columns while each keeps 12rem, one column in a narrower form — from its own width. */
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-16) * 3)), 1fr));
-  align-items: start;
-  gap: var(--prime-space-5) var(--prime-space-4);
-}
-
-.formWide {
-  grid-column: 1 / -1;
-}
-
 .formActions {
   display: flex;
   justify-content: flex-end;

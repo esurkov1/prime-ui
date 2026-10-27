@@ -14,14 +14,6 @@
   gap: var(--prime-space-1);
 }
 
-.formFields {
-  display: grid;
-  /* Two columns while each keeps 12rem, one column in a narrower form — from its own width. */
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-16) * 3)), 1fr));
-  align-items: start;
-  gap: var(--prime-space-5) var(--prime-space-4);
-}
-
 .formActions {
   display: flex;
   align-items: center;

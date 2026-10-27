@@ -14,6 +14,7 @@ import { ChevronRight } from "@/icons/glyphs/chevron-right";
 import { AUTOFILL_OFF } from "@/internal/autofill";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
+import { NativeButton } from "@/internal/disabledContext";
 import { fieldInputTextClass, fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { useLabels } from "@/internal/labels";
 import listRowStyles from "@/internal/listRow.module.css";
@@ -22,6 +23,7 @@ import menu from "@/internal/menu.module.css";
 import { RegionSwap } from "@/internal/RegionSwap";
 import { type ControlSize, stepDown } from "@/internal/states";
 import textRole from "@/internal/textRole.module.css";
+import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
 
 import styles from "./Datepicker.module.css";
 import {
@@ -119,7 +121,7 @@ export type RangeModeProps = {
   mode: "range";
   value?: DatepickerRange;
   defaultValue?: DatepickerRange;
-  onValueChange?: (value: DatepickerRange) => void;
+  onValueChange?: (value: DatepickerRange) => void | Promise<void>;
   resetValue?: DatepickerRange;
 };
 
@@ -127,7 +129,7 @@ export type SingleModeProps = {
   mode: "single";
   value?: Date | null;
   defaultValue?: Date | null;
-  onValueChange?: (value: Date | null) => void;
+  onValueChange?: (value: Date | null) => void | Promise<void>;
   resetValue?: Date | null;
 };
 
@@ -180,45 +182,84 @@ export function splitCalendarOptions<T extends CalendarOptions>({
   };
 }
 
-/** The value a part works with: controlled or internal, with its setter. */
+/**
+ * The value a part works with: controlled or internal, with its setter. `saving` — a promise from
+ * `onValueChange` is pending: the value it carries is shown, and a new commit waits for its answer.
+ */
 export type DatepickerValue =
   | {
       mode: "range";
       value: DatepickerRange;
       onChange: (value: DatepickerRange) => void;
       resetValue?: DatepickerRange | undefined;
+      saving: boolean;
     }
   | {
       mode: "single";
       value: Date | null;
       onChange: (value: Date | null) => void;
       resetValue?: Date | null | undefined;
+      saving: boolean;
     };
 
 const EMPTY_RANGE: DatepickerRange = { from: null, to: null };
+
+const takeNext = <T,>(_current: T, next: T) => next;
+
+/**
+ * One mode's value under the kit's async-event contract: the stored value with a pending change
+ * drawn over it; `commit(next)` hands it to the owner — a plain answer stores it at once, a promise
+ * holds it until it settles (resolve stores it, reject drops it and the stored value shows again).
+ */
+function usePendingDate<T>(
+  value: T | undefined,
+  defaultValue: T,
+  onValueChange: ((value: T) => void | Promise<void>) | undefined,
+) {
+  const [stored, setStored] = useControllableState<T>({ value, defaultValue });
+  const changes = usePendingChanges(stored, takeNext<T>);
+  const saving = changes.pending.length > 0;
+  const commit = (next: T) => {
+    if (saving || Object.is(next, changes.shown)) return;
+    const outcome = onValueChange?.(next);
+    if (!isPromiseLike(outcome)) {
+      setStored(next);
+      return;
+    }
+    changes.track(next, outcome, { onResolve: () => setStored(next) });
+  };
+  return { value: changes.shown, saving, commit };
+}
 
 /** Controlled-or-internal value of either mode (a part never switches its mode). */
 export function useDatepickerValue(props: RangeModeProps | SingleModeProps): DatepickerValue {
   const range = props.mode === "range" ? props : null;
   const single = props.mode === "single" ? props : null;
-  const [rangeValue, setRange] = useControllableState<DatepickerRange>({
-    value: range?.value,
-    defaultValue: range?.defaultValue ?? EMPTY_RANGE,
-    onChange: range?.onValueChange,
-  });
-  const [singleValue, setSingle] = useControllableState<Date | null>({
-    value: single?.value,
-    defaultValue: single?.defaultValue ?? null,
-    onChange: single?.onValueChange,
-  });
+  const rangeValue = usePendingDate<DatepickerRange>(
+    range?.value,
+    range?.defaultValue ?? EMPTY_RANGE,
+    range?.onValueChange,
+  );
+  const singleValue = usePendingDate<Date | null>(
+    single?.value,
+    single?.defaultValue ?? null,
+    single?.onValueChange,
+  );
   if (range) {
-    return { mode: "range", value: rangeValue, onChange: setRange, resetValue: range.resetValue };
+    return {
+      mode: "range",
+      value: rangeValue.value,
+      onChange: rangeValue.commit,
+      resetValue: range.resetValue,
+      saving: rangeValue.saving,
+    };
   }
   return {
     mode: "single",
-    value: singleValue,
-    onChange: setSingle,
+    value: singleValue.value,
+    onChange: singleValue.commit,
     resetValue: single?.resetValue,
+    saving: singleValue.saving,
   };
 }
 
@@ -526,6 +567,7 @@ export function PanelView(props: PanelViewProps) {
       className={cx(fieldTierClass, menu.tier, styles.panel, className)}
       data-size={size}
       data-embedded={embedded ? "true" : undefined}
+      aria-busy={props.saving || undefined}
       data-compact={compact ? "true" : undefined}
       data-layout={layout}
     >
@@ -560,9 +602,8 @@ export function PanelView(props: PanelViewProps) {
             }
             // Aside: a column of list rows, the active one checked at the end (a choice of one).
             return (
-              <button
+              <NativeButton
                 key={preset.key}
-                type="button"
                 aria-pressed={pressed}
                 {...menuRowProps({ size: menuRowTier(size), className: styles.preset })}
                 onClick={apply}
@@ -573,7 +614,7 @@ export function PanelView(props: PanelViewProps) {
                 <span className={cx(listRowStyles.check, styles.presetCheck)} aria-hidden="true">
                   <Check />
                 </span>
-              </button>
+              </NativeButton>
             );
           })}
         </ScrollContainer>
@@ -827,9 +868,8 @@ const MonthGrid = React.memo(function MonthGrid({
                     inBand && (time === hi || col === 6 || n === lastDay) ? "true" : undefined
                   }
                 >
-                  <button
+                  <NativeButton
                     ref={time === focusTarget ? events.focusNode : undefined}
-                    type="button"
                     className={styles.day}
                     data-day={time}
                     data-autofocus={autoFocus && roving ? "" : undefined}
@@ -844,7 +884,7 @@ const MonthGrid = React.memo(function MonthGrid({
                     onMouseEnter={() => !disabled && events.hover(date)}
                   >
                     {n}
-                  </button>
+                  </NativeButton>
                 </td>
               );
             })}

@@ -2,6 +2,7 @@ import { format, startOfDay } from "date-fns";
 import { ru } from "date-fns/locale";
 import type * as React from "react";
 import { Popover } from "@/components/popover/Popover";
+import { Spinner } from "@/components/spinner/Spinner";
 import { DEFAULT_ALIGN, type PositionAlign } from "@/hooks/usePosition";
 import { Calendar } from "@/icons/glyphs/calendar";
 import { ChevronDown } from "@/icons/glyphs/chevron-down";
@@ -9,7 +10,7 @@ import { ChevronDown } from "@/icons/glyphs/chevron-down";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { useInheritedDisabled } from "@/internal/disabledContext";
+import { NativeButton, useInheritedDisabled } from "@/internal/disabledContext";
 import {
   type FieldFocusRingProps,
   FieldFrame,
@@ -18,6 +19,7 @@ import {
 } from "@/internal/FieldFrame";
 import { fieldTriggerClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
+import { GlyphSwap } from "@/internal/glyphSwap";
 import { useLabels } from "@/internal/labels";
 import { useOpenState } from "@/internal/overlay/useOpenState";
 import { splitParts } from "@/internal/parts";
@@ -209,17 +211,18 @@ function DatepickerRoot(props: DatepickerRootProps) {
         openOnArrow
       >
         <Popover.Trigger>
-          <button
+          <NativeButton
             id={ids.controlId}
-            type="button"
             disabled={disabled}
             {...ids.controlAria({ role: "button", textId, text, ariaLabel, ariaLabelledBy })}
+            aria-busy={value.saving || undefined}
             className={cx(fieldTriggerClass, styles.trigger)}
             {...toDataAttributes({
               size,
               empty: shown ? undefined : true,
               "full-width": fullWidth || undefined,
               invalid: ids.invalid || undefined,
+              loading: value.saving || undefined,
               disabled: disabled || undefined,
               "focus-ring": focusRing,
             })}
@@ -228,8 +231,13 @@ function DatepickerRoot(props: DatepickerRootProps) {
             <span id={textId} className={styles.triggerLabel}>
               {text}
             </span>
-            <ChevronDown className={cx(styles.triggerIcon, styles.triggerChevron)} />
-          </button>
+            {/* A value saving looks as in Select: a Spinner in place of the chevron. */}
+            <span className={cx(styles.triggerIcon, styles.triggerChevron)} aria-hidden="true">
+              <GlyphSwap>
+                {value.saving ? <Spinner aria-hidden="true" /> : <ChevronDown />}
+              </GlyphSwap>
+            </span>
+          </NativeButton>
         </Popover.Trigger>
         <Popover.Content align={align} size={size} width="content" trapFocus flush>
           <PanelView

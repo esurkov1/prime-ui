@@ -320,6 +320,13 @@ p.barDescription {
   overflow-wrap: anywhere;
 }
 
+/* The heading is read by its title line alone: the line and the echoed title keep their own
+   width instead of stretching to the description's. */
+.row[data-measure="true"] > .heading > :is(.headingLine, .echo),
+.row[data-measure="true"] > .heading > .echo > .barTitle {
+  align-self: flex-start;
+}
+
 /* One action of the bar: measured whole, folded into «⋯» with `hidden`. */
 /* One action of the bar; a component that renders several controls keeps the actions' gap
    between them. */

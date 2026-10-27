@@ -41,7 +41,7 @@ ColorSwatches                 field frame: label → swatches → hint | error
 | `mode` | `"color" \| "palette"` | `"color"` | `color` — any CSS color from `presets`; `palette` — a kit palette hue (`PaletteColor`) from `palette`, drawn from its solid step in both themes. |
 | `value` | `string \| null · PaletteColor \| null` | — | Controlled color (a hue with `palette`); `null` — no color. |
 | `defaultValue` | `string \| null · PaletteColor \| null` | `null` | Initial color when uncontrolled. |
-| `onValueChange` | `(value: string \| null) => void · (value: PaletteColor \| null) => void` | — | Called with the preset `value` (as written in `presets`), the hue with `palette`, or `null`. |
+| `onValueChange` | `(value: string \| null) => void \| Promise<void> · (value: PaletteColor \| null) => void \| Promise<void>` | — | The preset `value` (as in `presets`), the hue with `palette`, or `null`. A promise: the group waits (`aria-busy`); a controlled owner sets `value` before resolving; reject brings the previous one back (`error` says why). |
 | `presets` | `readonly ColorPreset[]` | `COLOR_PRESETS` | `color` mode: swatches in order, `{ value, label }`; the label is the swatch's accessible name and tooltip. |
 | `palette` | `readonly PaletteColor[]` | every hue | `palette` mode: the hues in order; each is named by `labels.colorNames`. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the swatches (height 20 · 24 · 28 · 32 · 40); the label and hint keep the host tier. Without it the swatches take the host tier too. |
@@ -101,6 +101,7 @@ ColorSwatches                 field frame: label → swatches → hint | error
 | focus-visible | keyboard | focus ring outside the swatch |
 | invalid | `invalid` / `error` | `aria-invalid`, `data-invalid` on the group; the inner edge of every swatch turns `danger-border`; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | native `disabled` on every radio, `data-disabled` on the group; the arrow keys do nothing |
+| saving | `onValueChange` returned a pending promise | the picked swatch shows checked at once, `aria-busy` on the group, `data-loading` on every swatch (`cursor: progress`, no press), picks and arrows ignored, never disabled; a rejection puts the previous swatch back |
 
 Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`.
 
@@ -128,6 +129,7 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`.
 - `role="radiogroup"` with one `role="radio"` button per swatch; the color name is the radio's name and `title`.
 - Named by `label`, `aria-labelledby`, `aria-label` or `labels.group`; the hint or the error is linked through `aria-describedby`.
 - The check mark is decorative; the selection is announced by `aria-checked`.
+- While a pick is saved (a pending promise from `onValueChange`) the group has `aria-busy`. A refused save puts the previous swatch back — say why with `error`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

@@ -54,7 +54,7 @@
   order: 5;
 }
 
-.wrapper:has(> input:read-only:not(:disabled)) {
+.wrapper:has(> input:read-only:not(:disabled, [aria-disabled="true"])) {
   cursor: default;
 }
 
@@ -145,7 +145,7 @@
   color: var(--prime-color-text-secondary);
 }
 
-.wrapper:has(input:disabled) :is(.icon, .inlineAffix, .affix) {
+.wrapper:has(input:is(:disabled, [aria-disabled="true"])) :is(.icon, .inlineAffix, .affix) {
   color: var(--prime-color-text-disabled);
 }
 
@@ -207,7 +207,7 @@
   margin-inline-start: calc(var(--field-gap) * -1);
 }
 
-.wrapper:has(input:disabled) > [data-field-action] {
+.wrapper:has(input:is(:disabled, [aria-disabled="true"])) > [data-field-action] {
   color: var(--prime-color-text-disabled);
   background: transparent;
   cursor: not-allowed;

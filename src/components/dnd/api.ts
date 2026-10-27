@@ -65,8 +65,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "Content after the items that never moves and takes no drop position: an add tile at the end of a grid. Inside `ul` / `ol` it must be `li`.",
-          ru: "Содержимое после элементов, которое не перемещается и не становится местом сброса: плитка добавления в конце сетки. Внутри `ul` / `ol` — `li`.",
+          en: "Content after the items that never moves and takes no drop position: the add tile `Dnd.AddButton` at the end of a grid. Inside `ul` / `ol` it must be `li`.",
+          ru: "Содержимое после элементов, которое не перемещается и не становится местом сброса: плитка добавления `Dnd.AddButton` в конце сетки. Внутри `ul` / `ol` — `li`.",
         },
         {
           name: "axis",
@@ -219,6 +219,33 @@ export const api: ComponentApi = {
           type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" | "children">',
           en: "`className`, `disabled` and the other button attributes.",
           ru: "`className`, `disabled` и остальные атрибуты кнопки.",
+        },
+      ],
+    },
+    {
+      name: "Dnd.AddButton",
+      en: "`ref` → `HTMLButtonElement`. The add tile: the last cell of a `Dnd.Sortable` (in its `children`; `li` in `ul` / `ol`, else `div`), a `<button>` that fills it — in a `grid` as tall as its row. No item: never carried, never a drop place. Render it only while adding is possible.",
+      ru: "Плитка добавления: последняя ячейка `Dnd.Sortable` (в его `children`; `li` в `ul` / `ol`, иначе `div`), `<button>` во всю ячейку — в `grid` ростом с ряд. Не элемент: её не переносят, перед ней не встаёт сброс. Рендерите её, только пока добавить можно.",
+      props: [
+        {
+          name: "label",
+          type: "string",
+          default: "labels.add",
+          en: "The visible word under the «+» (a cell narrower than 6rem keeps only the «+»).",
+          ru: "Видимое слово под «+» (в ячейке уже 6rem остаётся только «+»).",
+        },
+        {
+          name: "aria-label",
+          type: "string",
+          defaultNote: { en: "`label`", ru: "`label`" },
+          en: "Accessible name; the visible word by default, so a narrow cell keeps it.",
+          ru: "Доступное имя; по умолчанию видимое слово, поэтому узкая ячейка его не теряет.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" | "children">',
+          en: "`onClick`, `className`, `disabled` (also from a disabled `Fieldset`) and the other button attributes.",
+          ru: "`onClick`, `className`, `disabled` (также от выключенного `Fieldset`) и остальные атрибуты кнопки.",
         },
       ],
     },
@@ -390,6 +417,10 @@ export const api: ComponentApi = {
   ],
   labels: labelRows(DND_LABELS, {
     handle: { en: "Name of `Dnd.Handle`.", ru: "Имя `Dnd.Handle`." },
+    add: {
+      en: "Text and name of `Dnd.AddButton`.",
+      ru: "Текст и имя `Dnd.AddButton`.",
+    },
     locked: {
       en: "Name of the lock a `Dnd.Handle` shows in a `locked` item.",
       ru: "Имя замка, который показывает `Dnd.Handle` в элементе с `locked`.",
@@ -433,8 +464,8 @@ export const api: ComponentApi = {
     keyboard: [
       {
         keys: "Tab",
-        en: "Moves to the list items (with `handle`, to the grips).",
-        ru: "Переходит к элементам списка (с `handle` — к ручкам).",
+        en: "Moves to the list items (with `handle`, to the grips), then to `Dnd.AddButton`.",
+        ru: "Переходит к элементам списка (с `handle` — к ручкам), затем к `Dnd.AddButton`.",
       },
       {
         keys: "Alt + ↑ · Alt + ↓",
@@ -445,6 +476,12 @@ export const api: ComponentApi = {
         keys: "Alt + ← · Alt + →",
         en: 'In lists sharing a `kind`: moves the item to the same row of the neighbouring list (`axis="x"`: Alt + ↑ / ↓); focus follows.',
         ru: 'В списке с общим `kind` — переносит элемент в соседний список на ту же строку (при `axis="x"` — Alt + ↑ / ↓); фокус идёт следом.',
+      },
+      {
+        keys: "Enter · Space",
+        native: true,
+        en: "On `Dnd.AddButton`: runs its `onClick`.",
+        ru: "На `Dnd.AddButton` — вызывает его `onClick`.",
       },
       {
         keys: "Escape",
@@ -476,6 +513,10 @@ export const api: ComponentApi = {
       {
         en: "A `locked` item has no role description or shortcuts; its `Dnd.Handle` is a lock: a `<span role=\"img\">` named `labels.locked` with the `status.locked` icon at the grip's size, taking the grip's `ref` and attributes.",
         ru: 'У элемента с `locked` нет описания роли и сочетаний; его `Dnd.Handle` — замок: `<span role="img">` с именем `labels.locked` и иконкой `status.locked` размера ручки, с `ref` и атрибутами ручки.',
+      },
+      {
+        en: "`Dnd.AddButton` is a `<button>` named by its word (`label`), also when a narrow cell hides the word; it is no item (no role description, no shortcuts). When it leaves while focused (the add that filled the list), focus goes to the last item.",
+        ru: "`Dnd.AddButton` — `<button>` с именем из слова (`label`), даже когда узкая ячейка прячет слово; это не элемент списка (без описания роли и сочетаний). Если плитка уходит в фокусе (добавление заполнило список), фокус переходит на последний элемент.",
       },
       {
         en: "Touch: a drag starts after a hold; a finger that moves first scrolls the page.",

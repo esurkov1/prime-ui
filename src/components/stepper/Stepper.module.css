@@ -172,7 +172,7 @@
   }
 }
 
-.root[data-orientation="vertical"] .step:active:not(:disabled) {
+.root[data-orientation="vertical"] .step:active:not(:disabled, [aria-disabled="true"]) {
   background: var(--prime-color-fill-subtle-active);
 }
 
@@ -198,7 +198,7 @@
   outline-offset: var(--prime-focus-offset);
 }
 
-.step:disabled {
+.step:is(:disabled, [aria-disabled="true"]) {
   color: var(--prime-color-text-disabled);
   cursor: not-allowed;
 }
@@ -251,7 +251,7 @@
   color: var(--prime-color-danger-fg);
 }
 
-.step:disabled .indicator {
+.step:is(:disabled, [aria-disabled="true"]) .indicator {
   background: var(--prime-color-fill-muted);
   color: var(--prime-color-text-disabled);
   box-shadow: none;

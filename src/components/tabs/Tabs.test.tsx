@@ -1276,3 +1276,42 @@ describe("Tabs — references and tier", () => {
     expect(screen.getByRole("tabpanel")).toHaveFocus();
   });
 });
+
+describe("Tabs — a disabled tab keeps its node", () => {
+  function Strip({ disabled }: { disabled: boolean }) {
+    return (
+      <Tabs.Root defaultValue="orders">
+        <Tabs.List aria-label="Разделы клиента">
+          <Tabs.Item value="orders">Заказы</Tabs.Item>
+          <Tabs.Item value="invoices" disabled={disabled}>
+            Счета
+          </Tabs.Item>
+          <Tabs.Item value="notes">Заметки</Tabs.Item>
+        </Tabs.List>
+      </Tabs.Root>
+    );
+  }
+
+  it("is the same element out of any host as disabled flips; click, Enter and arrows skip it", () => {
+    const { rerender } = render(<Strip disabled={false} />);
+    const invoices = screen.getByRole("tab", { name: "Счета" });
+    const parent = invoices.parentElement;
+    rerender(<Strip disabled />);
+    expect(screen.getByRole("tab", { name: "Счета" })).toBe(invoices);
+    expect(invoices.parentElement).toBe(parent);
+    expect(invoices).toHaveAttribute("aria-disabled", "true");
+    expect(invoices).toHaveAttribute("data-disabled", "true");
+    expect(invoices).not.toBeDisabled();
+
+    fireEvent.click(invoices);
+    expect(invoices).toHaveAttribute("aria-selected", "false");
+    const orders = screen.getByRole("tab", { name: "Заказы" });
+    orders.focus();
+    fireEvent.keyDown(orders, { key: "ArrowRight" });
+    expect(screen.getByRole("tab", { name: "Заметки" })).toHaveFocus();
+    expect(screen.getByRole("tab", { name: "Заметки" })).toHaveAttribute("aria-selected", "true");
+
+    rerender(<Strip disabled={false} />);
+    expect(screen.getByRole("tab", { name: "Счета" })).toBe(invoices);
+  });
+});

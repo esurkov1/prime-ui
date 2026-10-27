@@ -1,5 +1,6 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { NativeSelect } from "./NativeSelect";
@@ -118,5 +119,103 @@ describe("NativeSelect", () => {
     expect(select).toHaveFocus();
     await user.selectOptions(select, "b");
     expect(onValueChange).toHaveBeenCalledWith("b");
+  });
+});
+
+describe("NativeSelect — async onValueChange", () => {
+  /** A promise the test settles by hand. */
+  function deferred() {
+    let resolve: () => void = () => {};
+    let reject: (reason: unknown) => void = () => {};
+    const promise = new Promise<void>((done, fail) => {
+      resolve = done;
+      reject = fail;
+    });
+    return { promise, resolve, reject };
+  }
+
+  it("holds the pick busy with a Spinner, not disabled; picks wait; resolve keeps it", async () => {
+    const user = userEvent.setup();
+    const save = deferred();
+    const onValueChange = vi.fn((): void | Promise<void> => save.promise);
+    const { container } = render(
+      <NativeSelect aria-label="Язык" defaultValue="ru" onValueChange={onValueChange}>
+        <option value="ru">Русский</option>
+        <option value="en">English</option>
+        <option value="kk">Қазақша</option>
+      </NativeSelect>,
+    );
+    const select = screen.getByRole("combobox") as HTMLSelectElement;
+    await user.selectOptions(select, "en");
+    expect(select.value).toBe("en");
+    expect(select).toHaveAttribute("aria-busy", "true");
+    expect(select).toHaveAttribute("data-loading", "true");
+    expect(select).not.toBeDisabled();
+    expect(container.querySelector("[role='status']")).not.toBeNull();
+
+    await user.selectOptions(select, "kk");
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+    expect(select.value).toBe("en");
+
+    await act(async () => {
+      save.resolve();
+    });
+    expect(select.value).toBe("en");
+    expect(select).not.toHaveAttribute("aria-busy");
+    expect(select).not.toHaveAttribute("data-loading");
+    // The keyboard picks again once the save is answered.
+    onValueChange.mockImplementation(() => undefined);
+    select.focus();
+    await user.selectOptions(select, "kk");
+    expect(select.value).toBe("kk");
+    expect(onValueChange).toHaveBeenLastCalledWith("kk");
+  });
+
+  it("uncontrolled: reject puts the previous option back", async () => {
+    const save = deferred();
+    render(
+      <NativeSelect aria-label="Язык" onValueChange={() => save.promise}>
+        <option value="ru">Русский</option>
+        <option value="en">English</option>
+      </NativeSelect>,
+    );
+    const select = screen.getByRole("combobox") as HTMLSelectElement;
+    fireEvent.change(select, { target: { value: "en" } });
+    expect(select.value).toBe("en");
+    await act(async () => {
+      save.reject(new Error("offline"));
+    });
+    expect(select.value).toBe("ru");
+    expect(select).not.toHaveAttribute("aria-busy");
+  });
+
+  it("controlled: shown ahead of the owner; reject shows the owner's value again", async () => {
+    const save = deferred();
+    function Controlled() {
+      const [value, setValue] = React.useState("ru");
+      return (
+        <NativeSelect
+          aria-label="Язык"
+          value={value}
+          onValueChange={async (next) => {
+            await save.promise;
+            setValue(next);
+          }}
+        >
+          <option value="ru">Русский</option>
+          <option value="en">English</option>
+        </NativeSelect>
+      );
+    }
+    render(<Controlled />);
+    const select = screen.getByRole("combobox") as HTMLSelectElement;
+    fireEvent.change(select, { target: { value: "en" } });
+    expect(select.value).toBe("en");
+    expect(select).toHaveAttribute("aria-busy", "true");
+    await act(async () => {
+      save.reject(new Error("offline"));
+    });
+    expect(select.value).toBe("ru");
+    expect(select).not.toHaveAttribute("aria-busy");
   });
 });

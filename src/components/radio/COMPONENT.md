@@ -41,7 +41,7 @@ Radio.Indicator         the circle alone, no input: for an element that carries 
 |---|---|---|---|
 | `value` | `string` | — | Controlled value (the `value` of the chosen `Radio.Root`). |
 | `defaultValue` | `string` | — | Initial value when uncontrolled. |
-| `onValueChange` | `(value: string) => void` | — | Called with the value of the newly chosen option. |
+| `onValueChange` | `(value: string) => void \| Promise<void>` | — | Called with the value of the newly chosen option. Return the save's promise: the group waits (`aria-busy`); a controlled owner sets `value` before resolving; reject brings the previous option back (say why with `error`). |
 | `name` | `string` | — | Native `name` shared by the radios; generated when omitted. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of every circle, text, the label and the hint. Without it the group takes the tier of its host (LoginForm, Popover, a panel with a size), else `m`. |
 | `label` | `ReactNode` | — | Group heading above the options; names the radiogroup through `aria-labelledby`. Without it, pass `aria-label`. |
@@ -128,7 +128,8 @@ No `variant` / `tone` / `color`.
 | unselected | group `value` ≠ option `value` | `data-state="unchecked"` on the option; circle `fill-strong`, hover `fill-strong-hover` |
 | selected | group `value` = option `value` | `data-state="checked"`; accent circle with a thumb-coloured dot that grows in |
 | invalid | `invalid` or a non-empty `error` on the group | `data-invalid="true"`, `aria-invalid` on the group and the inputs; danger ring on unselected circles; the control shakes once when an error arrives (`data-shake` on the frame) |
-| disabled | group or option `disabled` | `data-disabled="true"`, native `disabled` on every radio; `fill-muted` circle, `cursor: not-allowed` |
+| disabled | group or option `disabled`, or a disabled `Fieldset` around it | `data-disabled="true"`, native `disabled` on every radio (under a `Tooltip.Trigger` `aria-disabled="true"` with no `name`, the same node); `fill-muted` circle, `cursor: not-allowed` |
+| saving | `onValueChange` returned a pending promise | the picked option shows selected at once, `aria-busy` on the group, `data-loading` on every option row (`cursor: progress`, no press), picks and arrows ignored, never disabled; a rejection puts the previous option back |
 | pressed | pointer press | the circle scales to the compact press scale |
 | focus-visible | keyboard | outer focus ring around the circle |
 
@@ -148,7 +149,7 @@ The radiogroup carries `data-size`, `data-orientation`, `aria-orientation`, `ari
 | Key | Action |
 |---|---|
 | `Tab` | Focuses the selected option (or the first one when nothing is selected). |
-| `ArrowDown` · `ArrowRight` · `ArrowUp` · `ArrowLeft` | Selects the next or previous option of the group (native radio behaviour). |
+| `ArrowDown` · `ArrowRight` · `ArrowUp` · `ArrowLeft` | Selects the next or previous option of the group (native radio behaviour); while a pick is saving they wait. |
 | `Space` | Selects the focused option. |
 
 ### ARIA
@@ -157,7 +158,9 @@ The radiogroup carries `data-size`, `data-orientation`, `aria-orientation`, `ari
 - `Radio.Group` is `role="radiogroup"`, named by its `label` through `aria-labelledby`, or by `aria-label`.
 - `aria-required`, `aria-invalid` and `aria-orientation` sit on the group; the group hint or error is in its `aria-describedby`.
 - Every option is a native `<input type="radio">` with the shared `name`; an option `hint` is linked through `aria-describedby`.
+- While a pick is saved (a pending promise from `onValueChange`) the group has `aria-busy`. A refused save puts the previous option back — say why with `error`.
 - `Radio.Indicator` is `aria-hidden`; the host element carries `role="radio"` and `aria-checked`.
+- Under a `Tooltip.Trigger` a disabled option is `aria-disabled="true"` with no native `disabled`, `name` or `required`: it keeps its node, a press picks nothing, the arrows and the form skip it.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -175,6 +178,7 @@ The radiogroup carries `data-size`, `data-orientation`, `aria-orientation`, `ari
 | [group.tsx](examples/group.tsx) | A required group with option descriptions and the group's error under the options — `label`, `required`, `hint`, `error`. |
 | [orientation.tsx](examples/orientation.tsx) | Options stacked in a column and laid out in a wrapping row — `orientation`. |
 | [indicator.tsx](examples/indicator.tsx) | The circle alone on selectable tiles: `selected` on the card marks its button and the circle shows it — `Card.Indicator`, `selected`. |
+| [saving.tsx](examples/saving.tsx) | A setting that applies on the server at once: the picked option stands while the save runs, and a refused save puts the previous one back and says why — `onValueChange`, `error`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the chosen plan and shows it in the hint — `value`, `onValueChange`. |
 | [in-form.tsx](examples/in-form.tsx) | Choices of an order form: a required group shows its error after a submit without a choice, an optional one is marked — `name`, `required`, `optional`, `error`. |
 

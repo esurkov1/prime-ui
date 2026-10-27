@@ -5,7 +5,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { useInheritedDisabled } from "@/internal/disabledContext";
+import { useInheritedDisabled, useReachableDisabled } from "@/internal/disabledContext";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import { GlyphSwap } from "@/internal/glyphSwap";
@@ -289,6 +289,9 @@ function ButtonRoot({
   // A held confirm whose promise is pending is a loading button.
   const loading = loadingProp || hold.phase === "confirming";
   const isDisabled = disabled || loading;
+  // Under a tooltip's trigger a disabled button stays a tab stop that takes hover
+  // (`aria-disabled`, presses blocked here), so the trigger never re-parents it into a host.
+  const reachable = useReachableDisabled() && disabled && !asChild;
   const hintId = React.useId();
   const circle = shape === "circle";
   const inProgress = progress !== undefined;
@@ -332,6 +335,11 @@ function ButtonRoot({
     className,
   );
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    // A reachable disabled button is no native `disabled`: the press (and a form submit) ends here.
+    if (reachable) {
+      event.preventDefault();
+      return;
+    }
     onClick?.(event);
     if (toggle && !event.defaultPrevented) setPressed(!pressed);
   };
@@ -436,7 +444,8 @@ function ButtonRoot({
       ref={ref}
       type={type}
       className={classes}
-      disabled={isDisabled}
+      disabled={isDisabled && !reachable}
+      aria-disabled={reachable || rest["aria-disabled"]}
       aria-busy={loading || inProgress || rest["aria-busy"] || undefined}
       aria-describedby={describedBy}
       onClick={handleClick}

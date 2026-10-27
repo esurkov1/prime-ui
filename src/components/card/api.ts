@@ -118,8 +118,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Badges",
-      en: "`ref` → `HTMLDivElement`. A `Badge.Group` after the title, on its line: one container for every badge of the record (status, role, counter; the meaning is the `tone` or `color` of a badge). Badges are `xs` · `xs` · `xs` · `s` · `s` by card size; what does not fit folds into «+N».",
-      ru: "`Badge.Group` после названия, на его строке: один контейнер для всех бейджей записи (статус, роль, счётчик; смысл — это `tone` или `color` бейджа). Бейджи `xs` · `xs` · `xs` · `s` · `s` по размеру карточки, что не помещается, сворачивается в «+N».",
+      en: "`ref` → `HTMLDivElement`. A `Badge.Group` after the title, on its line: every badge of the record (status, role, counter). Badges are `xs` · `xs` · `s` · `m` · `m` by card size, as tall as the title's line; what does not fit folds into «+N».",
+      ru: "`Badge.Group` после названия, на его строке: все бейджи записи (статус, роль, счётчик). Бейджи `xs` · `xs` · `s` · `m` · `m` по размеру карточки, высотой в строку названия, что не помещается, сворачивается в «+N».",
       props: [
         {
           name: "labels",

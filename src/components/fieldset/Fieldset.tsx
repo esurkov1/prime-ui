@@ -15,19 +15,24 @@ export type FieldsetProps = Omit<
   label?: React.ReactNode;
   description?: React.ReactNode;
   disabled?: boolean;
+  layout?: "stack" | "pair";
   children: React.ReactNode;
   ref?: React.Ref<HTMLFieldSetElement>;
 };
 
 /**
  * A frameless group of fields: native `<fieldset>` + `<legend>` heading, the kit's field rhythm
- * between the children, one `disabled` for all of them. No border, no padding, no fill. Without a
- * `label` it is the plain field column of a form.
+ * between the children, one `disabled` for all of them (passed to the kit controls inside through
+ * `DisabledProvider`; the `<fieldset>` itself only says `aria-disabled`). No border, no padding,
+ * no fill. Without a `label` it is the plain field column of a form. `layout="pair"` sets the
+ * fields two to a row: a field left alone in the last row spans it, and a narrow group stacks them
+ * in one column.
  */
 export function Fieldset({
   label,
   description,
   disabled: disabledProp = false,
+  layout = "stack",
   className,
   children,
   "aria-describedby": ariaDescribedBy,
@@ -44,9 +49,12 @@ export function Fieldset({
     <fieldset
       {...rest}
       className={cx(styles.root, className)}
-      disabled={disabled || undefined}
+      // No native `disabled`: it would take every button inside out of reach, so a tooltip's
+      // trigger would have to re-parent a control as the group flips. Each kit control disables
+      // itself from the context (native `disabled` on its inputs, so the form skips them).
+      aria-disabled={disabled || undefined}
       aria-describedby={describedBy}
-      {...toDataAttributes({ disabled: disabled || undefined })}
+      {...toDataAttributes({ disabled: disabled || undefined, layout })}
     >
       {hasContent(label) ? (
         <legend className={cx(textRole.titleS, styles.legend)}>{label}</legend>

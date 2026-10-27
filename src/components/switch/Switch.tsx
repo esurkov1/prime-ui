@@ -13,7 +13,7 @@ import {
 } from "@/internal/ChoiceField";
 import { useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
-import { useInheritedDisabled } from "@/internal/disabledContext";
+import { useDisabledControl, useInheritedDisabled } from "@/internal/disabledContext";
 import { useFieldFrame } from "@/internal/FieldFrame";
 import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
@@ -73,6 +73,7 @@ function SwitchRoot({
   const size = useControlSize(sizeProp);
   const labels = useLabels(SWITCH_LABELS, labelsProp);
   const disabled = useInheritedDisabled(disabledProp);
+  const off = useDisabledControl(disabled);
   const ids = useFieldFrame(id, { hint, error, invalid }, ariaDescribedBy);
   const [stored, setStored] = useControllableState<boolean>({
     value: checkedProp,
@@ -118,14 +119,17 @@ function SwitchRoot({
             type="checkbox"
             // biome-ignore lint/a11y/useAriaPropsForRole: a native checkbox exposes its checked state to role="switch"; an aria-checked copy could drift
             role="switch"
+            name={off.reachable ? undefined : inputRest.name}
+            required={off.reachable ? undefined : inputRest.required}
             checked={checked}
-            disabled={disabled}
+            disabled={off.native}
+            aria-disabled={off.ariaDisabled}
             aria-invalid={ids.invalid || undefined}
             aria-readonly={readOnly || undefined}
             aria-busy={busy || undefined}
             aria-describedby={ids.describedBy}
             onChange={(event) => {
-              if (!readOnly && !busy) toggle(event.target.checked);
+              if (!readOnly && !busy && !disabled) toggle(event.target.checked);
             }}
           />
           <span

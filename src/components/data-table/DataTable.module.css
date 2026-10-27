@@ -419,7 +419,7 @@
 }
 
 @media (hover: hover) {
-  .sortButton:hover {
+  .sortButton:hover:not(:disabled, [aria-disabled="true"]) {
     color: var(--prime-color-text-primary);
   }
 }

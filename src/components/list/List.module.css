@@ -17,15 +17,31 @@
  * The list reset at zero specificity: a consumer's class may pad the list in its pane. Bleed (the
  * public hook `--list-bleed: 1`, set by a host whose content edge the text should stand on — a
  * `Card.Body`): the rows reach past the list's edges by their own inline padding, so their text
- * lines up with the host's other content and the wash runs into the host's padding.
+ * lines up with the host's other content and the wash runs into the host's padding. The same
+ * hook bleeds the list's first and last row along the block axis by their own block padding when
+ * the list opens or closes its host (its first or last child), so the text of those rows stands on
+ * the host's padding like its other blocks; a group heading first keeps its place.
  */
 :where(.root) {
   --list-bleed-size: calc(var(--field-px) * var(--list-bleed, 0));
+  --list-bleed-block: calc(
+    (var(--list-row-h, var(--field-h)) - var(--field-lh)) /
+    2 *
+    var(--list-bleed, 0)
+  );
 
   width: calc(100% + 2 * var(--list-bleed-size));
   margin: 0 calc(var(--list-bleed-size) * -1);
   padding: 0;
   list-style: none;
+}
+
+:where(.root:first-child:has(> .item:first-child)) {
+  margin-block-start: calc(var(--list-bleed-block) * -1);
+}
+
+:where(.root:last-child:has(> :is(.item, .group):last-child)) {
+  margin-block-end: calc(var(--list-bleed-block) * -1);
 }
 
 .item {

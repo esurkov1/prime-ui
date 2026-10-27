@@ -2,7 +2,6 @@ import * as React from "react";
 import { Badge } from "@/components/badge/Badge";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
-import { useControllableState } from "@/hooks/useControllableState";
 import { useResizeEffect } from "@/hooks/useElementSize";
 import { prefersReducedMotion } from "@/hooks/usePresence";
 import { useHostTier } from "@/internal/ControlSizeContext";
@@ -34,6 +33,7 @@ import {
 import { slotChild } from "@/internal/slot";
 import type { ControlSize, PaletteColor } from "@/internal/states";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
+import { usePendingValue } from "@/internal/usePendingChanges";
 import styles from "./SegmentedControl.module.css";
 
 // ─── Context ─────────────────────────────────────────────────────────────────
@@ -129,7 +129,7 @@ export type SegmentedControlRootProps = Omit<FieldRootDomProps, "dir"> &
   FieldFrameProps & {
     value?: string;
     defaultValue?: string;
-    onValueChange?: (value: string) => void;
+    onValueChange?: (value: string) => void | Promise<void>;
     disabled?: boolean;
     size?: ControlSize;
     fullWidth?: boolean;
@@ -178,11 +178,10 @@ function SegmentedControlRoot({
   // `aria-current="page"`, no radio semantics or arrow-key selection (a link cannot be chosen by
   // focus).
   const links = hasLinkItems(children);
-  const [selectedValue, setSelectedValue] = useControllableState<string>({
-    value,
-    defaultValue,
-    onChange: onValueChange,
-  });
+  // A value the owner is still saving is drawn ahead of its answer; a refusal glides back.
+  const selection = usePendingValue<string>({ value, defaultValue, onChange: onValueChange });
+  const selectedValue = selection.value;
+  const saving = selection.saving;
 
   const viewportRef = React.useRef<HTMLElement>(null);
   const listRef = React.useRef<HTMLDivElement>(null);
@@ -196,14 +195,16 @@ function SegmentedControlRoot({
   const [firstEnabled, setFirstEnabled] = React.useState("");
   const [collapse, setCollapse] = React.useState<SegmentedControlCollapse>("full");
 
-  const onSelect = React.useCallback(
-    (nextValue: string) => {
-      if (nextValue === selectedValue) return;
-      userChangeRef.current = true;
-      setSelectedValue(nextValue);
-    },
-    [selectedValue, setSelectedValue],
-  );
+  const { commit } = selection;
+  const onSelect = (nextValue: string) => {
+    if (saving || nextValue === selectedValue) return;
+    userChangeRef.current = true;
+    commit(nextValue, {
+      onReject: () => {
+        userChangeRef.current = true;
+      },
+    });
+  };
 
   // After every commit: selection, items or their content may have changed.
   React.useLayoutEffect(() => {
@@ -265,20 +266,19 @@ function SegmentedControlRoot({
     const target = items[next];
 
     event.preventDefault();
+    // Focus and selection move together: while a choice is saved neither moves.
+    if (saving) return;
     // The row reveals the segment itself (clear of the edge fades), so focus must not jump-scroll.
     target.focus({ preventScroll: true });
     onSelect(target.dataset.value ?? "");
   }
 
-  const contextValue = React.useMemo<SegmentedControlContextValue>(
-    () => ({
-      value: selectedValue,
-      focusValue: selectedValue || firstEnabled,
-      onSelect,
-      rootDisabled: disabled,
-    }),
-    [selectedValue, firstEnabled, onSelect, disabled],
-  );
+  const contextValue: SegmentedControlContextValue = {
+    value: selectedValue,
+    focusValue: selectedValue || firstEnabled,
+    onSelect,
+    rootDisabled: disabled,
+  };
 
   return (
     <SegmentedControlProvider value={contextValue}>
@@ -310,6 +310,7 @@ function SegmentedControlRoot({
           aria-invalid={(!links && ids.invalid) || undefined}
           aria-required={(!links && required) || undefined}
           aria-disabled={(!links && disabled) || undefined}
+          aria-busy={saving || undefined}
           className={cx(fieldTierClass, styles.root)}
           onKeyDown={handleKeyDown}
           {...toDataAttributes({
@@ -446,6 +447,8 @@ function SegmentedControlItem({
       disabled: isDisabled || undefined,
       "icon-only": isIconOnly(content) || undefined,
       "two-line": twoLine || undefined,
+      // A Tooltip around it (its own or the consumer's) keeps a disabled segment as it is.
+      "reachable-disabled": isDisabled || undefined,
       value,
       color,
     }),
@@ -483,8 +486,11 @@ function SegmentedControlItem({
       role="radio"
       type="button"
       aria-checked={isChecked}
+      // `aria-disabled`, not native `disabled`: the segment stays the same element in the same
+      // place as `disabled` flips (the Tooltip around a titled segment would host a natively
+      // disabled one). The click is guarded above, arrow keys skip it.
+      aria-disabled={isDisabled || undefined}
       tabIndex={isTabStop ? 0 : -1}
-      disabled={isDisabled}
     >
       {inner}
     </button>

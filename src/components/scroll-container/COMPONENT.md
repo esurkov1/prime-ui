@@ -129,6 +129,7 @@ The scrollbar thumb uses `fill-strong` and stays still on hover in every engine.
 ## Layout & spacing
 - Sets `min-width: 0` and `min-height: 0`, so it shrinks inside a flex or grid parent; give the parent (or the container) a height.
 - Has **no padding of its own** (foundation §7): the host either pads the scrolling element by at least `--prime-focus-space` so focus rings are not clipped, or keeps content full-bleed and uses inset focus rings. Put side padding on the scrolling element itself (through `className`), never on an outer wrapper.
+- Stops a host's `--list-bleed` (it sets the public hook to `0`): a `List` inside a scroller never reaches past its edges, where the scroller would clip its first row's top, its last row's bottom and the rows' side padding.
 
 ## Accessibility
 

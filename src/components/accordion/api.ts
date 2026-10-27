@@ -256,6 +256,10 @@ export const api: ComponentApi = {
         en: "The chevron and `Accordion.Icon` are `aria-hidden`.",
         ru: "Шеврон и `Accordion.Icon` скрыты (`aria-hidden`).",
       },
+      {
+        en: 'Under a `Tooltip.Trigger` a disabled `Accordion.Trigger` is `aria-disabled="true"` with no native `disabled`: it keeps its tab stop and its node, a press neither opens nor closes it.',
+        ru: 'В `Tooltip.Trigger` выключенный `Accordion.Trigger` — `aria-disabled="true"` без нативного `disabled`: остаётся точкой Tab и тем же узлом, нажатие его не открывает и не закрывает.',
+      },
     ],
   },
 };

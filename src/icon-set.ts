@@ -207,6 +207,8 @@ export { FishSymbol as FishSymbolIcon } from "./icons/glyphs/fish-symbol";
 export { Flag as FlagIcon } from "./icons/glyphs/flag";
 export { Flame as FlameIcon } from "./icons/glyphs/flame";
 export { FlaskConical as FlaskConicalIcon } from "./icons/glyphs/flask-conical";
+export { FlipHorizontal2 as FlipHorizontal2Icon } from "./icons/glyphs/flip-horizontal-2";
+export { FlipVertical2 as FlipVertical2Icon } from "./icons/glyphs/flip-vertical-2";
 export { FolderArchive as FolderArchiveIcon } from "./icons/glyphs/folder-archive";
 export { FolderCheck as FolderCheckIcon } from "./icons/glyphs/folder-check";
 export { FolderClock as FolderClockIcon } from "./icons/glyphs/folder-clock";

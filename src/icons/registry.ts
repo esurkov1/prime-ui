@@ -43,6 +43,8 @@ import { EyeOff } from "./glyphs/eye-off";
 import { File } from "./glyphs/file";
 import { FileText } from "./glyphs/file-text";
 import { Flag } from "./glyphs/flag";
+import { FlipHorizontal2 } from "./glyphs/flip-horizontal-2";
+import { FlipVertical2 } from "./glyphs/flip-vertical-2";
 import { Forward } from "./glyphs/forward";
 import { Fuel } from "./glyphs/fuel";
 import { Funnel } from "./glyphs/funnel";
@@ -165,6 +167,10 @@ export const iconRegistry = {
   "action.externalLink": ExternalLink,
   "action.eyedropper": Pipette,
   "action.filter": ListFilter,
+  /** Mirror an object left to right (an image, a module, a layout). */
+  "action.flipHorizontal": FlipHorizontal2,
+  /** Mirror an object top to bottom. */
+  "action.flipVertical": FlipVertical2,
   /** Forward a message to another chat. */
   "action.forward": Forward,
   "action.login": LogIn,

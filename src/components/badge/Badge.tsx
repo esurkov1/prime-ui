@@ -2,7 +2,6 @@ import * as React from "react";
 import { Spinner } from "@/components/spinner/Spinner";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
-import { useControllableState } from "@/hooks/useControllableState";
 import { useResizeEffect } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { ChevronDown } from "@/icons/glyphs/chevron-down";
@@ -33,7 +32,7 @@ import {
   type Variant,
 } from "@/internal/states";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
-import { isPromiseLike } from "@/internal/usePendingChanges";
+import { isPromiseLike, usePendingValue } from "@/internal/usePendingChanges";
 
 import styles from "./Badge.module.css";
 import { markEdgeIcons } from "./edgeIcons";
@@ -62,7 +61,7 @@ export type BadgeRootProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "onClic
     loading?: boolean;
     pressed?: boolean;
     defaultPressed?: boolean;
-    onPressedChange?: (pressed: boolean) => void;
+    onPressedChange?: (pressed: boolean) => void | Promise<void>;
     labels?: Partial<BadgeLabels>;
     disabled?: boolean;
     children?: React.ReactNode;
@@ -211,16 +210,20 @@ function BadgeRoot({
   // A toggle when any part of the pressed triad is given: the body is a button over the badge.
   const toggle =
     pressedProp !== undefined || defaultPressed !== undefined || onPressedChange !== undefined;
-  const [pressed, setPressed] = useControllableState({
+  // A state the owner is still saving is drawn ahead of its answer; a refusal turns it back.
+  const pressedState = usePendingValue({
     value: pressedProp,
     defaultValue: defaultPressed ?? false,
     onChange: onPressedChange,
   });
+  const pressed = pressedState.value;
   /** A promise from `onRemove` is pending: the badge waits, the segment spins. */
   const [removing, setRemoving] = React.useState(false);
   const [failure, setFailure] = React.useState("");
 
-  const busy = removing || loading;
+  /** The remove segment spins for a removal or a value being created; a pressed save only waits. */
+  const spinning = removing || loading;
+  const busy = spinning || pressedState.saving;
 
   const remove = () => {
     if (busy || !onRemove) return;
@@ -361,7 +364,9 @@ function BadgeRoot({
           className={styles.body}
           aria-pressed={pressed}
           disabled={disabled}
-          onClick={() => setPressed(!pressed)}
+          onClick={() => {
+            if (!busy) pressedState.commit(!pressed);
+          }}
         >
           {body}
         </button>
@@ -382,7 +387,7 @@ function BadgeRoot({
           disabled={disabled}
         >
           <GlyphSwap layerClassName={iconSlotClass}>
-            {busy ? <Spinner aria-hidden="true" /> : <X />}
+            {spinning ? <Spinner aria-hidden="true" /> : <X />}
           </GlyphSwap>
         </button>
       ) : null}

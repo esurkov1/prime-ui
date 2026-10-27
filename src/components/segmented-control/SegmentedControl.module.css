@@ -286,6 +286,12 @@
   cursor: not-allowed;
 }
 
+/* Saving (a pending `onValueChange` promise): the thumb already stands on the new segment and the
+   row keeps every color and size; presses wait for the answer. */
+.root[aria-busy="true"] .item:not([data-disabled="true"]) {
+  cursor: progress;
+}
+
 /* ─── Parts ─────────────────────────────────────────────────────────────────── */
 
 .label {

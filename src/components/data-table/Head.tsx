@@ -8,6 +8,7 @@ import { ArrowUp } from "@/icons/glyphs/arrow-up";
 import { ArrowUpDown } from "@/icons/glyphs/arrow-up-down";
 import { Info } from "@/icons/glyphs/info";
 import { cx } from "@/internal/cx";
+import { NativeButton, useInheritedDisabled } from "@/internal/disabledContext";
 import { nodeText } from "@/internal/nodeText";
 import type { ControlSize } from "@/internal/states";
 import { stickySurfaceClass } from "@/internal/sticky";
@@ -77,6 +78,8 @@ export function Head<Row>({
   selectAll,
 }: HeadProps<Row>) {
   const idPrefix = React.useId();
+  // A disabled Fieldset around takes the sort buttons out, as it does every control.
+  const disabled = useInheritedDisabled();
   // One rung of the stacking ladder per head cell (DataTable.module.css): under a sticky head a
   // cell pinned to a column edge is a corner, every other cell stands on the sticky head's rung.
   const headCell = (pinned: boolean) =>
@@ -139,8 +142,7 @@ export function Head<Row>({
     const label = column.sortable ? (
       <WithDescription description={described ? column.description : undefined}>
         {/* A full-cell button: the head cell draws its inset focus ring (see CSS). */}
-        <button
-          type="button"
+        <NativeButton
           className={styles.sortButton}
           aria-keyshortcuts={moves ? "Alt+ArrowLeft Alt+ArrowRight" : undefined}
         >
@@ -149,7 +151,7 @@ export function Head<Row>({
             {info}
           </span>
           <SortGlyph className={styles.sortIcon} strokeWidth={2} />
-        </button>
+        </NativeButton>
       </WithDescription>
     ) : column.hideHeader ? (
       <>
@@ -181,7 +183,7 @@ export function Head<Row>({
         "data-column-id": column.id,
         "aria-labelledby": labelId,
         "aria-describedby": described ? descriptionId : undefined,
-        onClick: column.sortable ? () => onSort(column.id) : undefined,
+        onClick: column.sortable && !disabled ? () => onSort(column.id) : undefined,
       } satisfies React.ThHTMLAttributes<HTMLTableCellElement> & Record<`data-${string}`, unknown>,
       content: (
         <>

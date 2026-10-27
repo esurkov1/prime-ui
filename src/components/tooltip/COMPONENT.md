@@ -28,7 +28,7 @@ import { Tooltip } from "prime-ui-kit";
 Tooltip.Provider        optional; delay and skip-delay group for a subtree
 └── Tooltip.Root        state of one tooltip (no DOM)
     ├── Tooltip.Trigger clones its single child element and adds handlers
-    │                   (a focusable <span> around a disabled control)
+    │                   (a focusable <span> around a natively disabled element)
     └── Tooltip.Content portaled role="tooltip" chip
         └── arrow       decorative svg pointing at the trigger's centre
 ```
@@ -58,7 +58,7 @@ No DOM, no ref. Its tooltips form a group: one is open at a time, and once one h
 | `children` | `ReactNode` | — (required) | Subtree. |
 
 ### Tooltip.Trigger
-No DOM of its own: clones the single child and links it to the tooltip with `aria-describedby`. A `disabled` child — by its own prop or a disabled `Fieldset` around it — is wrapped in a focusable `<span>`; a child that is no tab stop becomes one.
+No DOM of its own: clones the single child and links it with `aria-describedby`. A disabled kit control stays itself (`aria-disabled`), never re-parented; an element the browser takes out of reach (a native `disabled`) is wrapped in a focusable `<span>`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -139,7 +139,7 @@ A chip of tier T is as tall as a menu item of tier T; text, padding and radius s
 - The tooltip is a description, not the name: an icon-only button needs its own `aria-label`.
 - The pointer may move onto the chip without closing it (WCAG 1.4.13); a touch does not open it, keyboard focus does.
 - Tooltip has no `closeOnEscape` / `closeOnOutsideClick` (foundation §8): it closes on pointer-leave, blur, a press on the trigger and Escape, and Escape cannot be turned off — WCAG 1.4.13 requires the chip to be dismissable without moving the pointer or focus.
-- A `disabled` control (its own prop or a disabled `Fieldset`) is wrapped by the kit in a focusable `<span>`: the host takes hover and Tab, the focus ring is drawn on the control. Around a button the host is that button for assistive tech — `role="button"`, `aria-disabled`, named by the control through `aria-labelledby` — and the control itself leaves the tree.
+- A disabled kit control under the trigger (a Button, a choice, a field, a select trigger, an item) stays its own tab stop: `aria-disabled="true"` instead of a native `disabled`, hover and focus open the tooltip, the press is blocked; it is never re-parented, so focus, typed text or a label morph survive `disabled` flipping — its own or a `Fieldset` around it. Only an element of your own the browser takes out of reach (a native `disabled`, a link out of the Tab order) is wrapped by the kit in a focusable `<span>`: the host takes hover and Tab, the focus ring is drawn on the control. Around a button the host is that button for assistive tech — `role="button"`, `aria-disabled`, named by the control through `aria-labelledby` — and the control itself leaves the tree.
 - A trigger that is no tab stop (Badge, Avatar, ProgressCircle, `Icon` with `label`) gets `tabIndex={0}` and the focus ring; its name comes from `aria-label` or the icon `label`.
 
 ### Labels

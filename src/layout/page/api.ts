@@ -45,8 +45,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Page.TopBar",
-      en: "`ref` → `HTMLElement` (`<header>`). The strip at the page's top edge: `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` in this DOM order, laid out by one plan from their natural widths — one line, tools below, icon-only buttons, «⋯», then a stacked or truncated heading.",
-      ru: "Полоса у верхнего края страницы: `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` в этом порядке DOM; их раскладывает один план по естественной ширине — одна строка, инструменты ниже, кнопки-иконки, «⋯», затем заголовок в столбик или с обрезкой.",
+      en: "`ref` → `HTMLElement` (`<header>`). The strip at the page's top edge: `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` in this DOM order, laid out by one steady plan — one line, tools below, icon-only buttons, «⋯», then a stacked or truncated heading.",
+      ru: "Полоса у верхнего края страницы: `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` в этом порядке DOM; их раскладывает один устойчивый план по установившейся ширине — одна строка, инструменты ниже, кнопки-иконки, «⋯», затем заголовок в столбик или с обрезкой.",
       props: [
         {
           name: "sticky",
@@ -107,8 +107,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Page.Description",
-      en: "`ref` → `HTMLParagraphElement`. One line of context that carries data (a period, a count): a muted caption under the whole heading line that truncates in the bar, secondary body-m that wraps (up to the reading measure) in the flow.",
-      ru: "Строка контекста с данными (период, количество): приглушённый caption под всей строкой заголовка с обрезкой в полосе, вторичный body-m с переносом (не шире колонки для чтения) в потоке.",
+      en: "`ref` → `HTMLParagraphElement`. One line of context that carries data (a period, a count): a muted caption under the whole heading line that truncates in the bar and claims no width of the bar's plan, secondary body-m that wraps (up to the reading measure) in the flow.",
+      ru: "Строка контекста с данными (период, количество): приглушённый caption под всей строкой заголовка с обрезкой в полосе, не влияющий на план полосы, вторичный body-m с переносом (не шире колонки для чтения) в потоке.",
       props: [
         {
           name: "loading",

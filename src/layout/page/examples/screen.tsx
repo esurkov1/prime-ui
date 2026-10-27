@@ -4,9 +4,7 @@ import {
   Button,
   Card,
   ConfirmDialog,
-  Dropdown,
   Fieldset,
-  Icon,
   Input,
   Page,
   Select,
@@ -14,8 +12,6 @@ import {
   Textarea,
 } from "prime-ui-kit";
 import * as React from "react";
-
-import styles from "./screen.module.css";
 
 const TIMEZONES = [
   { value: "Europe/Kaliningrad", label: "Калининград (UTC+2)" },
@@ -69,8 +65,6 @@ export default function PageScreenExample() {
     }, 900);
   };
 
-  const [removing, setRemoving] = React.useState(false);
-
   const removeWorkspace = () => new Promise<void>((resolve) => window.setTimeout(resolve, 1200));
 
   return (
@@ -104,7 +98,7 @@ export default function PageScreenExample() {
                     <Input.Field name="name" defaultValue="ООО «Прайм Софт»" />
                   </Input.Wrapper>
                 </Input.Root>
-                <div className={styles.pair}>
+                <Fieldset layout="pair">
                   <Input.Root label="ИНН" error={innError} hint="10 или 12 цифр" reserveSupportRow>
                     <Input.Wrapper>
                       <Input.Field name="inn" inputMode="numeric" defaultValue="7704512908" />
@@ -122,7 +116,7 @@ export default function PageScreenExample() {
                       ))}
                     </Select.Content>
                   </Select.Root>
-                </div>
+                </Fieldset>
                 <Textarea.Root
                   name="address"
                   label="Юридический адрес"
@@ -171,32 +165,24 @@ export default function PageScreenExample() {
           <Card.Header>
             <Card.Title as="h2">Рабочее пространство</Card.Title>
             <Card.Description>Удаление необратимо, доступно владельцу.</Card.Description>
-            <Card.Actions>
-              <Dropdown.Root>
-                <Dropdown.Trigger>
-                  <Button.Root variant="ghost" tone="neutral" aria-label="Действия с пространством">
-                    <Button.Icon>
-                      <Icon name="action.more" />
-                    </Button.Icon>
-                  </Button.Root>
-                </Dropdown.Trigger>
-                <Dropdown.Content>
-                  <Dropdown.Item tone="danger" onSelect={() => setRemoving(true)}>
-                    Удалить пространство
-                  </Dropdown.Item>
-                </Dropdown.Content>
-              </Dropdown.Root>
-            </Card.Actions>
           </Card.Header>
+          <Card.Footer>
+            <Card.Actions>
+              <ConfirmDialog.Root
+                title="Удалить «Прайм Софт»?"
+                description="312 счетов, 48 клиентов и вся история удалятся без возможности восстановления."
+                confirmLabel="Удалить пространство"
+                onConfirm={removeWorkspace}
+              >
+                <ConfirmDialog.Trigger>
+                  <Button.Root variant="soft" tone="danger">
+                    Удалить пространство
+                  </Button.Root>
+                </ConfirmDialog.Trigger>
+              </ConfirmDialog.Root>
+            </Card.Actions>
+          </Card.Footer>
         </Card.Root>
-        <ConfirmDialog.Root
-          open={removing}
-          onOpenChange={setRemoving}
-          title="Удалить «Прайм Софт»?"
-          description="312 счетов, 48 клиентов и вся история удалятся без возможности восстановления."
-          confirmLabel="Удалить пространство"
-          onConfirm={removeWorkspace}
-        />
       </Page.Body>
     </Page.Root>
   );

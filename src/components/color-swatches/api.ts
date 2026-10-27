@@ -31,9 +31,9 @@ export const api: ComponentApi = {
         },
         {
           name: "onValueChange",
-          type: "(value: string | null) => void · (value: PaletteColor | null) => void",
-          en: "Called with the preset `value` (as written in `presets`), the hue with `palette`, or `null`.",
-          ru: "`value` пресета (как в `presets`), оттенок при `palette` или `null`.",
+          type: "(value: string | null) => void | Promise<void> · (value: PaletteColor | null) => void | Promise<void>",
+          en: "The preset `value` (as in `presets`), the hue with `palette`, or `null`. A promise: the group waits (`aria-busy`); a controlled owner sets `value` before resolving; reject brings the previous one back (`error` says why).",
+          ru: "`value` пресета (как в `presets`), оттенок при `palette` или `null`. Промис: группа ждёт (`aria-busy`); управляемый владелец ставит `value` до resolve; при reject вернётся прежний (причину скажет `error`).",
         },
         {
           name: "presets",
@@ -206,6 +206,10 @@ export const api: ComponentApi = {
       {
         en: "The check mark is decorative; the selection is announced by `aria-checked`.",
         ru: "Галочка декоративна; выбор объявляет `aria-checked`.",
+      },
+      {
+        en: "While a pick is saved (a pending promise from `onValueChange`) the group has `aria-busy`. A refused save puts the previous swatch back — say why with `error`.",
+        ru: "Пока выбор сохраняется (ожидающий промис из `onValueChange`), на группе `aria-busy`; при отказе возвращается прежний образец, причину покажите через `error`.",
       },
     ],
   },

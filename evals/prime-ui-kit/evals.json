@@ -632,6 +632,150 @@
         "Drawer.Actions holds only the icon Buttons «Диалог» and «Копировать», each in a Tooltip, and no «Ещё» menu for two actions",
         "There is no useMediaQuery(COMPACT_QUERY) or matchMedia hiding a picker or moving it between the header and the body"
       ]
+    },
+    {
+      "id": 51,
+      "prompt": "Веб-панель контроллера видеостены (ESP32): страница «Вывод» с карточкой видеопотока (источник, разрешение, частота), настройками модулей (размер каждого модуля, список модулей: добавить, удалить, переставить) и селектором «Частота кадров». В шапке — чип состояния с поповером-сводкой. Ещё нужен автопоиск устройств в сети, и иногда устройство приходится добавить по IP.",
+      "expected_output": "Each value stands once: the popover summary holds only what the page has no block for; the measured rate is the hint of «Частота кадров»; a departing resolution is a warning row; the modules list has no count field; the manual IP entry waits in the empty state or a «⋯» menu, never beside the search.",
+      "files": [],
+      "expectations": [
+        "The status popover does not repeat the stream card's facts (source, resolution, rate) that the page already shows in a block",
+        "The measured frame rate is the `hint` of the «Частота кадров» control («Сейчас 60 к/с»), not a separate row «Кадров в секунду»",
+        "A separate resolution row appears only as a departure from the setting, with tone=\"warning\" («Фактическое разрешение»)",
+        "The modules are one list (FieldList or Dnd.Sortable) with no «Количество» field or stepper beside it",
+        "The manual IP entry is not an Input beside the search button in Page.Actions: it sits in a «⋯» Dropdown of the block or in the EmptyPage of no devices found"
+      ]
+    },
+    {
+      "id": 52,
+      "prompt": "Шапка карточки устройства и поповер состояния: имя устройства, версия прошивки, время работы, ID устройства, статус связи. Плюс баннер «Устройство не в сети площадки».",
+      "expected_output": "The ID is Card.Title number; the header and the popover hold the state and controls only (no firmware version, no uptime); the banner has no Banner.Icon because its title says the state.",
+      "files": [],
+      "expectations": [
+        "The device ID is the `number` of Card.Title (or Drawer.Title / List.ItemText), not a DescriptionList row or a line «ID устройства»",
+        "Firmware version and uptime are not in the card header, the status popover or the page bar (they may live in an «Об устройстве» section)",
+        "The status is a StatusDot or a Badge with words, not a hand-made dot",
+        "The Banner has no Banner.Icon when its title already names the state"
+      ]
+    },
+    {
+      "id": 53,
+      "prompt": "Настройки линии: переключатель «Тестовый сигнал», выбор режима (NDI / Шоу) и кнопка запуска вывода в шапке страницы. Каждое изменение уходит запросом на устройство (до секунды), запрос может не пройти. В описании страницы — модули, частота и состояние вывода.",
+      "expected_output": "Every control applies optimistically through its async event (a Promise from onCheckedChange / onValueChange), never disabled or frozen while saving; a refusal rolls back with a notification; the bar's toggle keeps one label and swaps its glyph; the description keeps the same facts in both states.",
+      "files": [],
+      "expectations": [
+        "The Switch and the mode control return the request's Promise from onCheckedChange / onValueChange; neither gets `disabled` (or a hand-made spinner) for the time of the request",
+        "No other control (tests, other settings) is disabled while one request runs",
+        "A failed request puts the previous value back and says why (notify or the field's error); the code does not set the value only after the answer",
+        "The start / stop button keeps one label (the object, e.g. «Вывод») and swaps its Button.Icon glyph (action.play ⇄ action.pause), with the whole action in aria-label — not «Запустить вывод» ⇄ «Стоп»",
+        "Page.Description names the same facts in both states and changes only their values"
+      ]
+    },
+    {
+      "id": 54,
+      "prompt": "Список устройств вывода с бейджами «В эфире» и метриками. Есть глобальная пауза вывода на все устройства и тестовый режим, в котором на линию идёт тестовая картинка вместо NDI.",
+      "expected_output": "One status map holds the item states and the states of the whole (paused, test, offline); the state of the whole overrides each badge's word and tone («На паузе» warning); the test mode is a warning status of the main summary above the normal source.",
+      "files": [],
+      "expectations": [
+        "There is one status map (status → label + tone) that includes paused, test and offline states",
+        "While output is paused every device badge reads «На паузе» with tone warning, not a green «В эфире»",
+        "In test mode the main status chip says the test («Тестовый сигнал», warning), not «NDI»",
+        "No badge picks its tone inline outside the map"
+      ]
+    },
+    {
+      "id": 55,
+      "prompt": "Страница «Сеть» панели устройства: карточка Wi-Fi со списком сетей и кнопкой «Найти сети», карточка «Обслуживание» с кнопками «Перезагрузить» и «Сбросить сеть», карточка «Устройство» с сохранением имени.",
+      "expected_output": "«Найти сети» is an icon button in the Wi-Fi card's Card.Header, not in Page.Actions; applying actions stand at the end of each card's Card.Footer, never in the body; unrelated action groups are separate cards.",
+      "files": [],
+      "expectations": [
+        "«Найти сети» is in Card.Actions of the Wi-Fi card's Card.Header (icon Button with Tooltip), not in Page.Actions",
+        "«Перезагрузить», «Сбросить сеть» and «Сохранить» are in Card.Actions of a Card.Footer, none in Card.Body",
+        "Restarting the device and resetting the network are not one card's mixed button row when they act on different things (split, or each with its own card)",
+        "Page.Actions holds only what acts on the whole page, if anything"
+      ]
+    },
+    {
+      "id": 56,
+      "prompt": "Плитки модулей видеостены: 6–12 модулей, у каждого номер места, температура, напряжение, кнопка настроек. И поповер состояния размером s с парами «источник — студия», «IP — …».",
+      "expected_output": "The tiles start small: one ControlSizeProvider value=\"xs\" around the set, the number as the title, «Место» only in VisuallyHidden, readings as one Badge.Group; no size on the DescriptionList inside the popover.",
+      "files": [],
+      "expectations": [
+        "One ControlSizeProvider value=\"xs\" (or a sized host) sets the tier of the tiles; no `size=\"xs\"` repeated on every Button",
+        "The visible label «Место N» is not shown; the order word is in VisuallyHidden and the number is the tile's title, not a display-size figure",
+        "Temperature and voltage are Badge.Root chips in one Badge.Group, not a DescriptionList of lines and not Kpi tiles",
+        "The DescriptionList inside Popover.Content carries no `size` prop",
+        "Nothing in Page.Actions / Page.Tools carries a `size` that makes it taller than the bar's buttons"
+      ]
+    },
+    {
+      "id": 57,
+      "prompt": "Десктопное приложение (Tauri): список NDI-устройств, у каждого живое превью 16:9, статус, настройки вывода (режим, частота, яркость) и метрики (fps, задержка, температура).",
+      "expected_output": "One card per row across the width: Card.Media with the preview edge to edge in 16:9, the status in Card.Badges, the settings folded in an Accordion whose Accordion.Description lists the current values, the readings last as a Badge.Group.",
+      "files": [],
+      "expectations": [
+        "The devices are one column of cards, not a grid of two or more columns",
+        "The preview is in Card.Media (a Carousel with ratio=\"16:9\") at the top, without padding of its own",
+        "The settings are inside a closed Accordion item whose Accordion.Description shows a line of current values",
+        "The metrics come after the settings, as a Badge.Group row"
+      ]
+    },
+    {
+      "id": 58,
+      "prompt": "Поповер-сводка из чипа состояния в шапке: режим NDI / Шоу, яркость, частота, сеть, видеопоток, кнопки тестов линии. В карточке «Вывод» на странице — показания и настройки яркости и частоты.",
+      "expected_output": "Popover.Trigger around a Badge.Root with tone and Badge.Description; inside: the mode switch first, then frequent settings, then reference sections, tests last, Divider between sections; the card puts its controls before its readings.",
+      "files": [],
+      "expectations": [
+        "The popover opens from a Badge.Root inside Popover.Trigger that keeps its tone (no hand-made chip button)",
+        "The first control in the popover is the main mode switch; the tests are the last section",
+        "A Divider separates the sections of the popover",
+        "In the «Вывод» card the brightness and frame-rate controls come before the measured readings"
+      ]
+    },
+    {
+      "id": 59,
+      "prompt": "Страница Wi-Fi: список доступных сетей, подключённая сеть с IP, и состояние «не в сети площадки» / «подключение…».",
+      "expected_output": "The connected network is the first list row with its IP in the description; the abnormal state is a Banner as the first block of Page.Body; no side column «Подключение».",
+      "files": [],
+      "expectations": [
+        "There is no side card or column that repeats the connected network",
+        "The connected network is the first row of the list with a StatusDot and its IP in List.ItemDescription",
+        "«Не в сети площадки» / «Подключение…» is a Banner first in Page.Body, shown only in that state"
+      ]
+    },
+    {
+      "id": 60,
+      "prompt": "Карточка настроек модуля на широкой странице: развёртка, частота кадров, яркость, гамма, скан (длинные подписи значений), режим цвета.",
+      "expected_output": "The fields stand in Fieldset layout=\"pair\": two columns at most however wide the card, a lone last field spans the row, one column on a narrow card; no own auto-fill grid.",
+      "files": [],
+      "expectations": [
+        "The settings are inside Fieldset layout=\"pair\" (or nested Fieldsets with it)",
+        "No CSS grid of the screen's own with auto-fill / auto-fit lays out the fields",
+        "No value or label is cut because of a third column"
+      ]
+    },
+    {
+      "id": 61,
+      "prompt": "Боковая карточка шириной ~18rem с шестью переключателями изображения: отразить по горизонтали, по вертикали, повернуть влево, вправо, инверсия, ч/б.",
+      "expected_output": "The six toggles are split by meaning into groups that fit the column (flips, rotation, colour) or become a Select; not one scrolling ButtonGroup of six.",
+      "files": [],
+      "expectations": [
+        "There is no single ButtonGroup with six segments in the 18rem card",
+        "The groups are split by meaning (e.g. flips with action.flipHorizontal / action.flipVertical, rotation, colour), each with its own aria-label or label",
+        "Toggle segments use the pressed triad (defaultPressed / onPressedChange), commands have none"
+      ]
+    },
+    {
+      "id": 62,
+      "prompt": "Веб-интерфейс настроек для ESP32 (одна HTML-страница из флеша, офлайн): цвет подсветки, загрузка прошивки, шрифты. И та же панель в Tauri с CSP default-src 'self'.",
+      "expected_output": "No prime-ui-kit/color-picker (ColorSwatches mode=\"color\" with presets plus the current colour, or ColorPresets allowCustom); firmware upload is FileUpload trigger=\"button\"; no fonts.css (self-hosted @fontsource or the system font); a gzip budget is checked.",
+      "files": [],
+      "expectations": [
+        "Nothing is imported from prime-ui-kit/color-picker; the colour is ColorSwatches (mode=\"color\", presets including the current colour) or ColorPresets.Root allowCustom",
+        "The firmware upload is FileUpload.Root trigger=\"button\" without multiple, not the default drop zone",
+        "prime-ui-kit/fonts.css is not imported; the faces come from @fontsource/golos-text and @fontsource/jetbrains-mono or the system font stays",
+        "The answer names a gzip size budget for the build and avoids the heavy parts (DataTable, Gantt, Kanban, Chat, MediaViewer, Datepicker) on the settings screen"
+      ]
     }
   ]
 }

@@ -72,8 +72,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Tooltip.Trigger",
-      en: "No DOM of its own: clones the single child and links it to the tooltip with `aria-describedby`. A `disabled` child — by its own prop or a disabled `Fieldset` around it — is wrapped in a focusable `<span>`; a child that is no tab stop becomes one.",
-      ru: "Без своего DOM: клонирует дочерний элемент и связывает его с подсказкой через `aria-describedby`. Контрол в состоянии `disabled` — своим пропом или внутри выключенного `Fieldset` — оборачивает в фокусируемый `<span>`; нефокусируемый элемент делает точкой Tab.",
+      en: "No DOM of its own: clones the single child and links it with `aria-describedby`. A disabled kit control stays itself (`aria-disabled`), never re-parented; an element the browser takes out of reach (a native `disabled`) is wrapped in a focusable `<span>`.",
+      ru: "Без своего DOM: клонирует дочерний элемент и связывает его через `aria-describedby`. Выключенный контрол кита остаётся собой (`aria-disabled`) и не переносится в обёртку; элемент, который браузер выводит из доступа (нативный `disabled`), оборачивает в фокусируемый `<span>`.",
       props: [
         {
           name: "children",
@@ -162,8 +162,8 @@ export const api: ComponentApi = {
         ru: "У подсказки нет `closeOnEscape` / `closeOnOutsideClick`: она закрывается при уходе указателя, потере фокуса, нажатии на триггер и по Escape, а Escape не отключается — WCAG 1.4.13 требует закрывать чип, не двигая указатель и фокус.",
       },
       {
-        en: 'A `disabled` control (its own prop or a disabled `Fieldset`) is wrapped by the kit in a focusable `<span>`: the host takes hover and Tab, the focus ring is drawn on the control. Around a button the host is that button for assistive tech — `role="button"`, `aria-disabled`, named by the control through `aria-labelledby` — and the control itself leaves the tree.',
-        ru: 'Контрол в состоянии `disabled` (свой проп или выключенный `Fieldset`) кит оборачивает в фокусируемый `<span>`: наведение и Tab получает обёртка, кольцо фокуса рисуется на контроле. Вокруг кнопки обёртка и есть эта кнопка для скринридера — `role="button"`, `aria-disabled`, имя от контрола через `aria-labelledby`, — а сам контрол из дерева уходит.',
+        en: 'A disabled kit control under the trigger (a Button, a choice, a field, a select trigger, an item) stays its own tab stop: `aria-disabled="true"` instead of a native `disabled`, hover and focus open the tooltip, the press is blocked; it is never re-parented, so focus, typed text or a label morph survive `disabled` flipping — its own or a `Fieldset` around it. Only an element of your own the browser takes out of reach (a native `disabled`, a link out of the Tab order) is wrapped by the kit in a focusable `<span>`: the host takes hover and Tab, the focus ring is drawn on the control. Around a button the host is that button for assistive tech — `role="button"`, `aria-disabled`, named by the control through `aria-labelledby` — and the control itself leaves the tree.',
+        ru: 'Выключенный контрол кита в триггере (Button, выбор, поле, триггер списка, пункт) остаётся своей точкой Tab: `aria-disabled="true"` вместо нативного `disabled`, наведение и фокус открывают подсказку, нажатие заблокировано; в обёртку он не переносится, так что фокус, набранный текст и морф подписи переживают смену `disabled` — своего или `Fieldset`. Только свой элемент, который браузер выводит из доступа (нативный `disabled`, ссылка вне порядка Tab), кит оборачивает в фокусируемый `<span>`: наведение и Tab получает обёртка, кольцо фокуса рисуется на контроле. Вокруг кнопки обёртка и есть эта кнопка для скринридера — `role="button"`, `aria-disabled`, имя от контрола через `aria-labelledby`, — а сам контрол из дерева уходит.',
       },
       {
         en: "A trigger that is no tab stop (Badge, Avatar, ProgressCircle, `Icon` with `label`) gets `tabIndex={0}` and the focus ring; its name comes from `aria-label` or the icon `label`.",

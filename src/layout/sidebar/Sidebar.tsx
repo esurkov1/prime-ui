@@ -25,6 +25,7 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { useDisclosure } from "@/internal/Disclosure";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { NativeButton, useDisabledControl, useInheritedDisabled } from "@/internal/disabledContext";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { GlyphSwap } from "@/internal/glyphSwap";
 import { iconSlotClass } from "@/internal/iconBox";
@@ -532,6 +533,8 @@ function SidebarGroup({
   const labelId = React.useId();
   const bodyId = React.useId();
   const rail = useRail();
+  // The fold buttons of a group are controls too: a disabled Fieldset around takes them out.
+  const disabled = useInheritedDisabled();
   const disclosure = collapsible && label !== undefined;
   const [open, setOpen] = usePersistedOpen(
     disclosure ? `group:${rest.id ?? nodeText(label)}` : "",
@@ -592,7 +595,7 @@ function SidebarGroup({
       data-collapsible="true"
     >
       <CompactTooltip text={text}>
-        <button
+        <NativeButton
           id={labelId}
           type="button"
           className={cx(
@@ -603,6 +606,8 @@ function SidebarGroup({
           )}
           aria-expanded={open}
           aria-controls={bodyId}
+          // Like a natively disabled button, Tab passes it by; the rail's tooltip never hosts it.
+          tabIndex={disabled ? -1 : undefined}
           // The chevron turns on the fold's clock once it moves (still on mount).
           data-mounted={bodyFold.root["data-mounted"]}
           // On the rail too it folds and unfolds the group (folded, the `…` row takes its place);
@@ -615,7 +620,7 @@ function SidebarGroup({
           <span className={styles.groupText}>{label}</span>
           <AttentionDot hue={hue} shown={!open && !rail} inline />
           <ChevronDown className={styles.groupChevron} />
-        </button>
+        </NativeButton>
       </CompactTooltip>
       {/* One place for the items and the rail row of a folded group: both sit in the same cell,
           so folding on the rail glides the height from the list to one row while the items fade
@@ -644,21 +649,22 @@ function SidebarGroup({
                   canOpen={() => !flyout.pointerInside.current && !flyout.open}
                 >
                   <Popover.Anchor>
-                    <button
+                    <NativeButton
                       ref={flyout.triggerRef}
                       type="button"
                       className={cx(listRowStyles.row, listRowStyles.hit, styles.item)}
                       aria-label={text}
                       aria-expanded={flyout.open}
                       aria-haspopup="dialog"
+                      tabIndex={disabled ? -1 : undefined}
                       {...toDataAttributes({ "active-path": active || undefined })}
-                      {...flyout.triggerHandlers}
+                      {...(disabled ? null : flyout.triggerHandlers)}
                     >
                       <SidebarItemIcon>
                         <Ellipsis />
                       </SidebarItemIcon>
                       <AttentionDot hue={hue} shown={folded} />
-                    </button>
+                    </NativeButton>
                   </Popover.Anchor>
                 </CompactTooltip>
                 {folded ? (
@@ -979,7 +985,7 @@ export type SidebarItemProps = SidebarItemOwnProps &
  */
 function SidebarItem({
   current = false,
-  disabled = false,
+  disabled: disabledProp = false,
   asChild = false,
   href,
   target,
@@ -989,6 +995,7 @@ function SidebarItem({
   onClick,
   ...rest
 }: SidebarItemProps) {
+  const disabled = useInheritedDisabled(disabledProp);
   const { offCanvas, setOpen } = useSidebar();
   const flyout = React.useContext(FlyoutContext);
 
@@ -1002,6 +1009,9 @@ function SidebarItem({
   const shared = {
     ...rest,
     disabled,
+    // The rail's name tooltip keeps a disabled row as it is (no host); like a natively disabled
+    // one, Tab passes it by.
+    tabIndex: disabled ? -1 : rest.tabIndex,
     className: cx(
       listRowStyles.row,
       listRowStyles.hit,
@@ -1333,7 +1343,7 @@ export type SidebarSubTriggerProps = Omit<
 function SidebarSubTrigger({
   className,
   children,
-  disabled = false,
+  disabled: disabledProp = false,
   onClick,
   onKeyDown,
   onPointerEnter,
@@ -1341,6 +1351,8 @@ function SidebarSubTrigger({
   ref,
   ...rest
 }: SidebarSubTriggerProps) {
+  const disabled = useInheritedDisabled(disabledProp);
+  const off = useDisabledControl(disabled);
   const sub = useSubContext();
   const rail = useRail();
   const parts = splitItemChildren(children, <ChevronDown className={styles.chevron} />);
@@ -1353,7 +1365,11 @@ function SidebarSubTrigger({
       ref={mergedRef}
       id={sub.triggerId}
       type="button"
-      disabled={disabled}
+      disabled={off.native}
+      aria-disabled={off.ariaDisabled}
+      // Like a natively disabled row, Tab passes it by; the rail's tooltip never hosts it.
+      tabIndex={disabled ? -1 : rest.tabIndex}
+      data-reachable-disabled={off.reachable || undefined}
       className={cx(
         listRowStyles.row,
         listRowStyles.hit,
@@ -1371,6 +1387,8 @@ function SidebarSubTrigger({
         mounted: sub.moving || undefined,
       })}
       onClick={(event) => {
+        // A reachable disabled row (under a tooltip's trigger) takes no press.
+        if (off.reachable) return;
         onClick?.(event);
         if (event.defaultPrevented) return;
         if (rail) flyout.triggerHandlers.onClick();
@@ -1378,7 +1396,7 @@ function SidebarSubTrigger({
       }}
       onKeyDown={(event) => {
         onKeyDown?.(event);
-        if (event.defaultPrevented) return;
+        if (event.defaultPrevented || off.reachable) return;
         const { key } = event;
         if (rail) {
           flyout.triggerHandlers.onKeyDown(event);
@@ -1394,7 +1412,7 @@ function SidebarSubTrigger({
       }}
       onPointerEnter={(event) => {
         onPointerEnter?.(event);
-        if (rail) flyout.triggerHandlers.onPointerEnter(event);
+        if (rail && !off.reachable) flyout.triggerHandlers.onPointerEnter(event);
       }}
       onPointerLeave={(event) => {
         onPointerLeave?.(event);
@@ -1579,7 +1597,7 @@ function SidebarAccount({ description, className, children, type, ...rest }: Sid
 
   return (
     <CompactTooltip text={nodeText(name).trim()}>
-      <button
+      <NativeButton
         {...rest}
         type={type ?? "button"}
         className={cx(styles.account, touchTargetRowClass, press.press, className)}
@@ -1597,7 +1615,7 @@ function SidebarAccount({ description, className, children, type, ...rest }: Sid
           )}
         </span>
         {opensMenu ? <ChevronsUpDown className={styles.accountChevron} /> : null}
-      </button>
+      </NativeButton>
     </CompactTooltip>
   );
 }

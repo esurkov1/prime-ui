@@ -226,6 +226,11 @@
   outline: none;
 }
 
+/* A pick is saving (`data-loading` on each swatch): the choice stands, presses wait (`press`). */
+.swatch[data-loading="true"] {
+  cursor: progress;
+}
+
 /* Disabled: one look for every swatch and swatch trigger. */
 .swatch:is(:disabled, [aria-disabled="true"]),
 .trigger:is(:disabled, [aria-disabled="true"]) {

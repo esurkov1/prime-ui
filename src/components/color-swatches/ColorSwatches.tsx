@@ -29,6 +29,7 @@ import {
   useSwatchGrid,
   useSwatchOptions,
 } from "@/internal/swatch";
+import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
 
 import styles from "./ColorSwatches.module.css";
 
@@ -69,7 +70,7 @@ export type ColorSwatchesColorProps = ColorSwatchesBaseProps & {
   mode?: "color";
   value?: string | null;
   defaultValue?: string | null;
-  onValueChange?: (value: string | null) => void;
+  onValueChange?: (value: string | null) => void | Promise<void>;
   presets?: readonly ColorPreset[];
   palette?: never;
 };
@@ -79,7 +80,7 @@ type ColorSwatchesPaletteProps = ColorSwatchesBaseProps & {
   mode: "palette";
   value?: PaletteColor | null;
   defaultValue?: PaletteColor | null;
-  onValueChange?: (value: PaletteColor | null) => void;
+  onValueChange?: (value: PaletteColor | null) => void | Promise<void>;
   presets?: never;
   palette?: readonly PaletteColor[];
 };
@@ -108,10 +109,15 @@ export function ColorSwatches(props: ColorSwatchesProps) {
       palette={palette}
       value={value}
       defaultValue={defaultValue ?? null}
-      onValueChange={onValueChange as ((value: string | null) => void) | undefined}
+      onValueChange={onValueChange as ((value: string | null) => void | Promise<void>) | undefined}
     />
   );
 }
+
+const takeNext = (_current: string | null, next: string | null) => next;
+
+/** The keys the swatch grid walks with (`useSwatchGrid`). */
+const GRID_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"]);
 
 function SwatchGrid({
   hues,
@@ -144,7 +150,7 @@ function SwatchGrid({
   palette: readonly PaletteColor[];
   value: string | null | undefined;
   defaultValue: string | null;
-  onValueChange: ((value: string | null) => void) | undefined;
+  onValueChange: ((value: string | null) => void | Promise<void>) | undefined;
 }) {
   const size = useControlSize(sizeProp);
   const disabled = useInheritedDisabled(disabledProp);
@@ -159,11 +165,25 @@ function SwatchGrid({
     }),
     [merged, labelsProp?.colorNames],
   );
-  const [value, setValue] = useControllableState<string | null>({
+  const [stored, setStored] = useControllableState<string | null>({
     value: valueProp,
     defaultValue,
-    onChange: onValueChange,
   });
+  // A color the owner is still saving is drawn ahead of its answer.
+  const changes = usePendingChanges(stored, takeNext);
+  const value = changes.shown;
+  const busy = changes.pending.length > 0;
+
+  /** Hands the pick to the owner; a promise holds it pending, picks wait until it settles. */
+  const setValue = (next: string | null) => {
+    if (busy || Object.is(next, value)) return;
+    const outcome = onValueChange?.(next);
+    if (!isPromiseLike(outcome)) {
+      setStored(next);
+      return;
+    }
+    changes.track(next, outcome, { onResolve: () => setStored(next) });
+  };
   const ids = useFieldFrame(id, { label, hint, error, invalid }, ariaDescribedBy);
   const colorOptions = useSwatchOptions(presets, allowEmpty, labels.empty);
   const hueOptions = usePaletteOptions(palette, allowEmpty, labels.empty, labels.colorNames);
@@ -177,7 +197,12 @@ function SwatchGrid({
   const labelledBy = ariaLabelledBy ?? ids.labelledBy;
 
   // A radio group: the arrows move the selection with the focus (by the visual rows).
+  // While a pick is saving the focus stays with it: the keys wait, the page does not scroll.
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (busy) {
+      if (GRID_KEYS.has(event.key)) event.preventDefault();
+      return;
+    }
     const next = grid.move(event, focusIndex);
     if (next !== null) setValue(options[next]?.value ?? null);
   };
@@ -207,6 +232,7 @@ function SwatchGrid({
         aria-describedby={ids.describedBy}
         aria-required={required || undefined}
         aria-invalid={ids.invalid || undefined}
+        aria-busy={busy || undefined}
         className={cx(swatchTierClass, swatchGridClass, styles.grid)}
         data-base="control"
         data-stretch="true"
@@ -240,6 +266,7 @@ function SwatchGrid({
               className={cx(swatchClass, hues && option.value && paletteStyles.hue)}
               {...toDataAttributes({
                 state: selected ? "checked" : "unchecked",
+                loading: busy || undefined,
                 contrast: option.contrast,
                 color: hues ? (option.value ?? undefined) : undefined,
               })}

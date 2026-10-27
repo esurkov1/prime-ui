@@ -806,11 +806,13 @@ button.reply:focus-visible {
 }
 
 @media (hover: hover) {
-  .reaction:not(:disabled, [data-selected="true"]):hover {
+  .reaction:not(:disabled, [aria-disabled="true"], [data-selected="true"]):hover {
     --msg-chip-fill: var(--prime-color-fill-muted-hover);
   }
 
-  .root[data-direction="outgoing"] .bubble .reaction:not(:disabled, [data-selected="true"]):hover {
+  .root[data-direction="outgoing"]
+    .bubble
+    .reaction:not(:disabled, [aria-disabled="true"], [data-selected="true"]):hover {
     --msg-chip-fill: var(--prime-color-message-outgoing-chip-hover);
   }
 }
@@ -822,7 +824,7 @@ button.reply:focus-visible {
   outline-offset: var(--prime-focus-offset);
 }
 
-.reaction:disabled {
+.reaction:is(:disabled, [aria-disabled="true"]) {
   cursor: default;
 }
 

@@ -9,6 +9,7 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { useDisclosure } from "@/internal/Disclosure";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useDisabledControl, useInheritedDisabled } from "@/internal/disabledContext";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import {
   HeaderLineContent,
@@ -147,10 +148,11 @@ export type AccordionItemProps = React.HTMLAttributes<HTMLDivElement> & {
 function AccordionItem({
   className,
   value,
-  disabled = false,
+  disabled: disabledProp = false,
   children,
   ...rest
 }: AccordionItemProps) {
+  const disabled = useInheritedDisabled(disabledProp);
   const { openValues } = useAccordionContext();
   const open = openValues.includes(value);
   const reactId = React.useId();
@@ -205,6 +207,7 @@ export type AccordionTriggerProps = Omit<React.ButtonHTMLAttributes<HTMLButtonEl
 function AccordionTrigger({ className, children, onClick, ...rest }: AccordionTriggerProps) {
   const { toggleItem } = useAccordionContext();
   const item = useAccordionItem();
+  const off = useDisabledControl(item.disabled);
   const titleRef = React.useRef<HTMLSpanElement>(null);
   useTitleFloor(titleRef);
   const nodes = flattenChildren(children);
@@ -218,7 +221,8 @@ function AccordionTrigger({ className, children, onClick, ...rest }: AccordionTr
       type="button"
       {...rest}
       id={item.triggerId}
-      disabled={item.disabled}
+      disabled={off.native}
+      aria-disabled={off.ariaDisabled ?? rest["aria-disabled"]}
       aria-controls={item.contentId}
       aria-expanded={item.open}
       {...toDataAttributes({
@@ -227,6 +231,8 @@ function AccordionTrigger({ className, children, onClick, ...rest }: AccordionTr
       })}
       className={cx(styles.trigger, touchTargetRowClass, className)}
       onClick={(event) => {
+        // A reachable disabled header (under a tooltip's trigger) neither opens nor closes.
+        if (off.reachable) return;
         onClick?.(event);
         if (!event.defaultPrevented) toggleItem(item.value);
       }}

@@ -87,7 +87,7 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (`Page.TopBar`, `Page.Header`, `Page.Body`), `className` and the other div attributes. |
 
 ### Page.TopBar
-`ref` → `HTMLElement` (`<header>`). The strip at the page's top edge: `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` in this DOM order, laid out by one plan from their natural widths — one line, tools below, icon-only buttons, «⋯», then a stacked or truncated heading.
+`ref` → `HTMLElement` (`<header>`). The strip at the page's top edge: `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` in this DOM order, laid out by one steady plan — one line, tools below, icon-only buttons, «⋯», then a stacked or truncated heading.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -117,7 +117,7 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 | `…rest` | `HTMLAttributes<HTMLHeadingElement>` | — | `children`, `id`, `className` and the other heading attributes. |
 
 ### Page.Description
-`ref` → `HTMLParagraphElement`. One line of context that carries data (a period, a count): a muted caption under the whole heading line that truncates in the bar, secondary body-m that wraps (up to the reading measure) in the flow.
+`ref` → `HTMLParagraphElement`. One line of context that carries data (a period, a count): a muted caption under the whole heading line that truncates in the bar and claims no width of the bar's plan, secondary body-m that wraps (up to the reading measure) in the flow.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -251,7 +251,7 @@ The size follows the place; the consumer passes nothing, and there are no title 
 | `busy` (Guard) | nothing until a person leaves: a press on the navigation or the path does nothing | the page's save request runs | `false` |
 
 ### Top bar plan
-One plan, chosen from the natural widths of the groups (`data-plan` on the bar's row). The bar takes the first step whose first line fits:
+One plan, chosen from the natural widths of the groups (`data-plan` on the bar's row). The heading counts its title line only (path, title, badges): `Page.Description` truncates in the room that line leaves, so its live data never moves the plan. Each button counts the width it settles at — a label that changes in place is read where its glide lands. The bar takes the first step whose first line fits; once laid out it holds its step within a margin of 48 (`--prime-space-6` × 2): short by less, the heading truncates by that much (at most half its width) instead; a looser step comes back only once it fits with the margin to spare. A label that changes by a word, or a resize across a step, never flips the row back and forth:
 
 | Step | Looks like | Use when | Default |
 |---|---|---|---|
@@ -289,7 +289,7 @@ A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pai
 | sticky bar | `sticky` | `data-sticky="true"` on TopBar |
 | title repeated in the bar | `collapse` and the flow title out of view | `data-collapsed="true"` on TopBar; the echo rises in (`transform` on the fast movement clock, `opacity` on the fast fade; reduced motion keeps the fade). After a `Breadcrumb` path the echo is the path's last level (an `aria-hidden`, `inert` `Breadcrumb.Item`), so the path folds its levels into «…» for it (`data-collapsed` on the Breadcrumb) and the title stays readable; a path whose last level already reads as the title (the same words, however spaced or cased) gets no echo |
 | menu button | the shell's Sidebar is off-canvas (`useAppShellNav`) | a soft icon Button at the start of the bar, `aria-expanded` |
-| bar plan | the natural widths of the groups against the bar's width (measured after every render, re-chosen on resize and once web fonts load) | `data-plan="one" \| "below" \| "icons-secondary" \| "icons" \| "fold"` on the bar's row; `data-heading="stack"` when a heading with a path stacks past the last step |
+| bar plan | the natural widths of the groups against the bar's width (measured after every render, re-chosen on resize and once web fonts load), held within the plan's margin | `data-plan="one" \| "below" \| "icons-secondary" \| "icons" \| "fold"` on the bar's row; `data-heading="stack"` when a heading with a path stacks past the last step |
 | icon-only button | plan `icons-secondary` (secondary) or `icons` / `fold` (all) | `data-button-label="icon"` on the button's wrapper; its label hides, its tooltip opens on hover and focus |
 | folded buttons | plan `fold` | the secondary Buttons' wrappers `hidden`; a «⋯» Dropdown in their place, their `menuitem`s inside |
 | heading place | inside TopBar or in the flow | `data-place="bar" \| "flow"` on Heading |
@@ -305,7 +305,7 @@ A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pai
 - `Page.TopBar` steps out of the gutter to the panel's edges and keeps the gutter inside; padding 12 above (or the top safe-area inset) and below; what follows starts 24 under its controls (header → body; the bar's own 12 counts in). The first line is as high as the Sidebar brand row (control m + 8), so the two read as one line. Groups 16 apart on a line, lines 12 apart; tools 8 apart; buttons 8 apart.
 - `Page.Tools` and `Page.Chips` are the kit's one tool row and chips line (`ToolRow`), the same as the DataTable `toolbar` and `toolbarChips`: the bar only places them. On the first line every tool keeps its natural width; on a line of their own they take the line and lay out from its width (container `prime-tool-row`), never from the window.
 - The tool row lays out the elements it is given, each in a cell: pass the tools as direct children of `Page.Tools` or a fragment. A wrapper component that returns several controls is one cell — no gaps between them, no growing search.
-- In the bar only the heading's column gives (`minmax(0, 1fr)`): the tools and the actions keep their width. The heading keeps its natural width until every button step is taken; then a heading with a path stacks (the path over the title, the title and the description wrapping), so no level is cut to a fragment; a heading without a path truncates its title.
+- In the bar only the heading's column gives (`minmax(0, 1fr)`): the tools and the actions keep their width. The heading keeps its title line's natural width until every button step is taken — short of room by less than the plan's margin, it truncates by that much and the step holds; its description truncates in whatever room the line has; then a heading with a path stacks (the path over the title, the title and the description wrapping), so no level is cut to a fragment; a heading without a path truncates its title.
 - The plan is measured, never chosen by breakpoints: the bar lays itself out from its own width.
 - Header (flow) → Body 24; blocks inside Body 24; a `Page.Section` 40 from its neighbours (the body's 24 + 16); tile → tile in a Grid 16 on both axes; section heading → content 16, heading → description 4; flow Title → Description 8; heading → Actions 24 side by side, 16 once they wrap below.
 - A `Page.Section` about a record (`number`, `Page.Badges`) heads it with one line, as a record header does: the `label` is cut down to its own text or 8em, the number after it never, the badges 6 after it fold into «+N»; a plain heading wraps.

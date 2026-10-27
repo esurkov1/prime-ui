@@ -74,7 +74,7 @@ Tabs.Root                 value, size (else the host tier), orientation, tone, f
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `value` | `string` | — (required) | Value that selects this tab and its panel. |
-| `disabled` | `boolean` | `false` | Disables the tab; clicks and arrow keys skip it. |
+| `disabled` | `boolean` | `false` | Disables the tab (`aria-disabled`, the same element in the same place); clicks and arrow keys skip it. |
 | `onRemove` | `() => void \| Promise<void>` | — | Makes the tab closable (close button, `Delete` / `Backspace`, middle click); remove the item from your list here. Return a promise to confirm first: rejected, the tab stays. |
 | `children` | `ReactNode` | — (required) | Plain text, or `Tabs.Icon` / `Tabs.Label` / `Tabs.Count` / `Tabs.Description`. A description makes the tab two-line. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value" \| "type" \| "role" \| "onClick">` | — | `className`, `aria-*` and the other button attributes; your `onKeyDown` / `onAuxClick` run first and `preventDefault()` keeps the tab open. |
@@ -185,7 +185,7 @@ Avoid icons or descriptions on only some tabs (uneven rows; without an icon on e
 | hover | pointer | text → primary; the folder shape in `fill-faint`, under the folder |
 | pressed | pointer down | the tab content gives in by the compact press distance (`internal/press`) |
 | focus-visible | keyboard | the tab draws an inset ring in its own shape, above the folder; the focused panel draws the outer ring |
-| disabled | `disabled` on Item | native `disabled`, `data-disabled="true"`, `text-disabled`; a removable tab loses its close button |
+| disabled | `disabled` on Item | `aria-disabled="true"` (not native `disabled`: the tab stays the same element, so its Tooltip never re-hosts it and nothing moves), `data-disabled="true"` and `data-reachable-disabled`, `text-disabled`; click, Enter, Space and arrow keys never select it; a removable tab loses its close button |
 | removable | `onRemove` on Item | item wrapper `data-removable="true"`, close button, tab `aria-keyshortcuts="Delete"` |
 | closing, confirm pending | `onRemove` returned a promise that has not settled | the close button is `loading` (`aria-busy`); the tab, its selection and focus stay; resolved → the neighbour takes over, rejected → nothing changes |
 | kept | `keepMounted` on Panel, its tab once opened and now inactive | the panel stays mounted with `hidden` (out of the layout, the tab order and the accessibility tree); its tab keeps `aria-controls`; shown again, its content enters as on a first open |
@@ -241,6 +241,7 @@ Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-
 - Selection follows focus; the panel is focusable (`tabIndex=0`).
 - In a two-line tab the accessible name is label (+ count); `Tabs.Description` becomes `aria-describedby`.
 - `Tabs.Icon` and `Tabs.Separator` are `aria-hidden`.
+- A disabled tab is `aria-disabled` rather than natively `disabled`: it keeps its node and its `Tooltip` as `disabled` flips, takes hover, and selection never lands on it.
 - When only icons are left, a `VisuallyHidden` copy of the label names the tab and the label shows in a `Tooltip` on hover and focus.
 - The close button of a removable tab is named after it (`labels.remove`) and stays out of the Tab order; the tab announces `aria-keyshortcuts="Delete"`.
 

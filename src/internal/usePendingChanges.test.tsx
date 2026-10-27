@@ -6,6 +6,7 @@ import {
   usePendingAction,
   usePendingChanges,
   usePendingKeys,
+  usePendingValue,
 } from "./usePendingChanges";
 
 const add = (value: readonly string[], item: string) =>
@@ -120,5 +121,46 @@ describe("usePendingAction", () => {
     act(() => result.current.run?.());
     expect(sync).toHaveBeenCalledTimes(1);
     expect(result.current.pending).toBe(false);
+  });
+});
+
+describe("usePendingValue", () => {
+  it("stores a plain answer at once", () => {
+    const onChange = vi.fn();
+    const { result } = renderHook(() => usePendingValue({ defaultValue: "a", onChange }));
+    act(() => result.current.commit("b"));
+    expect(onChange).toHaveBeenCalledWith("b");
+    expect(result.current.value).toBe("b");
+    expect(result.current.saving).toBe(false);
+  });
+
+  it("shows a pending change, keeps it on resolve and rolls it back on reject", async () => {
+    const accept = deferred();
+    const refuse = deferred();
+    const onReject = vi.fn();
+    const answers = [accept.promise, refuse.promise];
+    const { result } = renderHook(() =>
+      usePendingValue({ defaultValue: "a", onChange: () => answers.shift() }),
+    );
+
+    act(() => result.current.commit("b"));
+    expect(result.current.value).toBe("b");
+    expect(result.current.saving).toBe(true);
+    await act(async () => {
+      accept.resolve();
+      await accept.promise;
+    });
+    expect(result.current.value).toBe("b");
+    expect(result.current.saving).toBe(false);
+
+    act(() => result.current.commit("c", { onReject }));
+    expect(result.current.value).toBe("c");
+    await act(async () => {
+      refuse.reject(new Error("Нет прав"));
+      await refuse.promise.catch(() => {});
+    });
+    expect(result.current.value).toBe("b");
+    expect(result.current.saving).toBe(false);
+    expect(onReject).toHaveBeenCalledWith(new Error("Нет прав"));
   });
 });

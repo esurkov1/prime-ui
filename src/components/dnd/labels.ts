@@ -5,6 +5,8 @@
 export type DndLabels = {
   /** `aria-label` of `Dnd.Handle`. */
   handle: string;
+  /** Text and name of `Dnd.AddButton`. */
+  add: string;
   /** Name of the lock a `Dnd.Handle` shows in a `locked` item. */
   locked: string;
   /** `aria-roledescription` of every draggable element. */
@@ -31,6 +33,7 @@ export type DndLabels = {
 
 export const DND_LABELS: DndLabels = {
   handle: "Перетащить",
+  add: "Добавить",
   locked: "Закреплено",
   roleDescription: "перетаскиваемый элемент",
   grabbed: "{label}: взят",

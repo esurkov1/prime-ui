@@ -41,15 +41,23 @@
   color: var(--prime-color-text-muted);
 }
 
+/* The chevron, or the Spinner while a value is saving, in one icon-sized slot. */
 .triggerChevron {
+  width: var(--field-icon);
+  height: var(--field-icon);
   transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+/* A value is saving: it stands, the field still opens. */
+.trigger[data-loading="true"] {
+  cursor: progress;
 }
 
 .trigger[data-state="open"] .triggerChevron {
   transform: rotate(180deg);
 }
 
-.trigger:disabled .triggerIcon {
+.trigger:is(:disabled, [aria-disabled="true"]) .triggerIcon {
   color: var(--prime-color-text-disabled);
 }
 
@@ -62,7 +70,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-.trigger[data-empty="true"]:not(:disabled) .triggerLabel {
+.trigger[data-empty="true"]:not(:disabled, [aria-disabled="true"]) .triggerLabel {
   color: var(--prime-color-text-placeholder);
 }
 
@@ -290,7 +298,7 @@
   }
 }
 
-.day:active:not(:disabled):not([data-edge="true"]) {
+.day:active:not(:disabled, [aria-disabled="true"]):not([data-edge="true"]) {
   background: var(--prime-color-fill-subtle-active);
 }
 
@@ -299,7 +307,7 @@
   outline-offset: var(--prime-focus-offset-inset);
 }
 
-.day:disabled {
+.day:is(:disabled, [aria-disabled="true"]) {
   color: var(--prime-color-text-disabled);
   cursor: not-allowed;
 }
@@ -314,7 +322,7 @@
   font-weight: var(--prime-font-weight-semibold);
 }
 
-.day[aria-current="date"]:disabled {
+.day[aria-current="date"]:is(:disabled, [aria-disabled="true"]) {
   color: var(--prime-color-text-disabled);
 }
 

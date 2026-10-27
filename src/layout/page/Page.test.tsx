@@ -496,10 +496,21 @@ describe("Page.TopBar plan", () => {
   /** Natural widths jsdom cannot lay out: the heading, the tools and each button by its label. */
   const HEADING = 200;
   const TOOLS = 300;
-  const BUTTONS: Record<string, number> = { Экспорт: 100, Печать: 100, "Новый заказ": 120 };
+  const BUTTONS: Record<string, number> = {
+    Экспорт: 100,
+    Печать: 100,
+    Возобновить: 140,
+    "Новый заказ": 120,
+  };
   const SQUARE = 40;
   let available = 2000;
   let resize: (() => void)[] = [];
+  /** Widths of particular nodes over the defaults (a button mid-glide). */
+  const widthOverrides = new Map<Element, number>();
+
+  /** The description line: 10 per character, as its text runs. */
+  const descriptionWidth = (heading: HTMLElement) =>
+    (heading.querySelector("p")?.textContent?.length ?? 0) * 10;
 
   function layout(width: number) {
     available = width;
@@ -507,14 +518,19 @@ describe("Page.TopBar plan", () => {
       this: HTMLElement,
     ) {
       const testId = this.dataset.testid;
+      const parent = this.parentElement;
+      const titleLine = parent?.dataset.testid === "heading" && parent.firstElementChild === this;
       const width =
-        testId === "heading"
+        widthOverrides.get(this) ??
+        (titleLine
           ? HEADING
-          : testId === "tools"
-            ? TOOLS
-            : this.dataset.role
-              ? (BUTTONS[this.textContent ?? ""] ?? 0)
-              : 0;
+          : testId === "heading"
+            ? Math.max(HEADING, descriptionWidth(this))
+            : testId === "tools"
+              ? TOOLS
+              : this.dataset.role
+                ? (BUTTONS[this.textContent ?? ""] ?? 0)
+                : 0);
       return { width, height: SQUARE } as DOMRect;
     });
     vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockImplementation(function (
@@ -550,15 +566,25 @@ describe("Page.TopBar plan", () => {
 
   afterEach(() => {
     resize = [];
+    widthOverrides.clear();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
 
-  function Bar({ onExport }: { onExport?: () => void }) {
+  function Bar({
+    onExport,
+    description,
+    print = "Печать",
+  }: {
+    onExport?: () => void;
+    description?: string;
+    print?: string;
+  }) {
     return (
       <Page.TopBar>
         <Page.Heading data-testid="heading">
           <Page.Title>Заказы</Page.Title>
+          {description ? <Page.Description>{description}</Page.Description> : null}
         </Page.Heading>
         <Page.Tools data-testid="tools">
           <button type="button">Период</button>
@@ -574,7 +600,7 @@ describe("Page.TopBar plan", () => {
             <Button.Icon>
               <Icon name="action.refresh" />
             </Button.Icon>
-            Печать
+            {print}
           </Button.Root>
           <Button.Root>
             <Button.Icon>
@@ -608,6 +634,56 @@ describe("Page.TopBar plan", () => {
     expect(plan(container)).toBe("fold");
     resizeTo(1000);
     expect(plan(container)).toBe("one");
+  });
+
+  it("the description claims no width: a change of its text never changes the plan", () => {
+    // One line: 200 + 300 + 320 = 820. The description runs from 60 to 600 wide.
+    layout(820);
+    const { container, rerender } = render(<Bar description="5,9 Мбит/с" />);
+    expect(plan(container)).toBe("one");
+    rerender(<Bar description="вывод на паузе с 12:40, очередь 1 248 строк, ждёт оператора" />);
+    expect(plan(container)).toBe("one");
+    expect(cell("Экспорт").dataset.buttonLabel).toBeUndefined();
+    rerender(<Bar description="5,9 Мбит/с" />);
+    expect(plan(container)).toBe("one");
+  });
+
+  it("a label 40 longer near the threshold collapses no neighbour, and back", () => {
+    layout(820);
+    const { container, rerender } = render(<Bar />);
+    expect(plan(container)).toBe("one");
+    rerender(<Bar print="Возобновить" />);
+    expect(plan(container)).toBe("one");
+    expect(cell("Экспорт").dataset.buttonLabel).toBeUndefined();
+    rerender(<Bar />);
+    expect(plan(container)).toBe("one");
+    // Short by more than the margin, the bar steps as before.
+    resizeTo(700);
+    expect(plan(container)).toBe("below");
+  });
+
+  it("an action mid-glide is measured where its glide lands, not at its transient width", () => {
+    layout(820);
+    const { container, rerender } = render(<Bar />);
+    expect(plan(container)).toBe("one");
+    // «Печать» glides its label from 130 down to 30: on screen 200 wide now, 100 once it lands.
+    const print = cell("Печать");
+    const label = print.querySelector("button") as HTMLElement;
+    widthOverrides.set(print, 200);
+    widthOverrides.set(label, 130);
+    Object.defineProperty(print, "getAnimations", {
+      configurable: true,
+      value: () => [
+        {
+          transitionProperty: "width",
+          effect: { target: label, getKeyframes: () => [{ width: "130px" }, { width: "30px" }] },
+        },
+      ],
+    });
+    // A re-render mid-glide (live data in the description) re-measures.
+    rerender(<Bar description="5,9 Мбит/с" />);
+    expect(plan(container)).toBe("one");
+    expect(cell("Экспорт").dataset.buttonLabel).toBeUndefined();
   });
 
   function SubPagesBar() {

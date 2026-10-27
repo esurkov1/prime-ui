@@ -43,7 +43,7 @@ Checkbox.Indicator     the box alone, no input — a mark inside option / menu r
 |---|---|---|---|
 | `checked` | `boolean` | — | Controlled checked state. |
 | `defaultChecked` | `boolean` | `false` | Initial state when uncontrolled. |
-| `onCheckedChange` | `(checked: boolean) => void` | — | Called with the new state on every toggle (not while `readOnly`). |
+| `onCheckedChange` | `(checked: boolean) => void \| Promise<void>` | — | Called with the new state on every toggle (not while `readOnly`). Return the save's promise: the box waits (`aria-busy`); a controlled owner sets `checked` before resolving; on reject it goes back (say why with `error`). |
 | `indeterminate` | `boolean` | `false` | Mixed state (a partial «select all»): a bar instead of the check; wins over `checked` visually and sets the native `indeterminate`. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the box, the text and the gap. Without it the tier of its host (a form, a panel, a table), else `m`. |
 | `shape` | `"square" \| "circle"` | `"square"` | Outline of the box: `square` is the rounded square; `circle` is a full circle (a selection mark in lists and chats). Size, the check draw-in, the indeterminate bar and states are the same. |
@@ -122,8 +122,9 @@ The circle changes only the outline (`--prime-radius-full`); the check draw-in, 
 | checked | `checked` / `defaultChecked` | `data-state="checked"`; accent box, the check draws in |
 | indeterminate | `indeterminate` | `data-state="indeterminate"`, `input.indeterminate`; accent box with a bar |
 | invalid | `invalid` or a non-empty `error` | `data-invalid="true"`, `aria-invalid` on the input; danger ring on the unchecked box and on focus; the row shakes once when an error arrives (`data-shake`) |
-| disabled | `disabled` | `data-disabled="true"` on the root; `fill-muted` box, disabled text, `cursor: not-allowed` |
+| disabled | `disabled`, or a disabled `Fieldset` around it | `data-disabled="true"` on the root; `fill-muted` box, disabled text, `cursor: not-allowed`; native `disabled` on the input — under a `Tooltip.Trigger` `aria-disabled="true"` with no `name` or `required`, the same node |
 | read-only | `readOnly` | `aria-readonly="true"` on the input, `data-readonly="true"` on the root; the state stays, no hover or press, default cursor |
+| saving | `onCheckedChange` returned a pending promise | the box shows the new state at once, `aria-busy` on the input, `data-loading` on the `<label>` row (`cursor: progress`, no press), presses ignored, never disabled; a rejection puts the previous state back |
 | pressed | pointer press | the box scales to the compact press scale |
 | focus-visible | keyboard focus | outer focus ring around the box |
 
@@ -142,7 +143,7 @@ Root also carries `data-size`; the box carries `data-shape`. Controlled: `checke
 | Key | Action |
 |---|---|
 | `Tab` | Moves focus to the checkbox. |
-| `Space` | Toggles it. |
+| `Space` | Toggles it (not while `readOnly` or saving). |
 
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -151,7 +152,9 @@ Root also carries `data-size`; the box carries `data-shape`. Controlled: `checke
 - `aria-invalid` is set when invalid; `aria-describedby` = your ids + the hint or the error id.
 - Without visible text, pass `aria-label` on `Checkbox.Root` (it lands on the input).
 - `required` goes to the native input and draws a red `*` after the text; the `*` is `aria-hidden`, the input reports the requirement.
+- While a change is saved (a pending promise from `onCheckedChange`) the input has `aria-busy`. A refused save puts the state back — say why with `error`.
 - `Checkbox.Indicator` is `aria-hidden`; the host row carries `aria-selected` / `aria-checked` / `aria-pressed`.
+- Under a `Tooltip.Trigger` a disabled checkbox is `aria-disabled="true"` with no native `disabled`, `name` or `required`: it keeps its tab stop and its node, a press changes nothing, the form skips it.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

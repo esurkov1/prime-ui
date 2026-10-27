@@ -186,7 +186,7 @@ export default function DrawerScreenExample() {
                           <Input.Field name="name" placeholder="ООО «Ромашка»" />
                         </Input.Wrapper>
                       </Input.Root>
-                      <div className={styles.pair}>
+                      <Fieldset layout="pair">
                         <Input.Root label="ИНН" error={errors.inn} reserveSupportRow>
                           <Input.Wrapper>
                             <Input.Field name="inn" inputMode="numeric" placeholder="7704512908" />
@@ -197,7 +197,7 @@ export default function DrawerScreenExample() {
                             <Input.Field name="kpp" inputMode="numeric" placeholder="770401001" />
                           </Input.Wrapper>
                         </Input.Root>
-                      </div>
+                      </Fieldset>
                     </Fieldset>
                     <Fieldset label="Контакты" disabled={saving}>
                       <Input.Root

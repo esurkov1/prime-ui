@@ -20,7 +20,9 @@ export default function CheckboxInFormExample() {
           name="terms"
           required
           error={error}
-          onCheckedChange={(checked) => checked && setError(undefined)}
+          onCheckedChange={(checked) => {
+            if (checked) setError(undefined);
+          }}
         >
           <Checkbox.Label>Принимаю условия оферты</Checkbox.Label>
         </Checkbox.Root>

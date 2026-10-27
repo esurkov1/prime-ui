@@ -9,6 +9,7 @@
 - Status of a row in a table or list («Оплачен», «Просрочен») — `tone`; a category («Бета», a team, a tag) — `color`.
 - Counters inside buttons and fields («Входящие 12», «−25%»).
 - A workflow state with a leading dot (`Badge.Dot`).
+- A status chip that opens its details (a sync state, a record's health): the badge inside a `Popover.Trigger` keeps its `tone`, gains the opener's chevron and, with `Badge.Description`, a second line.
 - A person on a record (an assignee, an author) — `Badge.Avatar`, a picker inside a `Dropdown.Trigger`; with a detail line under the name (a role, an e-mail) — `Badge.Description`.
 - A selected value, keyword or applied filter the user can remove (`onRemove`).
 - Values in a filter panel that toggle on press and hide with a hover action (the `pressed` triad, `Badge.Action`).
@@ -34,7 +35,7 @@ Badge.Root          <span>: fill, tier dimensions
 ├─ [start segment]  Badge.Icon or Badge.Dot at the start edge: full height, mark centred
 ├─ body             text, Badge.Dot, inline Badge.Icon
 │  └─ Badge.Description  the second line under the text: the chip stands on two lines, the avatar spans both
-│                   (a toggle <button> with the pressed triad, or the opener inside a `Dropdown.Trigger`; a <span> with a trailing segment; none when read-only)
+│                   (a toggle <button> with the pressed triad, or the opener inside a `Dropdown.Trigger` / `Popover.Trigger`; a <span> with a trailing segment; none when read-only)
 ├─ Badge.Action     optional end segment revealed on hover / focus (always shown on touch screens)
 └─ remove segment   with onRemove: full height, the whole end is the hit area (Icon action.close)
 
@@ -48,7 +49,7 @@ Badge.Group         <div>: a row of Badge.Root, one value; `size` sets every bad
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Badge.Root
-`ref` → `HTMLSpanElement`. The chip: a read-only badge is one `<span>`, the `pressed` triad makes the body a toggle `<button>`, `onRemove` adds a remove segment; inside a `Dropdown.Trigger` the body is the opener with a chevron.
+`ref` → `HTMLSpanElement`. The chip: a read-only badge is one `<span>`, the `pressed` triad makes the body a toggle `<button>`, `onRemove` adds a remove segment; inside a `Dropdown.Trigger` or `Popover.Trigger` the body is the opener with a chevron and keeps its tone.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -59,10 +60,10 @@ Badge.Group         <div>: a row of Badge.Root, one value; `size` sets every bad
 | `shape` | `"chip" \| "square"` | `"chip"` | `square` — a tile as wide as it is tall, the text centred: a file format («PDF»), a short code. |
 | `fullWidth` | `boolean` | `false` | A plate as wide as its container, the text centred: the one next step of a record on its card («Выдать завтра в 06:00»). |
 | `onRemove` | `() => void \| Promise<void>` | — | Adds the full-height remove segment at the end; called on its click. Return the request's promise: the badge waits with a spinner; take it out of your list before resolving; on reject it stays. |
-| `loading` | `boolean` | `false` | The badge waits on a request (a value its owner is still creating): dimmed, `aria-busy`, a spinner in the remove segment, which takes no press. A promise from `onRemove` does the same on its own. |
+| `loading` | `boolean` | `false` | The badge waits on a request (a value its owner is still creating): dimmed, `aria-busy`, a spinner in the remove segment, no press. A promise from `onRemove` or `onPressedChange` does the same. |
 | `pressed` | `boolean` | — | A toggle chip (a filter value): the body becomes a `<button>` over the whole badge with `aria-pressed`; on takes the selected look (accent soft). |
 | `defaultPressed` | `boolean` | — | The initial state of an uncontrolled toggle chip; a press flips it. |
-| `onPressedChange` | `(pressed: boolean) => void` | — | Fires with the new state when the toggle chip is pressed. |
+| `onPressedChange` | `(pressed: boolean) => void \| Promise<void>` | — | The new state on a press. A promise: the state shows at once, the chip waits dimmed (`aria-busy`); a controlled owner sets `pressed` before resolving; reject turns it back. |
 | `disabled` | `boolean` | — | Muted look for every variant, `aria-disabled`; the body button, remove and action get native `disabled`. |
 | `className` | `string` | — | Class on the badge. |
 | `labels` | `Partial<BadgeLabels>` | — | Built-in strings, see Labels. |
@@ -74,7 +75,7 @@ Badge.Group         <div>: a row of Badge.Root, one value; `size` sets every bad
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | the host tier, one step down | Tier of every badge in the group; a badge's own `size` wins. Small tiers stand closer. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | the tier of a lone badge | Tier of every badge; a badge's own `size` wins. Without it a lone badge's tier: in a control one step down, on a sized surface (`Card.Root`) its tier, else `m`. Small tiers stand closer. |
 | `overflow` | `"wrap" \| "count"` | `"wrap"` | `wrap` — the row wraps onto more lines. `count` — one line (a table cell): the badges that fit the container, the rest behind a focusable «+N» badge whose tooltip lists them. |
 | `labels` | `Partial<BadgeGroupLabels>` | — | Built-in strings of the «+N» badge, see Labels. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the `Badge.Root`s, one per value), `className`, `aria-label` (a named group is `role="group"`) and the other div attributes. |
@@ -197,6 +198,8 @@ Beside controls in one row a chip is two sizes up: `l` (28) is as tall as an `xs
 | removing | `onRemove` returned a pending promise, or `loading` | `data-pending`, `aria-busy`; the content quiets to 0.6 (`fast`, both ways), a `Spinner` stands in for the ×, the segment gets `aria-disabled` and takes no second press; rejected — the badge stays and `labels.removeFailed` is announced |
 | leaving | the owner took the badge out (after its remove segment, or any change of the list) | a copy stays in place and closes up — fades, settles and shrinks to nothing with its gap (`fast`, `exit`, `internal/partPresence`) — so the badges after it glide in; off under reduced motion |
 | toggle / pressed | the `pressed` / `defaultPressed` / `onPressedChange` triad | `data-pressable`, `aria-pressed` on the body; on adds `data-pressed` and the selected look (accent soft), gliding in and out (`fast`); hover washes a step of the badge's text color over its fill |
+| saving a toggle | `onPressedChange` returned a pending promise | the new state shows at once; `data-pending`, `aria-busy`, the content quiets to 0.6; presses wait; rejected — the state turns back |
+| opener | the badge is the child of `Dropdown.Trigger` or `Popover.Trigger` | `data-pressable`; the body is the trigger `<button>` with `aria-expanded` and `data-state`, a chevron at the end that turns while open; open keeps the hue or tone and holds the hover wash of its own ink — no `aria-pressed`, no selected look |
 | action | `Badge.Action` | `data-action="reveal" \| "persistent"`; the text slides and the segment fades in over `fast` |
 | disabled | `disabled` | `data-disabled`, `aria-disabled`; inner buttons disabled, no hover wash |
 | person | a `Badge.Avatar` child | `data-avatar` on the root: the tier's corners like every badge, the avatar first whatever the order, its `data-size` the chip's (`chipAvatarSize.line`: `2xs` · `2xs` · `xs` · `s` · `s`); the avatar's box is `aria-hidden` |
@@ -288,6 +291,7 @@ Beside controls in one row a chip is two sizes up: `l` (28) is as tall as an `xs
 - A row of badges in a hand-made flex wrapper with its own gap → `Badge.Group`.
 - A set of values in a table cell that wraps and grows the row, or a hand-made «+N» → `Badge.Group overflow="count"`.
 - `onRemove` together with `Badge.Action` → one end segment per badge.
+- A status chip that opens a popover drawn with `Popover.Anchor` and the `pressed` triad → put the badge in `Popover.Trigger`: it is the opener (`aria-expanded`) and keeps its tone; pressed is a toggle's selected look (accent), not an open state.
 - A `Badge.Root` in `Dropdown.Trigger` as the picker of a status or a person in the header or footer of a surface → a `Select` at the surface's control tier; the chip picker stays in a dense row or table cell.
 - A person's role or e-mail as a second badge, a `·` in the text or a hand-made two-line chip → `Badge.Description`.
 - An `Avatar.Root` with its own `size` inside a badge, or in a `Badge.Icon` → put it in `Badge.Avatar` without `size`: the chip sizes it.

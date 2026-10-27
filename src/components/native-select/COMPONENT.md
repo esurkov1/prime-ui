@@ -51,7 +51,7 @@ NativeSelect          field frame: label row · control · support row
 | `placeholder` | `string` | — | Empty first option shown in the placeholder color while nothing is picked. |
 | `value` | `string` | — | Controlled value (native); with `onValueChange` or `onChange`. |
 | `defaultValue` | `string` | — | Initial value, uncontrolled. |
-| `onValueChange` | `(value: string) => void` | — | Called with the picked value; native `onChange` still fires. |
+| `onValueChange` | `(value: string) => void \| Promise<void>` | — | The picked value; native `onChange` still fires. A promise: a Spinner for the chevron (`aria-busy`); a controlled owner sets `value` before resolving; reject brings the previous value back (say why with `error`). |
 | `focusRing` | `boolean` | `true` | `false` hides the visual focus ring (`data-focus-ring="false"`), never focus or the error ring. |
 | `labels` | `Partial<NativeSelectLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — (required) | Native `<option>` and `<optgroup>` elements. |
@@ -83,7 +83,8 @@ One look, the Select trigger's: field fill, inset control border, tier radius; t
 |---|---|---|
 | placeholder shown | `placeholder` and no value | the empty first option is selected; placeholder text color |
 | invalid | `invalid` or `error` | `aria-invalid="true"`, `data-invalid="true"`; the control shakes once when an error arrives (`data-shake` on the frame) |
-| disabled | `disabled` | native `disabled` |
+| disabled | `disabled`, or a disabled `Fieldset` around it | native `disabled`, `data-disabled="true"`; under a `Tooltip.Trigger` `aria-disabled="true"` with no `name` or `required`, no picker, the same node |
+| saving | `onValueChange` returned a pending promise | the picked value stands, a `Spinner` in place of the chevron, `aria-busy` and `data-loading` on the select (`cursor: progress`), picks ignored, never disabled; a rejection puts the previous value back |
 | size | `size` | `data-size` |
 | focus ring off | `focusRing={false}` | `data-focus-ring="false"` |
 
@@ -107,6 +108,8 @@ One look, the Select trigger's: field fill, inset control border, tier radius; t
 - It is a real `<select>`: the role, the keyboard and the list come from the browser and the OS.
 - `label` is a `<label htmlFor>`; the hint and the error are linked by `aria-describedby`, the error sets `aria-invalid`.
 - The chevron is decorative (`aria-hidden`).
+- While a value is saved (a pending promise from `onValueChange`) the select has `aria-busy`; the Spinner is hidden from assistive tech. A refused save puts the previous value back — say why with `error`.
+- Under a `Tooltip.Trigger` a disabled select is `aria-disabled="true"` with no native `disabled`, `name` or `required`: it keeps its tab stop and its node, opens no picker, takes no key but Tab, the form skips it.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -133,5 +136,5 @@ One look, the Select trigger's: field fill, inset control border, tier radius; t
 - Several values with `multiple` → not supported; use Select `multiple` or TagSelect.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md) (field frame), `Icon` (chevron), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md) (field frame), `Icon` (chevron), [Spinner](../spinner/COMPONENT.md) (saving, in place of the chevron), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Select](../select/COMPONENT.md), [Radio](../radio/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

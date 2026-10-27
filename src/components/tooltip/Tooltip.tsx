@@ -5,7 +5,7 @@ import { type PositionAlign, type PositionSide, readCssLengthPx } from "@/hooks/
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { useInheritedDisabled } from "@/internal/disabledContext";
+import { ReachableDisabledProvider, useInheritedDisabled } from "@/internal/disabledContext";
 import { FloatingPanel, FloatingTrigger } from "@/internal/overlay/FloatingPanel";
 import { focusFromKeyboard, hasNativeTabStop } from "@/internal/overlay/focus";
 import tooltipSurface from "@/internal/overlay/tooltipSurface.module.css";
@@ -212,13 +212,16 @@ const BUTTON = 'button:not([role]), [role="button"]';
 export type TooltipTriggerProps = SlotPartProps;
 
 /**
- * Wraps one element. A focusable one (Button, link) is the trigger as is; a disabled control — by
- * its own `disabled` or a disabled `Fieldset` around it — is wrapped in a focusable host that takes
- * hover and Tab for it (around a button the host is the button: `role="button"`, `aria-disabled`,
- * named by the control); a non-interactive
- * one (Badge, Avatar, ProgressCircle, an `Icon` with `label`) becomes a tab stop. The tooltip id
- * joins the child's own `aria-describedby`; the child's handlers run first. Props a wrapping trigger
- * adds pass on to the child.
+ * Wraps one element. A focusable one (Button, link) is the trigger as is; a non-interactive one
+ * (Badge, Avatar, ProgressCircle, an `Icon` with `label`) becomes a tab stop. A disabled kit
+ * control — by its own `disabled` or a disabled `Fieldset` around it — stays reachable itself
+ * (`ReachableDisabledProvider`: a tab stop that takes hover, `aria-disabled`), so the trigger never
+ * re-parents it and it keeps its state (a label morph, focus) as `disabled` flips. Only a control
+ * the DOM shows natively out of reach (a plain `<button disabled>`, a link out of the Tab order) is
+ * wrapped in a focusable host that takes hover and Tab for it (around a button the host is the
+ * button: `role="button"`, `aria-disabled`, named by the control). The tooltip id joins the child's
+ * own `aria-describedby`; the child's handlers run first. Props a wrapping trigger adds pass on to
+ * the child.
  */
 function TooltipTrigger(props: TooltipTriggerProps) {
   const { children } = props;
@@ -232,6 +235,11 @@ function TooltipTrigger(props: TooltipTriggerProps) {
   const inheritedDisabled = useInheritedDisabled();
   const [domDisabled, setDomDisabled] = React.useState(false);
   const disabledChild = childProps.disabled === true || (inheritedDisabled && domDisabled);
+  // Whether the disabled control still takes focus and hover by itself (a kit control under
+  // `ReachableDisabledProvider`). Assumed until the DOM shows otherwise, so a kit control is never
+  // moved into a host; once a control shows itself out of reach, it is hosted while disabled.
+  const [reachable, setReachable] = React.useState(true);
+  const hosted = disabledChild && !reachable;
   // A child that is no tab stop of its own (a Badge, an Avatar) is made one, so keyboard users
   // reach the tooltip too. Measured on the DOM: only the element knows whether it is focusable.
   const [ownTabStop, setOwnTabStop] = React.useState(true);
@@ -243,73 +251,100 @@ function TooltipTrigger(props: TooltipTriggerProps) {
     if (!node) return;
     const host = node.hasAttribute("data-disabled-host");
     const control = host ? node.firstElementChild : node;
-    setDomDisabled(
-      inheritedDisabled && control?.matches(":disabled, [aria-disabled='true']") === true,
-    );
+    // Read on the trigger's own element only: inside a host the child's outer element may be
+    // another one (a field's frame around its control), and a reading there would unhost it.
+    if (!host) {
+      setDomDisabled(
+        inheritedDisabled && control?.matches(":disabled, [aria-disabled='true']") === true,
+      );
+    }
     setButtonHost(host && control?.matches(BUTTON) === true);
-    if (!disabledChild) setOwnTabStop(childProps.tabIndex !== undefined || hasNativeTabStop(node));
+    if (disabledChild && !host && control instanceof HTMLElement && outOfReach(control)) {
+      setReachable(false);
+    }
+    if (!hosted) setOwnTabStop(childProps.tabIndex !== undefined || hasNativeTabStop(node));
   });
-  const madeFocusable = disabledChild || !ownTabStop;
+  const madeFocusable = hosted || !ownTabStop;
   // The host names itself after the control it stands for.
   const generatedId = React.useId();
   const controlId = typeof childProps.id === "string" ? childProps.id : generatedId;
 
   return (
-    <FloatingTrigger
-      {...props}
-      triggerProps={{
-        ref: triggerRef,
-        "aria-describedby": isOpen ? contentId : undefined,
-        ...toDataAttributes({ state: isOpen ? "open" : "closed" }),
-        ...(madeFocusable ? { tabIndex: 0, className: styles.focusHost } : null),
-        onPointerEnter: (e: React.PointerEvent<HTMLElement>) => {
-          // Touch has no hover: a tap must not leave a tooltip behind. Keyboard focus still opens it.
-          if (e.pointerType === "touch") return;
-          if (!pressedRef.current) scheduleOpen();
-        },
-        onPointerLeave: () => {
-          pressedRef.current = false;
-          scheduleClose();
-        },
-        onPointerDown: () => {
-          pressedRef.current = true;
-          close();
-        },
-        onFocus: (e: React.FocusEvent<HTMLElement>) => {
-          // Only keyboard focus shows it: not the focus a click causes, nor a layer moving focus
-          // in or back after a click (a ⋯ in a drawer's header).
-          if (!pressedRef.current && focusFromKeyboard(e.currentTarget)) scheduleOpen();
-        },
-        onBlur: () => {
-          pressedRef.current = false;
-          close();
-        },
-      }}
-    >
-      {disabledChild ? (
-        // Around a button the host is the one button assistive tech meets: disabled, named by the
-        // control, which itself is out of reach (no pointer events, no focus) and out of the tree.
-        <span
-          className={styles.disabledHost}
-          data-disabled-host=""
-          {...(buttonHost
-            ? { role: "button", "aria-disabled": "true", "aria-labelledby": controlId }
-            : null)}
-        >
-          {buttonHost
-            ? React.cloneElement(
-                children as React.ReactElement<{ id?: string }>,
-                {
-                  id: controlId,
-                  "aria-hidden": true,
-                } as { id: string },
-              )
-            : children}
-        </span>
-      ) : (
-        children
-      )}
-    </FloatingTrigger>
+    // Around both branches, so the tree above the child never changes with them.
+    <ReachableDisabledProvider>
+      <FloatingTrigger
+        {...props}
+        triggerProps={{
+          ref: triggerRef,
+          "aria-describedby": isOpen ? contentId : undefined,
+          ...toDataAttributes({ state: isOpen ? "open" : "closed" }),
+          ...(madeFocusable ? { tabIndex: 0, className: styles.focusHost } : null),
+          onPointerEnter: (e: React.PointerEvent<HTMLElement>) => {
+            // Touch has no hover: a tap must not leave a tooltip behind. Keyboard focus still opens it.
+            if (e.pointerType === "touch") return;
+            if (!pressedRef.current) scheduleOpen();
+          },
+          onPointerLeave: () => {
+            pressedRef.current = false;
+            scheduleClose();
+          },
+          onPointerDown: () => {
+            pressedRef.current = true;
+            close();
+          },
+          onFocus: (e: React.FocusEvent<HTMLElement>) => {
+            // Only keyboard focus shows it: not the focus a click causes, nor a layer moving focus
+            // in or back after a click (a ⋯ in a drawer's header).
+            if (!pressedRef.current && focusFromKeyboard(e.currentTarget)) scheduleOpen();
+          },
+          onBlur: () => {
+            pressedRef.current = false;
+            close();
+          },
+        }}
+      >
+        {hosted ? (
+          // Around a button the host is the one button assistive tech meets: disabled, named by the
+          // control, which itself is out of reach (no pointer events, no focus) and out of the tree.
+          <span
+            className={styles.disabledHost}
+            data-disabled-host=""
+            {...(buttonHost
+              ? { role: "button", "aria-disabled": "true", "aria-labelledby": controlId }
+              : null)}
+          >
+            {buttonHost
+              ? React.cloneElement(
+                  children as React.ReactElement<{ id?: string }>,
+                  {
+                    id: controlId,
+                    "aria-hidden": true,
+                  } as { id: string },
+                )
+              : children}
+          </span>
+        ) : (
+          children
+        )}
+      </FloatingTrigger>
+    </ReachableDisabledProvider>
+  );
+}
+
+/**
+ * A disabled control that takes no focus by itself: natively disabled or taken out of the Tab
+ * order (`tabindex="-1"`). An element with no tab stop of its own (a choice row's `<label>`, an
+ * item's frame) is not: the trigger makes it one, like a Badge. An item of a roving group (a
+ * segment, a tab) marks itself `data-reachable-disabled`: its `tabIndex={-1}` is the roving model,
+ * not a lost reach — its own group moves focus, it takes hover and stays `aria-disabled`, so it is
+ * never hosted.
+ */
+function outOfReach(control: HTMLElement): boolean {
+  if (control.matches(":disabled")) return true;
+  return (
+    control.hasAttribute("tabindex") &&
+    control.tabIndex < 0 &&
+    !control.hasAttribute("data-reachable-disabled")
   );
 }
 

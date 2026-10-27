@@ -186,6 +186,7 @@ A Button lines up exactly with Input, Select, Datepicker trigger, SegmentedContr
 | hover / active | pointer | hover fill per variant; press gives the edges in by `--prime-motion-press-distance` (`-compact` icon-only and on a circle) through the shared `internal/press`; not while disabled, loading or busy |
 | focus-visible | keyboard | outer focus ring with `--prime-focus-offset`; `tone="inherit"` draws it in `currentColor` |
 | disabled | `disabled`, or a disabled `Fieldset` around it | native `disabled`, `data-disabled="true"`, `fill-muted` + `text-disabled`, `cursor: not-allowed`; ghost stays transparent |
+| disabled under a tooltip | `disabled` inside `Tooltip.Trigger` | no native `disabled`: `aria-disabled="true"`, `data-disabled="true"`, the same disabled look; stays a tab stop and takes hover (the tooltip opens), the press and a submit are blocked; the trigger never re-parents it, so a label change still morphs |
 | loading | `loading` (native `<button>`) | `data-loading="true"`, native `disabled`, `aria-busy="true"`, colors kept (busy, not unavailable), no hover or press; the leading (or only) icon's glyph cross-fades into a `Spinner` (`aria-hidden`) and back, otherwise the spinner is centered over the hidden label (`data-loading-overlay="true"`) |
 | progress | `progress` (0…1) | `data-progress="true"`, `aria-busy="true"`, still pressable; a plate of the text color with the button's radius slides in from the start edge (`fast` · standard), so corners match at any value; removing the prop fades it where it is |
 | progress unknown (square) | `progress={null}` | `aria-busy="true"`, still pressable; a `Spinner` takes the leading icon's glyph (or stands over the label, `data-loading-overlay="true"`) as with `loading` |
@@ -215,7 +216,7 @@ Other data attributes: `data-variant`, `data-tone`, `data-size`, `data-shape`, `
 | Key | Action |
 |---|---|
 | `Enter` · `Space` | Presses the button (native `<button>`); a toggle flips its state; with `holdToConfirm` the key is held until the fill completes. |
-| `Tab` | Moves focus; a disabled button is skipped, the `asChild` child too (`tabIndex=-1`, `aria-disabled`). |
+| `Tab` | Moves focus; a disabled button is skipped, the `asChild` child too (`tabIndex=-1`, `aria-disabled`); under a `Tooltip.Trigger` a disabled button stays a tab stop (`aria-disabled`) so its tooltip is reachable. |
 
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -226,6 +227,7 @@ Other data attributes: `data-variant`, `data-tone`, `data-size`, `data-shape`, `
 - `shape="circle"` requires `aria-label`; its `progress` ring is `aria-hidden`, the share goes in the label or description («Отменить отправку», described by «Отправка 45%»).
 - `loading` sets `aria-busy="true"` and blocks the press; `progress` sets `aria-busy` and keeps the button pressable.
 - `holdToConfirm` describes the gesture through `aria-describedby` (`labels.holdHint`); `Space` / `Enter` hold like a pointer.
+- A disabled button under a `Tooltip.Trigger` is `aria-disabled="true"` with no native `disabled`: it keeps its tab stop and hover, the press and a form submit are blocked.
 - A changed label is announced once: the animated letters are hidden, the name is the new text.
 - With `asChild` the disabled state is `aria-disabled="true"` without a native `disabled`; a link child loses its `href`.
 - A toggle (`pressed`, `defaultPressed` or `onPressedChange`) carries `aria-pressed`; `current` sets `aria-current="page"`. Both are named states, never color alone: the selected fill comes with the attribute.

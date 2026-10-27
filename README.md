@@ -88,6 +88,11 @@ Next.js, esbuild) keeps only the modules and the styles of the components you us
 few controls ships a few controls, not the whole kit. The base leaves the root font size to the
 browser. `data-theme="light" | "dark"` also works on any wrapper, so one page can show both themes.
 
+`fonts.css` loads the faces from Google Fonts. Offline or under a strict CSP (`default-src 'self'`
+in a desktop app) leave it out and self-host them with `@fontsource/golos-text` (400, 500, 600) and
+`@fontsource/jetbrains-mono` (400, 500) — the token stacks find them by family name — or keep the
+system font.
+
 Tests that run the kit in Node need its CSS imports handled: in Vitest, inline the package
 (`test.server.deps.inline: ["prime-ui-kit"]`); in Jest, map `\.css$` to a stub with
 `moduleNameMapper`.
@@ -419,7 +424,7 @@ the kit, run the command again: it replaces the folder with the skill of the new
 | `prime-ui-kit` | The JS/TS API: every component, layout, icon, hook and helper. It brings the base CSS (tokens, both themes, focus ring, reduced motion); every component brings its own; only what you import is bundled. |
 | `prime-ui-kit/color-picker` | `ColorPicker`, `ColorField` and `parseColor` — the only code on the optional peer `react-aria-components`. |
 | `prime-ui-kit/icons` | The full animated glyph set as named components (`<BellIcon />`): Lucide drawings, one gesture each; only what you import is bundled. |
-| `prime-ui-kit/fonts.css` | Optional: Golos Text and JetBrains Mono from Google Fonts, with metric-matched local fallbacks, so text does not move when a face arrives. |
+| `prime-ui-kit/fonts.css` | Optional: Golos Text and JetBrains Mono from Google Fonts, with metric-matched local fallbacks, so text does not move when a face arrives. Offline or under a strict CSP self-host the faces instead (`@fontsource/*`). |
 | `prime-ui-kit/reset.css` | Optional: minimal document reset. |
 | `prime-ui-kit/tokens.css`, `theme-light.css`, `theme-dark.css` | The token layers alone (already brought by `prime-ui-kit`), for styling without components. |
 

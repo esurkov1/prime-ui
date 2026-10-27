@@ -7,6 +7,7 @@ import { Image } from "@/icons/glyphs/image";
 import { Video } from "@/icons/glyphs/video";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { NativeButton } from "@/internal/disabledContext";
 import { formatClock } from "@/internal/formatClock";
 import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
@@ -176,8 +177,7 @@ function GalleryTileView({
         </>
       ) : null}
       {onOpen ? (
-        <button
-          type="button"
+        <NativeButton
           className={styles.open}
           aria-label={formatLabel(labels.open, { name })}
           aria-haspopup="dialog"

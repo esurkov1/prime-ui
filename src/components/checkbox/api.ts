@@ -24,9 +24,9 @@ export const api: ComponentApi = {
         },
         {
           name: "onCheckedChange",
-          type: "(checked: boolean) => void",
-          en: "Called with the new state on every toggle (not while `readOnly`).",
-          ru: "Новое состояние при каждом переключении (кроме `readOnly`).",
+          type: "(checked: boolean) => void | Promise<void>",
+          en: "Called with the new state on every toggle (not while `readOnly`). Return the save's promise: the box waits (`aria-busy`); a controlled owner sets `checked` before resolving; on reject it goes back (say why with `error`).",
+          ru: "Новое состояние при каждом переключении (кроме `readOnly`). Верните промис сохранения: квадрат ждёт (`aria-busy`); управляемый владелец ставит `checked` до resolve; при reject он вернётся (причину покажите в `error`).",
         },
         {
           name: "indeterminate",
@@ -193,7 +193,11 @@ export const api: ComponentApi = {
   accessibility: {
     keyboard: [
       { keys: "Tab", en: "Moves focus to the checkbox.", ru: "Переводит фокус на флажок." },
-      { keys: "Space", en: "Toggles it.", ru: "Переключает его." },
+      {
+        keys: "Space",
+        en: "Toggles it (not while `readOnly` or saving).",
+        ru: "Переключает его (кроме `readOnly` и пока идёт сохранение).",
+      },
     ],
     aria: [
       {
@@ -213,8 +217,16 @@ export const api: ComponentApi = {
         ru: "`required` уходит в нативный input и рисует красную `*` после текста; `*` скрыта (`aria-hidden`), обязательность сообщает input.",
       },
       {
+        en: "While a change is saved (a pending promise from `onCheckedChange`) the input has `aria-busy`. A refused save puts the state back — say why with `error`.",
+        ru: "Пока изменение сохраняется (ожидающий промис из `onCheckedChange`), на input `aria-busy`; при отказе состояние возвращается, причину покажите через `error`.",
+      },
+      {
         en: "`Checkbox.Indicator` is `aria-hidden`; the host row carries `aria-selected` / `aria-checked` / `aria-pressed`.",
         ru: "`Checkbox.Indicator` скрыт (`aria-hidden`); состояние несёт строка (`aria-selected` / `aria-checked` / `aria-pressed`).",
+      },
+      {
+        en: 'Under a `Tooltip.Trigger` a disabled checkbox is `aria-disabled="true"` with no native `disabled`, `name` or `required`: it keeps its tab stop and its node, a press changes nothing, the form skips it.',
+        ru: 'В `Tooltip.Trigger` выключенный чекбокс — `aria-disabled="true"` без нативного `disabled`, `name` и `required`: остаётся точкой Tab и тем же узлом, нажатие ничего не меняет, форма его пропускает.',
       },
     ],
   },

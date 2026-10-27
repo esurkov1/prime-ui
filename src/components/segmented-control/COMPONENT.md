@@ -45,7 +45,7 @@ The root is a field root: `className`, `ref` and the native attributes land on t
 |---|---|---|---|
 | `value` | `string` | — | Selected value (controlled). |
 | `defaultValue` | `string` | `""` | Initial value (uncontrolled); `""` — nothing selected. |
-| `onValueChange` | `(value: string) => void` | — | Called with the new value on click or arrow keys. |
+| `onValueChange` | `(value: string) => void \| Promise<void>` | — | The new value on click or arrow keys. A promise: the thumb moves at once, the track is `aria-busy`, presses wait; a controlled owner sets `value` before resolving; reject glides it back (say why with `error`). |
 | `disabled` | `boolean` | `false` | Disables the whole group. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Control tier; the outer height equals the control height 28 · 32 · 36 · 40 · 48. Without it the tier of its host (a toolbar, a panel with a size), else `m`. |
 | `fullWidth` | `boolean` | `false` | Fills the container; single-line segments tend to equal widths but never get narrower than their label — when they do not fit, the row scrolls. |
@@ -68,7 +68,7 @@ The root is a field root: `className`, `ref` and the native attributes land on t
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `value` | `string` | — (required) | Option value compared with the root value. |
-| `disabled` | `boolean` | `false` | Disables this option; arrow keys skip it. |
+| `disabled` | `boolean` | `false` | Disables this option (`aria-disabled`, out of the Tab order, a click does nothing); arrow keys skip it. The segment keeps its size and place. |
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | — | Palette hue: a dot before the content; while selected the thumb takes a soft fill of the hue with a ring of it. |
 | `asChild` | `boolean` | `false` | The single child (a router `<Link>`) becomes the segment. A row of links is a navigation: links in the Tab order, the one matching `value` current, no arrow keys. |
 | `children` | `ReactNode` | — (required) | Text, `Icon`, `Label`, `Count`, `Description`. Only an icon → square segment; give it `aria-label`. |
@@ -153,8 +153,9 @@ Colour all items or none; do not give an item and its Count the same hue; prefer
 | selected | root `value` = item `value` | `aria-checked="true"`, `data-state="checked"`; thumb under the segment, `text-primary` |
 | unselected | — | `aria-checked="false"`, `data-state="unchecked"`; `text-secondary`, hover → `text-primary` (no fill) |
 | no selection | `value` / `defaultValue` = `""` | thumb hidden; the first enabled segment takes Tab focus |
-| item disabled | item `disabled` | `data-disabled="true"`, native `disabled`, `text-disabled`, skipped by arrows |
-| group disabled | root `disabled` | track `data-disabled="true"`, `aria-disabled`; every segment disabled; label and hint dimmed |
+| item disabled | item `disabled` | `data-disabled="true"`, `aria-disabled="true"` and `data-reachable-disabled` (not native `disabled`: the segment stays the same element, so nothing moves or resizes and a Tooltip around it, the kit's or yours, never re-hosts it), out of the Tab order, a click does nothing, `text-disabled`, skipped by arrows |
+| group disabled | root `disabled` | track `data-disabled="true"`, `aria-disabled`; every segment disabled; label and hint dimmed; the geometry and the thumb's place stay as they are |
+| saving | `onValueChange` returned a pending promise | the thumb stands on the new segment (it glides there), track `aria-busy`, `cursor: progress`; presses and arrow keys wait; a rejection glides the thumb back to the stored value |
 | invalid | `invalid` or non-empty `error` | track `data-invalid="true"` + `aria-invalid="true"`, inset danger ring on the track; the error replaces the hint; the track shakes once when an error arrives |
 | required | `required` | red `*` after the label, `aria-required="true"` on the radiogroup |
 | optional | `optional` | a muted `labels.optional` marker after the label |
@@ -193,7 +194,8 @@ Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `dat
 
 - The track is `role="radiogroup"`, named by `label` (`aria-labelledby`); without a label give the root `aria-label`. `aria-disabled` when disabled.
 - Hint and error are linked through `aria-describedby`; an error sets `aria-invalid="true"`, `required` sets `aria-required="true"`.
-- Items are `<button role="radio" aria-checked>` with roving `tabIndex`.
+- Items are `<button role="radio" aria-checked>` with roving `tabIndex`. A disabled item is `aria-disabled`, not natively `disabled`: inside a `Tooltip` it keeps its node, takes hover, and selection never lands on it.
+- While an `onValueChange` promise is pending the track is `aria-busy`; a rejection puts the previous option back as checked.
 - With an `asChild` item the track is `role="navigation"` (named the same way), the links keep their role and the current one has `aria-current="page"`; `required` and `invalid` do not apply.
 - Two-line items: `aria-labelledby` = label (+ count), `aria-describedby` = description; plain text is the label, so every reference resolves.
 - Icons are `aria-hidden`; icon-only items need `aria-label` (and a Tooltip for sighted users). In a row collapsed to icons a `VisuallyHidden` copy of the title names the segment and a `Tooltip` shows it.
@@ -217,6 +219,7 @@ Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `dat
 | [scroll.tsx](examples/scroll.tsx) | Segments never wrap: in a column narrower than the row it scrolls with edge fades and brings the chosen segment into view — `defaultValue`. |
 | [two-line.tsx](examples/two-line.tsx) | A label and a counter on the first line, a metric on the second — `SegmentedControl.Label`, `SegmentedControl.Count`, `SegmentedControl.Description`. |
 | [router.tsx](examples/router.tsx) | Router links as the segments: the current route is the value, each segment is a link and the row is a navigation; render it inside a router — `asChild`, `value`. |
+| [saving.tsx](examples/saving.tsx) | A project setting saved on the server at once: the thumb stands on the new segment while the request runs, and a refused save glides it back and says why — `onValueChange`, `error`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the choice and updates other content from it — `value`, `onValueChange`. |
 | [in-form.tsx](examples/in-form.tsx) | An expense form: the choice is a labelled field with a hint, checked on submit, its error leaves as soon as a segment is chosen; an optional choice beside it — `label`, `hint`, `required`, `error`, `optional`. |
 
@@ -228,6 +231,7 @@ Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `dat
 - `variant="…"` or `tone="…"` on the root → there is none; use `color` on items for hue.
 - Different `size` than neighbouring controls in a toolbar → use the same tier so heights match.
 - Expecting segments to wrap on narrow screens → they scroll; use `fullWidth` or fewer options.
+- `disabled` for the time of a save, or setting `value` first and setting it back when the request fails → return the request's promise from `onValueChange`; set `value` only after it succeeds.
 
 ## Related
 - **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (`internal/SwitcherScroller`, the row), [Badge](../badge/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md) (the title of a collapsed segment), [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [VisuallyHidden](../visually-hidden/COMPONENT.md); `internal/selectionIndicator` (the thumb), `internal/interactiveElement` (a link segment, `asChild`)

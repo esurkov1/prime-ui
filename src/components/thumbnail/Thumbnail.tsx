@@ -8,6 +8,7 @@ import { prefersReducedMotion } from "@/hooks/usePresence";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { NativeButton, useInheritedDisabled } from "@/internal/disabledContext";
 import { formatClock } from "@/internal/formatClock";
 import {
   createImageSlot,
@@ -81,6 +82,8 @@ function ThumbnailRoot({
     onChange: onCheckedChange,
   });
   const interactive = asChild || selectable;
+  // A disabled Fieldset around takes the tile's own control out, as it does every control.
+  const groupDisabled = useInheritedDisabled();
   const frame = {
     className: cx(styles.root, palette.hue, interactive && press.press, className),
     ...toDataAttributes({
@@ -99,11 +102,10 @@ function ThumbnailRoot({
     const { onClick } = rest as React.ButtonHTMLAttributes<HTMLButtonElement>;
     return provide(
       <slot.ImageSlotProvider>
-        {/* biome-ignore lint/a11y/useSemanticElements: a picture tile cannot be an <input>; the button carries the checkbox role and its state */}
-        <button
+        {/* A picture tile cannot be an <input>: the button carries the checkbox role and its state. */}
+        <NativeButton
           {...(rest as React.ButtonHTMLAttributes<HTMLButtonElement>)}
           ref={ref as React.Ref<HTMLButtonElement>}
-          type="button"
           role="checkbox"
           aria-checked={checked}
           {...frame}
@@ -116,7 +118,7 @@ function ThumbnailRoot({
           <span className={cx(styles.check, pill.choice)} aria-hidden="true">
             <Checkbox.Indicator checked={checked} size={fullWidth ? "s" : compactTier(size)} />
           </span>
-        </button>
+        </NativeButton>
       </slot.ImageSlotProvider>,
     );
   }
@@ -124,7 +126,7 @@ function ThumbnailRoot({
   if (asChild) {
     return provide(
       <slot.ImageSlotProvider>
-        <Slot {...rest} {...frame} ref={ref}>
+        <Slot {...rest} {...frame} ref={ref} aria-disabled={groupDisabled || rest["aria-disabled"]}>
           {children}
         </Slot>
       </slot.ImageSlotProvider>,

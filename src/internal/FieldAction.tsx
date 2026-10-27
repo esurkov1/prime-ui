@@ -4,6 +4,7 @@ import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { Check } from "@/icons/glyphs/check";
 import { Copy } from "@/icons/glyphs/copy";
 import { cx } from "@/internal/cx";
+import { NativeButton } from "@/internal/disabledContext";
 import { GlyphSwap } from "@/internal/glyphSwap";
 import { Slot } from "@/internal/slot";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
@@ -55,9 +56,9 @@ export function FieldActionButton({
       {children}
     </Slot>
   ) : (
-    <button {...shared} ref={ref} type={type} disabled={disabled}>
+    <NativeButton {...shared} ref={ref} type={type} disabled={disabled}>
       <GlyphSwap>{children}</GlyphSwap>
-    </button>
+    </NativeButton>
   );
   if (!tooltip) return segment;
   return (
@@ -85,7 +86,7 @@ export function FieldSectionButton({
   ...rest
 }: FieldSectionButtonProps) {
   return (
-    <button
+    <NativeButton
       {...rest}
       ref={ref}
       type={type}

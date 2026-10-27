@@ -127,7 +127,7 @@
   }
 }
 
-.trigger:active:not(:disabled) {
+.trigger:active:not(:disabled, [aria-disabled="true"]) {
   background: var(--prime-color-fill-strong);
 }
 
@@ -136,7 +136,7 @@
   outline-offset: var(--prime-focus-offset-inset);
 }
 
-.trigger:disabled {
+.trigger:is(:disabled, [aria-disabled="true"]) {
   color: var(--prime-color-text-disabled);
   cursor: not-allowed;
 }
@@ -164,7 +164,7 @@
   color: var(--prime-color-text-secondary);
 }
 
-.trigger:disabled .icon {
+.trigger:is(:disabled, [aria-disabled="true"]) .icon {
   color: var(--prime-color-text-disabled);
 }
 
@@ -191,7 +191,7 @@
   transform: rotate(180deg);
 }
 
-.trigger:disabled .chevron {
+.trigger:is(:disabled, [aria-disabled="true"]) .chevron {
   color: var(--prime-color-text-disabled);
 }
 

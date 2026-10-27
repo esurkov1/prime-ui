@@ -23,6 +23,9 @@ checks.
 - [ ] Every KPI row holds one size, picked by how many figures share it: `s` for 6–8, `m` for 4–5, `l` for three, `xl` for one or two ([a figure: Kpi and its size](choosing.md#a-figure-kpi-and-its-size)).
 - [ ] A DataTable's row grip and column order follow the rule: grip at the end, columns by `columnOrder` saved with `hiddenColumns` ([choosing](choosing.md#3-pairs-that-are-easy-to-confuse)).
 - [ ] The column chooser is `columnsMenu` only over a row-actions column, else `DataTableColumnsMenu` beside the table's search; a DataTable `toolbar` holds the table's controls unwrapped, never a lone button ([controls of a table](composition.md#controls-of-a-table)).
+- [ ] Every button stands with what it acts on: the page's in `Page.Actions`, a card's applying ones at the end of its `Card.Footer`, a block's helper in its `Card.Header`; a card of unrelated groups is split ([an action stands with what it acts on](composition.md#an-action-stands-with-what-it-acts-on)).
+- [ ] A normal state reads from the main content; only an abnormal one is a `Banner`, first in `Page.Body`; no side column for a status ([the normal state needs no block](composition.md#the-normal-state-needs-no-block)).
+- [ ] Devices or records with previews are one card per row: the preview and the status first, the settings folded in an `Accordion` with their values in `Accordion.Description`, the readings last ([a list of devices](composition.md#a-list-of-devices-with-previews)).
 - [ ] A rich board card is made of the Kanban card parts (zones, title with number, resources, facts, a `fullWidth` next step), its hideable fields a `KanbanFieldsMenu` beside the filter, every card in `items` ([sales pipeline board](composition.md#sales-pipeline-board)).
 
 ## UX ([ux.md](ux.md))
@@ -36,6 +39,9 @@ checks.
 - [ ] Labels on a form of rows ≤ columns + the list label; none repeated, numbered or repeating its heading ([label economy](ux.md#3-label-economy)).
 - [ ] No text explains the layout; every hint is two to five words the label and the control leave out, never the obvious outcome ([label economy](ux.md#3-label-economy)).
 - [ ] Every setting sits with what it governs, as a field beside its neighbours; a stored choice is a `Select`, no section holds one setting ([where a setting lives](ux.md#10-where-a-setting-lives)).
+- [ ] Every value stands in one place: no summary repeats a block, a setting's live value is its `hint`, no count beside a list that counts, no manual path beside the automatic one ([one fact, one place](ux.md#11-one-fact-one-place)).
+- [ ] A popover, the bar and a header hold only what a person acts on; a record's ID is its title's `number`; a `Banner` has an icon only where it reads worse without ([only what a person acts on](ux.md#only-what-a-person-acts-on)).
+- [ ] Inside every block the controls come before the readings; a summary popover opens with the mode and ends with the rare, a `Divider` between its sections ([controls first](ux.md#controls-first-readings-after)).
 - [ ] No button text repeats its icon's verb («+ Оплата», never «+ Добавить оплату»); a bare verb is icon-only with `aria-label` and a `Tooltip`; the name and the tooltip say the whole action («Новая оплата»); a button without an icon says the verb and the object ([words](ux.md#4-words)).
 - [ ] Errors say how to fix it, empty states offer the next step ([words](ux.md#4-words)).
 - [ ] Money, numbers and dates go through `Intl` with `ru-RU`, in Russian typography ([words](ux.md#4-words)).
@@ -57,6 +63,9 @@ checks.
 
 ## Sizes and alignment
 - [ ] Default size `m`; a tier changes for a whole region, never for one control ([the host tier](api-contract.md#size-and-the-host-tier)).
+- [ ] Every `size=` in my code has a reason I can name; none inside a Popover, Modal, Drawer, Sheet or LoginForm, nothing in the bar taller than its controls ([the host tier](api-contract.md#size-and-the-host-tier)).
+- [ ] A set of many items (modules, ports, tags) takes `xs` once for its region, its number is the title, an order word is `VisuallyHidden`, short readings are one `Badge.Group` ([many of a kind](composition.md#many-of-a-kind-start-small)).
+- [ ] Fields stand two to a row at most, in `Fieldset layout="pair"`; no grid of my own for fields ([forms](composition.md#7-forms)).
 - [ ] Every row of controls uses one size and its heights line up ([density](composition.md#5-density-and-size)).
 - [ ] A switch ends its row; a reorderable list shows its grips always — leading (`handle="start"`) when the rows end with a switch ([list rows](composition.md#list-rows)).
 - [ ] A destructive action is `tone="danger"` and asks through a `ConfirmDialog` — an icon button with a Tooltip among one or two actions, the last item of «Ещё» among three or more ([the number of actions](composition.md#the-number-of-actions)).
@@ -75,6 +84,7 @@ checks.
 - [ ] Every hue answers «what is this» or «what state is it in»; none decorates ([tone and color](foundations.md#6-tone-and-color)).
 - [ ] Judgements wear `tone`, stages and categories wear `color`; no two stages share one tone ([tone or color](foundations.md#tone-or-color)).
 - [ ] Each status's label and colour come from one map of the app, read by every badge, segment, dot and series ([one status map](foundations.md#one-status-map)).
+- [ ] A state of the whole (paused, a test, offline) is in the status map and overrides every item's word and tone; a mode that replaces the content is a `warning` status of the main summary ([one status map](foundations.md#one-status-map)).
 - [ ] A hue keeps its meaning across the product; derived states refine their base hue; a history event wears the state it led to ([hue meanings](foundations.md#hue-meanings)).
 - [ ] Category hues are unique within their set, stable per id, and never a status hue in the same view ([categories](foundations.md#categories)).
 - [ ] A colour a person picks is a stored palette name, an unknown one gray ([colours people choose](foundations.md#colours-people-choose)).
@@ -136,6 +146,8 @@ checks.
 ## States
 - [ ] Hover and focus-visible come from the kit, nothing removed ([focus](foundations.md#10-focus-and-motion)).
 - [ ] Busy controls use `loading`, unavailable ones `disabled` — no hand-made spinners ([loading](api-contract.md#loading-without-datatable)).
+- [ ] A control that applies at once returns its request's Promise: the value shows at once, nothing is `disabled` or frozen while it saves, a refusal rolls back ([applies at once](api-contract.md#a-control-that-applies-at-once)).
+- [ ] No control changes size with its state: a toggle keeps its label and swaps its glyph, a line of data keeps its facts ([nothing changes size](foundations.md#nothing-changes-size-with-its-state)).
 - [ ] Fields show `hint` and `error`; only the minority is marked `required` or `optional` ([forms](api-contract.md#forms)).
 - [ ] Every data block has its loading, empty and error states ([feedback](composition.md#9-feedback)).
 - [ ] Every region swaps its states through `Crossfade`, loading is a `Skeleton` of the data ([continuity](foundations.md#11-state-changes-are-continuous)).
@@ -154,7 +166,13 @@ checks.
 - [ ] The screen passes the responsive checklist in both themes ([responsive](responsive.md#checklist-before-handing-a-screen-over)).
 - [ ] On a phone the Sidebar opens from the menu button the top bar draws; the page title stays in the bar ([app frame](layouts.md#app-frame-once-per-app)).
 - [ ] Tabs that outgrow the width scroll; no two topics merged into one tab ([switchers](responsive.md#switchers)).
+- [ ] No ButtonGroup or SegmentedControl holds more segments than its column shows; a long one is split by meaning or becomes a `Select` ([switchers](responsive.md#switchers)).
 - [ ] At every width the bar fits: tools on their own line, then icon-only buttons, then «⋯», the primary always on screen ([the page's top bar](responsive.md#the-pages-top-bar--pagetopbar)).
+
+## Build
+- [ ] An app offline or under a strict CSP imports no `fonts.css`: its faces are self-hosted or it keeps the system font ([setup](SKILL.md#setup-once-per-app)).
+- [ ] An embedded build reads its gzip size against a budget and takes no `prime-ui-kit/color-picker`: a colour is `ColorSwatches` or `ColorPresets.Root allowCustom` ([setup](SKILL.md#setup-once-per-app), [colour pickers](choosing.md#3-pairs-that-are-easy-to-confuse)).
+- [ ] One service file in a settings card (firmware, a certificate) is a FileUpload `trigger="button"`, not a drop zone ([FileUpload shapes](choosing.md#3-pairs-that-are-easy-to-confuse)).
 
 ## Keyboard and a11y
 - [ ] Every action is reachable by Tab in reading order and works with Enter / Space ([interaction](responsive.md#interaction-and-accessibility)).

@@ -275,6 +275,51 @@ export function DealStageShare({ counts }: { counts: Record<DealStage, number> }
 A status that is a judgement keeps the same shape with `tone` in place of `color`
 (`satisfies Record<InvoiceStatus, { label: string; tone: "success" | "warning" | "danger" }>`).
 
+**The state of the whole overrides its parts.** A state of the app or of a group — output paused
+on every device, a test running, no connection — changes what each item's status means, so it is
+an entry of the same map and wins: every badge, dot and figure it touches takes its word and tone
+(«На паузе» `warning`), never the green «В эфире» of an item under a paused output. A mode that
+replaces the normal content (a test picture, a demo, a calibration) is a status of its own in the
+main summary, `warning`, ranked above the normal source: the chip says «Тестовый сигнал», not the
+source it replaced. Put these states into the map from the start — «приостановлено», «тестовый
+режим», «нет связи» — so no screen invents them later.
+
+```tsx partial
+// bad — output is paused for every device, the item's badge still says what it would say alone
+<Badge.Root tone="success">В эфире</Badge.Root>
+```
+
+```tsx
+// entities/output/status.ts — one map; the state of the whole decides first
+import { Badge } from "prime-ui-kit";
+
+type OutputStatus = "live" | "idle" | "paused" | "test" | "offline";
+type AppState = { online: boolean; testing: boolean; paused: boolean };
+
+const OUTPUT_STATUS = {
+  live: { label: "В эфире", tone: "success" },
+  idle: { label: "Ожидает", tone: "neutral" },
+  paused: { label: "На паузе", tone: "warning" },
+  test: { label: "Тестовый сигнал", tone: "warning" },
+  offline: { label: "Нет связи", tone: "danger" },
+} as const satisfies Record<
+  OutputStatus,
+  { label: string; tone: "success" | "neutral" | "warning" | "danger" }
+>;
+
+function outputStatus(live: boolean, app: AppState): OutputStatus {
+  if (!app.online) return "offline";
+  if (app.testing) return "test";
+  if (app.paused) return "paused";
+  return live ? "live" : "idle";
+}
+
+export function OutputBadge({ live, app }: { live: boolean; app: AppState }) {
+  const status = OUTPUT_STATUS[outputStatus(live, app)];
+  return <Badge.Root tone={status.tone}>{status.label}</Badge.Root>;
+}
+```
+
 ### Hue meanings
 
 The kit suggests a generic meaning per hue; the product writes its own map on top, and a hue keeps
@@ -435,3 +480,36 @@ data → empty → error, one record → another — renders its content inside 
   opened again) renders as it is, with no fade.
 
 Data already on screen stays during a refresh (`aria-busy`), it does not go back to a skeleton.
+
+### Nothing changes size with its state
+
+A control keeps its width and height in every state it has and whatever its neighbours hold, so a
+press never moves what stands beside it. The kit holds its own geometry (a busy button keeps its
+width, the page's bar plans from settled widths); the words are yours:
+
+- **A toggle keeps its label.** A button that starts and stops something says its object once
+  («Вывод») and lets the glyph carry the verb (`action.play` ⇄ `action.pause`, the whole action in
+  its `aria-label`) — never «Запустить вывод» that turns into «Стоп».
+- **A line of data keeps its facts.** A `Page.Description` or a card's description names the same
+  facts in every state and changes only their values («6 модулей · 60 к/с · на паузе»), never a
+  line that drops its figures when the output stops.
+
+```tsx partial
+// bad — the label and the line of data change length with the state
+<Page.Description>{running ? "6 модулей · 60 к/с · в эфире" : "Остановлено"}</Page.Description>
+<Button.Root>{running ? "Остановить вывод" : "Старт"}</Button.Root>
+```
+
+```tsx good
+// declare: const running: boolean
+// good — the same facts in both states, one label; the glyph is the verb
+<>
+  <Page.Description>{`6 модулей · 60 к/с · ${running ? "в эфире" : "на паузе"}`}</Page.Description>
+  <Button.Root aria-label={running ? "Остановить вывод" : "Запустить вывод"}>
+    <Button.Icon>
+      <Icon name={running ? "action.pause" : "action.play"} />
+    </Button.Icon>
+    Вывод
+  </Button.Root>
+</>
+```

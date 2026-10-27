@@ -65,7 +65,7 @@
   margin-inline-end: var(--field-gap);
 }
 
-.control:has(textarea:disabled) .edge > [data-field-action] {
+.control:has(textarea:is(:disabled, [aria-disabled="true"])) .edge > [data-field-action] {
   color: var(--prime-color-text-disabled);
   background: transparent;
   cursor: not-allowed;
