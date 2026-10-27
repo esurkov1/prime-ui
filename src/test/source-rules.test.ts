@@ -10,6 +10,9 @@
  * - a component imports another component only through its PascalCase module or `types.ts`
  *   (shared mechanics live in `src/internal` / `src/hooks`);
  * - every `biome-ignore lint/correctness/useExhaustiveDependencies` is a counted exception;
+ * - the kit draws a glyph by importing its module (`@/icons/glyphs/<name>`), never through the
+ *   name registry (`<Icon name>`, `IconName`): the registry holds every glyph and is the
+ *   consumer's API, a kit module that reached it would bundle them all;
  * - `src/icons/glyphs` holds only glyph modules (`*.tsx`).
  */
 import path from "node:path";
@@ -62,6 +65,12 @@ describe("source rules", () => {
           "biome-ignore useExhaustiveDependencies",
         ),
       );
+      if (!file.startsWith("src/icons/") && file !== "src/index.ts") {
+        const code = text.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+        offenders.push(
+          ...matches(file, code, /<Icon\b|\bIconName\b|\biconRegistry\b/g, "a glyph by name"),
+        );
+      }
       const own = file.match(/^src\/(?:components|layout)\/([\w-]+)\//)?.[1];
       if (own) {
         for (const m of text.matchAll(/^import [^;]*?from "([^"]+)";/gm)) {

@@ -1,12 +1,13 @@
 import * as React from "react";
-
 import { Badge } from "@/components/badge/Badge";
 import { Checkbox } from "@/components/checkbox/Checkbox";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { Icon } from "@/icons";
+import { ChevronDown } from "@/icons/glyphs/chevron-down";
+import { Plus } from "@/icons/glyphs/plus";
+
 import { AUTOFILL_OFF } from "@/internal/autofill";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
@@ -802,7 +803,7 @@ export function TagSelect({
         />
 
         <span className={styles.chevron} aria-hidden="true">
-          <Icon name="nav.chevronDown" />
+          <ChevronDown />
         </span>
       </div>
 
@@ -833,7 +834,7 @@ export function TagSelect({
             onPick={() => pick(CREATE_VALUE)}
           >
             <ListRowMark size={rowTier} lines="line">
-              <Icon name="action.add" />
+              <Plus />
             </ListRowMark>
             <span className={styles.createLabel}>{labels.create}</span>
             <Badge.Root color={fallbackColor} className={styles.chip}>

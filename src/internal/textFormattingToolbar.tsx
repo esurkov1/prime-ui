@@ -1,10 +1,17 @@
 import * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { Kbd } from "@/components/kbd/Kbd";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { usePresence } from "@/hooks/usePresence";
-import { Icon, type IconName } from "@/icons";
+import type { Glyph } from "@/icons/glyph";
+import { Bold } from "@/icons/glyphs/bold";
+import { Code } from "@/icons/glyphs/code";
+import { EyeOff } from "@/icons/glyphs/eye-off";
+import { Italic } from "@/icons/glyphs/italic";
+import { Link2 } from "@/icons/glyphs/link-2";
+import { Strikethrough } from "@/icons/glyphs/strikethrough";
+import { TextQuote } from "@/icons/glyphs/text-quote";
+import { Underline } from "@/icons/glyphs/underline";
 import { setControlValue } from "./controlValue";
 import { cx } from "./cx";
 import overlayMotion from "./overlayMotion.module.css";
@@ -30,15 +37,15 @@ import styles from "./textFormattingToolbar.module.css";
  * `anchorProps` on it (the toolbar shows while the focus is in that box).
  */
 
-const TOOL_ICONS: Record<TextFormat, IconName> = {
-  bold: "format.bold",
-  italic: "format.italic",
-  underline: "format.underline",
-  strikethrough: "format.strikethrough",
-  code: "format.code",
-  spoiler: "format.spoiler",
-  link: "format.link",
-  quote: "format.quote",
+const TOOL_ICONS: Record<TextFormat, Glyph> = {
+  bold: Bold,
+  italic: Italic,
+  underline: Underline,
+  strikethrough: Strikethrough,
+  code: Code,
+  spoiler: EyeOff,
+  link: Link2,
+  quote: TextQuote,
 };
 
 const isApplePlatform = () =>
@@ -165,6 +172,7 @@ export function useTextFormatting({
         <Tooltip.Provider>
           {TEXT_FORMATS.map((format, index) => {
             const shortcut = FORMAT_SHORTCUTS[format];
+            const ToolGlyph = TOOL_ICONS[format];
             return (
               <Tooltip.Root key={format}>
                 <Tooltip.Trigger>
@@ -181,7 +189,7 @@ export function useTextFormatting({
                     onClick={() => apply(format)}
                   >
                     <Button.Icon>
-                      <Icon name={TOOL_ICONS[format]} />
+                      <ToolGlyph />
                     </Button.Icon>
                   </Button.Root>
                 </Tooltip.Trigger>

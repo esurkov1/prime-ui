@@ -1,9 +1,11 @@
 import * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { Spinner } from "@/components/spinner/Spinner";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
-import { Icon, type IconName } from "@/icons";
+import { CircleAlert } from "@/icons/glyphs/circle-alert";
+import { Download } from "@/icons/glyphs/download";
+import { RefreshCw } from "@/icons/glyphs/refresh-cw";
+import { X } from "@/icons/glyphs/x";
 import { cx } from "@/internal/cx";
 import { mediaDiskClass } from "@/internal/mediaDisk";
 import { Ring } from "@/internal/ring";
@@ -119,14 +121,8 @@ export function useTransferDisk({
   };
 
   // One glyph slot: the host's `Button.Icon` cross-fades a change of it in place.
-  const glyphName: IconName = remote
-    ? "action.download"
-    : failed
-      ? onRetry
-        ? "action.refresh"
-        : "status.failed"
-      : "action.close";
-  const glyph = busy ? <Spinner /> : <Icon name={glyphName} />;
+  const TransferGlyph = remote ? Download : failed ? (onRetry ? RefreshCw : CircleAlert) : X;
+  const glyph = busy ? <Spinner /> : <TransferGlyph />;
   const name =
     action === "cancel" ? labels.cancel : action === "retry" ? labels.retry : labels.download;
   // The ring: empty while queued (it turns at its least arc), the share while loading (`null`

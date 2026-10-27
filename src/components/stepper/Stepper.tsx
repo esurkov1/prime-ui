@@ -1,8 +1,10 @@
 import * as React from "react";
-
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
-import { Icon } from "@/icons";
+import { Check } from "@/icons/glyphs/check";
+import { ChevronRight } from "@/icons/glyphs/chevron-right";
+import { CircleX } from "@/icons/glyphs/circle-x";
+
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -163,7 +165,7 @@ function StepperItem({
       <li className={styles.item}>
         {/* Decorative chevron in front of the step; CSS shows it only between horizontal steps. */}
         <span className={styles.separator} aria-hidden="true">
-          <Icon name="nav.chevronRight" strokeWidth={2} />
+          <ChevronRight strokeWidth={2} />
         </span>
         <button
           {...rest}
@@ -187,7 +189,7 @@ function StepperItem({
           {/* A vertical row that opens a page or panel ends with a chevron (`arrows`). */}
           {arrows && orientation === "vertical" ? (
             <span className={styles.arrow} aria-hidden="true">
-              <Icon name="nav.chevronRight" strokeWidth={2} />
+              <ChevronRight strokeWidth={2} />
             </span>
           ) : null}
         </button>
@@ -207,8 +209,8 @@ export type StepperIndicatorProps = SpanProps & {
 
 /** The default glyph of a status: the step number, a check, or the danger mark. */
 function statusGlyph(status: StepperItemStatus, index: number): React.ReactNode {
-  if (status === "completed") return <Icon name="action.check" strokeWidth={2} />;
-  if (status === "danger") return <Icon name="status.danger" />;
+  if (status === "completed") return <Check strokeWidth={2} />;
+  if (status === "danger") return <CircleX />;
   return index + 1;
 }
 

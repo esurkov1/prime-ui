@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { Avatar, type AvatarRootProps } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
@@ -12,7 +11,14 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useModalLayer } from "@/hooks/useModalLayer";
 import { usePresence } from "@/hooks/usePresence";
-import { Icon, type IconName } from "@/icons";
+import type { Glyph } from "@/icons/glyph";
+import { ChevronDown } from "@/icons/glyphs/chevron-down";
+import { ChevronsLeft } from "@/icons/glyphs/chevrons-left";
+import { ChevronsUpDown } from "@/icons/glyphs/chevrons-up-down";
+import { Ellipsis } from "@/icons/glyphs/ellipsis";
+import { PanelLeftClose } from "@/icons/glyphs/panel-left-close";
+import { PanelLeftOpen } from "@/icons/glyphs/panel-left-open";
+import { Plus } from "@/icons/glyphs/plus";
 import { AnchorRectProvider, type AnchorRectResolver } from "@/internal/AnchorRectContext";
 import { ControlSizeProvider, useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
@@ -608,7 +614,7 @@ function SidebarGroup({
         >
           <span className={styles.groupText}>{label}</span>
           <AttentionDot hue={hue} shown={!open && !rail} inline />
-          <Icon name="nav.chevronDown" className={styles.groupChevron} />
+          <ChevronDown className={styles.groupChevron} />
         </button>
       </CompactTooltip>
       {/* One place for the items and the rail row of a folded group: both sit in the same cell,
@@ -649,7 +655,7 @@ function SidebarGroup({
                       {...flyout.triggerHandlers}
                     >
                       <SidebarItemIcon>
-                        <Icon name="action.more" />
+                        <Ellipsis />
                       </SidebarItemIcon>
                       <AttentionDot hue={hue} shown={folded} />
                     </button>
@@ -849,7 +855,7 @@ function SidebarItemAction({ label, children, className, ...rest }: SidebarItemA
       side="right"
       className={cx(styles.action, className)}
     >
-      {children ?? <Icon name="action.add" />}
+      {children ?? <Plus />}
     </RowAction>
   );
 }
@@ -1337,10 +1343,7 @@ function SidebarSubTrigger({
 }: SidebarSubTriggerProps) {
   const sub = useSubContext();
   const rail = useRail();
-  const parts = splitItemChildren(
-    children,
-    <Icon name="nav.chevronDown" className={styles.chevron} />,
-  );
+  const parts = splitItemChildren(children, <ChevronDown className={styles.chevron} />);
   const { flyout } = sub;
   const mergedRef = useMergedRefs<HTMLButtonElement>(ref, flyout.triggerRef);
 
@@ -1593,7 +1596,7 @@ function SidebarAccount({ description, className, children, type, ...rest }: Sid
             <span className={styles.accountDescription}>{description}</span>
           )}
         </span>
-        {opensMenu ? <Icon name="nav.chevronsUpDown" className={styles.accountChevron} /> : null}
+        {opensMenu ? <ChevronsUpDown className={styles.accountChevron} /> : null}
       </button>
     </CompactTooltip>
   );
@@ -1623,14 +1626,14 @@ function SidebarToggle(props: SidebarToggleProps) {
 SidebarToggle.displayName = "Sidebar.Toggle";
 
 /** The glyph of an item toggle: the panel folds while it is in view, unfolds otherwise. */
-const toggleGlyph = (expanded: boolean): IconName =>
-  expanded ? "nav.sidebarCollapse" : "nav.sidebarExpand";
+const toggleGlyph = (expanded: boolean): Glyph => (expanded ? PanelLeftClose : PanelLeftOpen);
 
 /** The toggle in the rail: the Sidebar's own state, the rail's tooltip and edge motion. */
 function RailToggle({ variant = "item", className, onClick, ref, ...rest }: SidebarToggleProps) {
   const { mode, offCanvas, open, toggle, navId, labels, size } = useSidebar();
   const expanded = offCanvas ? open : mode === "expanded";
   const label = offCanvas ? labels.close : expanded ? labels.collapse : labels.expand;
+  const ToggleGlyph = toggleGlyph(expanded);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     onClick?.(event);
     if (!event.defaultPrevented) toggle();
@@ -1656,7 +1659,7 @@ function RailToggle({ variant = "item", className, onClick, ref, ...rest }: Side
             onClick={handleClick}
           >
             <Button.Icon>
-              <Icon name="nav.chevronsLeft" className={styles.headerToggleIcon} />
+              <ChevronsLeft className={styles.headerToggleIcon} />
             </Button.Icon>
           </Button.Root>
         </Tooltip.Trigger>
@@ -1686,7 +1689,7 @@ function RailToggle({ variant = "item", className, onClick, ref, ...rest }: Side
       >
         <SidebarItemIcon>
           <GlyphSwap>
-            <Icon name={toggleGlyph(expanded)} />
+            <ToggleGlyph />
           </GlyphSwap>
         </SidebarItemIcon>
         <span className={cx(listRowStyles.body, styles.label)}>
@@ -1709,6 +1712,7 @@ function ShellToggle({ variant: _variant, onClick, ref, ...rest }: SidebarToggle
       ? SIDEBAR_LABELS.close
       : SIDEBAR_LABELS.collapse
     : SIDEBAR_LABELS.expand;
+  const NavToggleGlyph = toggleGlyph(nav.expanded);
   return (
     <Button.Root
       {...rest}
@@ -1725,7 +1729,7 @@ function ShellToggle({ variant: _variant, onClick, ref, ...rest }: SidebarToggle
     >
       {/* The Button glyph cross-fades by itself. */}
       <Button.Icon>
-        <Icon name={toggleGlyph(nav.expanded)} />
+        <NavToggleGlyph />
       </Button.Icon>
     </Button.Root>
   );

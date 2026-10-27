@@ -1,6 +1,5 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
-
 import { Button } from "@/components/button/Button";
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import type { ThumbnailRatio } from "@/components/thumbnail/Thumbnail";
@@ -12,7 +11,11 @@ import { type ImageStatus, useImageStatus } from "@/hooks/useImageStatus";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { prefersReducedMotion } from "@/hooks/usePresence";
-import { Icon, type IconName } from "@/icons";
+import { ChevronLeft } from "@/icons/glyphs/chevron-left";
+import { ChevronRight } from "@/icons/glyphs/chevron-right";
+import { Image } from "@/icons/glyphs/image";
+import { Volume2 } from "@/icons/glyphs/volume-2";
+import { VolumeX } from "@/icons/glyphs/volume-x";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -534,7 +537,7 @@ function CarouselRoot({
           <Skeleton shape="block" className={styles.placeholder} />
         ) : count === 0 ? (
           <span className={styles.fallback} role="img" aria-label={labels.empty}>
-            <Icon name="object.image" />
+            <Image />
           </span>
         ) : (
           items.map((item, at) => (
@@ -583,7 +586,7 @@ function CarouselRoot({
               onClick={() => step(-1, "step")}
             >
               <Button.Icon>
-                <Icon name="nav.chevronLeft" />
+                <ChevronLeft />
               </Button.Icon>
             </Button.Root>
           ) : null}
@@ -599,7 +602,7 @@ function CarouselRoot({
               onClick={() => step(1, "step")}
             >
               <Button.Icon>
-                <Icon name="nav.chevronRight" />
+                <ChevronRight />
               </Button.Icon>
             </Button.Root>
           ) : null}
@@ -691,7 +694,7 @@ function SlideState({ status, labels }: { status: ImageStatus; labels: CarouselL
   if (status === "error") {
     return (
       <span className={styles.fallback} role="img" aria-label={labels.loadError}>
-        <Icon name="object.image" />
+        <Image />
       </span>
     );
   }
@@ -770,7 +773,7 @@ function VideoSlide({
   const [muted, setMuted] = React.useState(true);
   const duration = item.duration ?? metaDuration;
   const sound = usePartPresence<HTMLButtonElement>({ present: playing, axis: "inline" });
-  const soundGlyph: IconName = muted ? "status.muted" : "status.sound";
+  const SoundGlyph = muted ? VolumeX : Volume2;
 
   return (
     <>
@@ -807,7 +810,7 @@ function VideoSlide({
                       onClick={() => setMuted(!muted)}
                     >
                       <Button.Icon>
-                        <Icon name={soundGlyph} />
+                        <SoundGlyph />
                       </Button.Icon>
                     </Button.Root>
                   ) : null}

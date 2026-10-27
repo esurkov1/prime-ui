@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { Avatar } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
 import { Crossfade } from "@/components/crossfade/Crossfade";
@@ -13,6 +12,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useElementSize } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
+
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";

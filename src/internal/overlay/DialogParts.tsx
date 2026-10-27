@@ -4,8 +4,8 @@
  * context) and the shared header / body / footer parts. Not exported from the package root:
  * consumers use them as `Modal.*`, `Drawer.*` and `Sheet.*`.
  */
-import * as React from "react";
 
+import * as React from "react";
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
@@ -19,7 +19,8 @@ import { useModalLayer } from "@/hooks/useModalLayer";
 import { readCssLengthPx } from "@/hooks/usePosition";
 import { type PresenceState, usePresence } from "@/hooks/usePresence";
 import { useSwipeDismiss } from "@/hooks/useSwipeDismiss";
-import { Icon } from "@/icons";
+import { X } from "@/icons/glyphs/x";
+
 import { BlockStackContext } from "@/internal/blockStack";
 import { ControlSizeProvider, useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
@@ -813,7 +814,7 @@ export function DialogHeader({
               onClick={onClose}
             >
               <Button.Icon>
-                <Icon name="action.close" tone="secondary" />
+                <X tone="secondary" />
               </Button.Icon>
             </Button.Root>
           ) : null}

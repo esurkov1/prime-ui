@@ -1,11 +1,12 @@
 import * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { ColorSwatches } from "@/components/color-swatches/ColorSwatches";
 import { Divider } from "@/components/divider/Divider";
 import { Input } from "@/components/input/Input";
 import { Popover } from "@/components/popover/Popover";
-import { Icon } from "@/icons";
+import { Ellipsis } from "@/icons/glyphs/ellipsis";
+import { Trash2 } from "@/icons/glyphs/trash-2";
+
 import { formatLabel } from "@/internal/formatLabel";
 import { ListRowMark, listRowStyles } from "@/internal/listRow";
 import { menuRowProps } from "@/internal/MenuGroup";
@@ -97,7 +98,7 @@ export function TagOptionMenu({
           onMouseDown={(event) => event.preventDefault()}
         >
           <Button.Icon>
-            <Icon name="action.more" />
+            <Ellipsis />
           </Button.Icon>
         </Button.Root>
       </Popover.Trigger>
@@ -150,7 +151,7 @@ export function TagOptionMenu({
                 }}
               >
                 <ListRowMark size="s" lines="line">
-                  <Icon name="action.delete" />
+                  <Trash2 />
                 </ListRowMark>
                 <span className={listRowStyles.title}>{labels.delete}</span>
               </button>

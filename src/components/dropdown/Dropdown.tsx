@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { Avatar } from "@/components/avatar/Avatar";
 import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Divider } from "@/components/divider/Divider";
@@ -16,7 +15,8 @@ import {
   type PositionAlign,
   type PositionSide,
 } from "@/hooks/usePosition";
-import { Icon } from "@/icons";
+import { Search } from "@/icons/glyphs/search";
+
 import { AUTOFILL_OFF } from "@/internal/autofill";
 import { useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
@@ -427,7 +427,7 @@ function DropdownSearch({
 
   return (
     <div className={cx(menu.searchRow, menu.panelSearch, fieldInputTextClass)}>
-      <Icon name="action.search" size="s" />
+      <Search size="s" />
       <input
         {...rest}
         type="search"

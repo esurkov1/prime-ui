@@ -1,9 +1,9 @@
 import * as React from "react";
-
 import { Badge, type BadgeGroupProps } from "@/components/badge/Badge";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { Icon } from "@/icons";
+import { ChevronDown } from "@/icons/glyphs/chevron-down";
+
 import { useControlSize, useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -243,7 +243,7 @@ function AccordionTrigger({ className, children, onClick, ...rest }: AccordionTr
         badges={badges}
         description={description}
       />
-      <Icon name="nav.chevronDown" className={styles.chevron} />
+      <ChevronDown className={styles.chevron} />
     </button>
   );
 }

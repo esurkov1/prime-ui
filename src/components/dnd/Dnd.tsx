@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
@@ -7,7 +6,9 @@ import { readCssLengthPx } from "@/hooks/usePosition";
 import { prefersReducedMotion } from "@/hooks/usePresence";
 import { useScrollRegion } from "@/hooks/useScrollRegion";
 import { flowGaps, useVirtualRows } from "@/hooks/useVirtualRows";
-import { Icon } from "@/icons";
+import { GripVertical } from "@/icons/glyphs/grip-vertical";
+import { Lock } from "@/icons/glyphs/lock";
+
 import { cx } from "@/internal/cx";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { motionTiming } from "@/internal/motionTiming";
@@ -150,7 +151,7 @@ export function DndLock({ className, "aria-label": ariaLabel, ...rest }: DndLock
       data-size="xs"
       data-dnd-lock=""
     >
-      <Icon name="status.locked" />
+      <Lock />
     </span>
   );
 }
@@ -184,7 +185,7 @@ function DndHandle({ className, "aria-label": ariaLabel, ref, ...rest }: DndHand
       className={cx(styles.handle, className)}
     >
       <Button.Icon>
-        <Icon name="action.drag" />
+        <GripVertical />
       </Button.Icon>
     </Button.Root>
   );

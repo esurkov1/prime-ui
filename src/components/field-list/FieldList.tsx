@@ -10,7 +10,12 @@ import { VisuallyHidden, visuallyHiddenClass } from "@/components/visually-hidde
 import { useControllableState } from "@/hooks/useControllableState";
 import { useResizeEffect } from "@/hooks/useElementSize";
 import { readCssLengthPx } from "@/hooks/usePosition";
-import { Icon } from "@/icons";
+import { ChevronDown } from "@/icons/glyphs/chevron-down";
+import { ChevronUp } from "@/icons/glyphs/chevron-up";
+import { Ellipsis } from "@/icons/glyphs/ellipsis";
+import { Plus } from "@/icons/glyphs/plus";
+import { Trash2 } from "@/icons/glyphs/trash-2";
+
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -639,7 +644,7 @@ export function FieldList<T extends object>({
               }}
             >
               <Button.Icon>
-                <Icon name="action.more" />
+                <Ellipsis />
               </Button.Icon>
             </Button.Root>
           </Dropdown.Trigger>
@@ -648,14 +653,14 @@ export function FieldList<T extends object>({
               <>
                 <Dropdown.Item disabled={!canUp} onSelect={() => move(id, -1)}>
                   <Dropdown.ItemIcon>
-                    <Icon name="nav.chevronUp" />
+                    <ChevronUp />
                   </Dropdown.ItemIcon>
                   {labels.moveUp}
                   <Dropdown.ItemShortcut>Alt ↑</Dropdown.ItemShortcut>
                 </Dropdown.Item>
                 <Dropdown.Item disabled={!canDown} onSelect={() => move(id, 1)}>
                   <Dropdown.ItemIcon>
-                    <Icon name="nav.chevronDown" />
+                    <ChevronDown />
                   </Dropdown.ItemIcon>
                   {labels.moveDown}
                   <Dropdown.ItemShortcut>Alt ↓</Dropdown.ItemShortcut>
@@ -665,7 +670,7 @@ export function FieldList<T extends object>({
             ) : null}
             <Dropdown.Item tone="danger" disabled={removeOff} onSelect={() => remove(id)}>
               <Dropdown.ItemIcon>
-                <Icon name="action.delete" />
+                <Trash2 />
               </Dropdown.ItemIcon>
               {labels.removeItem}
               {reason ? <Dropdown.ItemDescription>{reason}</Dropdown.ItemDescription> : null}
@@ -687,7 +692,7 @@ export function FieldList<T extends object>({
           data-fl-action=""
         >
           <Button.Icon>
-            <Icon name="action.delete" />
+            <Trash2 />
           </Button.Icon>
         </Button.Root>
       );
@@ -951,7 +956,7 @@ export function FieldList<T extends object>({
                 onClick={add}
               >
                 <Button.Icon>
-                  <Icon name="action.add" />
+                  <Plus />
                 </Button.Icon>
                 {addLabel}
               </Button.Root>

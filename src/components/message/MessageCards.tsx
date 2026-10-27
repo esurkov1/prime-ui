@@ -1,10 +1,11 @@
 import * as React from "react";
-
 import { Avatar } from "@/components/avatar/Avatar";
 import { StatusDot } from "@/components/status-dot/StatusDot";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
-import { Icon } from "@/icons";
+import { Globe } from "@/icons/glyphs/globe";
+import { MapPin } from "@/icons/glyphs/map-pin";
+
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
@@ -73,7 +74,7 @@ export function MessageLocation({
         data-live={live || undefined}
         aria-hidden="true"
       >
-        <Icon name="object.mapPin" animated={false} />
+        <MapPin animated={false} />
       </span>
     </>
   );
@@ -235,7 +236,7 @@ export function MessageLinkPreview({
           <Thumbnail.Root fullWidth ratio="16:9" size="s" className={styles.previewImage}>
             <Thumbnail.Image src={image} />
             <Thumbnail.Fallback>
-              <Icon name="object.globe" />
+              <Globe />
             </Thumbnail.Fallback>
           </Thumbnail.Root>
         ) : null}

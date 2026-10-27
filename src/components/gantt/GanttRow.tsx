@@ -1,11 +1,12 @@
 // biome-ignore-all lint/a11y/useSemanticElements: an ARIA grid of divs (see Gantt.tsx)
 // biome-ignore-all lint/a11y/useFocusableInteractive: rows and cells are not focus stops; the row header and bars are
+
 import type { Locale } from "date-fns";
 import * as React from "react";
-
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Tooltip } from "@/components/tooltip/Tooltip";
-import { Icon } from "@/icons";
+import { Plus } from "@/icons/glyphs/plus";
+
 import { useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -400,7 +401,7 @@ function GanttGhostView({
           {phantom ? (
             <>
               <span className={styles.ghostIcon}>
-                <Icon name="action.add" animated={false} />
+                <Plus animated={false} />
               </span>
               <span className={styles.ghostLabel}>{label}</span>
             </>

@@ -2,7 +2,10 @@ import * as React from "react";
 import type { HintTone } from "@/components/hint/Hint";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { Icon } from "@/icons";
+import { Check } from "@/icons/glyphs/check";
+import { Eye } from "@/icons/glyphs/eye";
+import { EyeOff } from "@/icons/glyphs/eye-off";
+import { X } from "@/icons/glyphs/x";
 import { AUTOFILL_OFF, useAutofill } from "@/internal/autofill";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
@@ -424,7 +427,7 @@ function InputValidMark() {
       className={cx(iconSlotClass, styles.validMark, arrived && enterMotion.enter)}
       aria-hidden="true"
     >
-      <Icon name="action.check" drawn={drawn} />
+      <Check drawn={drawn} />
     </span>
   );
 }
@@ -716,7 +719,7 @@ function InputClearButton({ onClick, className, ref, ...rest }: InputClearButton
         if (!event.defaultPrevented) inputRef.current?.focus();
       }}
     >
-      <Icon name="action.close" />
+      <X />
     </FieldActionButton>
   );
 }
@@ -773,7 +776,7 @@ export type InputRevealButtonProps = Omit<
  */
 function InputRevealButton({ onClick, onMouseDown, ref, ...rest }: InputRevealButtonProps) {
   const { inputId, inputRef, labels, revealed, setRevealed, selectionRef } = useInputContext();
-  const glyph = revealed ? "field.password.hide" : "field.password.show";
+  const RevealGlyph = revealed ? EyeOff : Eye;
   return (
     <FieldActionButton
       tooltip={false}
@@ -799,7 +802,7 @@ function InputRevealButton({ onClick, onMouseDown, ref, ...rest }: InputRevealBu
         setRevealed((shown) => !shown);
       }}
     >
-      <Icon name={glyph} />
+      <RevealGlyph />
     </FieldActionButton>
   );
 }

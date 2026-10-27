@@ -1,8 +1,10 @@
 import * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { useControllableState } from "@/hooks/useControllableState";
-import { Icon, type IconName } from "@/icons";
+import { Captions } from "@/icons/glyphs/captions";
+import { ChevronUp } from "@/icons/glyphs/chevron-up";
+import { Pause } from "@/icons/glyphs/pause";
+import { Play } from "@/icons/glyphs/play";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
@@ -531,7 +533,7 @@ export function PlayDisk({
   const inTransfer = transferDisk !== null && covered;
   // A transfer state whose handler was not given only shows itself: the disk takes no press.
   const still = inTransfer && !transfer.pressable;
-  const glyph: IconName = playing ? "action.pause" : "action.play";
+  const PlayGlyph = playing ? Pause : Play;
   return (
     <span className={cx(styles.slot, className)}>
       <Button.Root
@@ -550,9 +552,7 @@ export function PlayDisk({
         onClick={inTransfer ? transfer.run : onToggle}
         onKeyDown={inTransfer ? undefined : onKeyDown}
       >
-        <Button.Icon>
-          {inTransfer ? transfer.glyph : <Icon name={glyph} fill="currentColor" />}
-        </Button.Icon>
+        <Button.Icon>{inTransfer ? transfer.glyph : <PlayGlyph fill="currentColor" />}</Button.Icon>
       </Button.Root>
       {transferDisk ? transfer.texts : null}
     </span>
@@ -576,7 +576,7 @@ export function TranscriptButton({
   disabled?: boolean;
   className?: string;
 }) {
-  const glyph: IconName = transcript.expanded ? "nav.chevronUp" : "action.transcribe";
+  const TranscriptGlyph = transcript.expanded ? ChevronUp : Captions;
   return (
     <Button.Root
       variant="soft"
@@ -588,7 +588,7 @@ export function TranscriptButton({
       {...transcript.buttonProps}
     >
       <Button.Icon>
-        <Icon name={glyph} />
+        <TranscriptGlyph />
       </Button.Icon>
     </Button.Root>
   );

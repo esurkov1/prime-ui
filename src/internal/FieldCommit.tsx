@@ -1,9 +1,9 @@
 import * as React from "react";
-
 import { Spinner } from "@/components/spinner/Spinner";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { usePresence } from "@/hooks/usePresence";
-import { Icon } from "@/icons";
+import { Check } from "@/icons/glyphs/check";
+
 import { setControlValue, type ValueControl } from "@/internal/controlValue";
 import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -163,9 +163,7 @@ export function FieldCommitStatus({
           aria-hidden="true"
           onAnimationEnd={presence.onExitEnd}
         >
-          <GlyphSwap>
-            {glyph === "saved" ? <Icon name="action.check" /> : <Spinner aria-hidden="true" />}
-          </GlyphSwap>
+          <GlyphSwap>{glyph === "saved" ? <Check /> : <Spinner aria-hidden="true" />}</GlyphSwap>
         </span>
       ) : null}
       <VisuallyHidden live="polite">

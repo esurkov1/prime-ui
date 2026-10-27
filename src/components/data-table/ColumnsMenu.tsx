@@ -1,10 +1,10 @@
 import type * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { Dnd } from "@/components/dnd/Dnd";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Tooltip } from "@/components/tooltip/Tooltip";
-import { Icon } from "@/icons";
+import { Columns3 } from "@/icons/glyphs/columns-3";
+
 import { formatLabel } from "@/internal/formatLabel";
 import { nodeText } from "@/internal/nodeText";
 import type { ControlSize } from "@/internal/states";
@@ -112,7 +112,7 @@ export function ColumnsMenu({
           <Dropdown.Trigger>
             <Button.Root variant="ghost" tone="neutral" size={size} aria-label={name}>
               <Button.Icon>
-                <Icon name="view.columns" />
+                <Columns3 />
               </Button.Icon>
             </Button.Root>
           </Dropdown.Trigger>

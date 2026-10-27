@@ -1,10 +1,10 @@
 // biome-ignore-all lint/a11y/useSemanticElements: an ARIA grid of divs — table elements would lose their semantics under the flex layout the time layers need
 // biome-ignore-all lint/a11y/useFocusableInteractive: grid rows and cells are not focus stops; the row headers and bars inside them are (one roving tab stop)
+
 import { addDays, format, type Locale, startOfDay } from "date-fns";
 import { ru } from "date-fns/locale";
 import * as React from "react";
 import { flushSync } from "react-dom";
-
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import { EmptyPage } from "@/components/empty-page/EmptyPage";
@@ -18,7 +18,9 @@ import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { readCssLengthPx } from "@/hooks/usePosition";
 import { prefersReducedMotion } from "@/hooks/usePresence";
 import { useVirtualRows } from "@/hooks/useVirtualRows";
-import { Icon } from "@/icons";
+import { ChevronLeft } from "@/icons/glyphs/chevron-left";
+import { ChevronRight } from "@/icons/glyphs/chevron-right";
+import { ZoomIn } from "@/icons/glyphs/zoom-in";
 import {
   AnchorRectProvider,
   type AnchorRectResolver,
@@ -2619,7 +2621,7 @@ const GanttZoomSelect = React.memo(function GanttZoomSelect({
       >
         {compact ? (
           <Select.TriggerIcon>
-            <Icon name="action.zoomIn" />
+            <ZoomIn />
           </Select.TriggerIcon>
         ) : (
           <Select.Value />
@@ -2665,10 +2667,10 @@ function TodayJump({
   const size = stepDown(useControlSize(undefined));
   const pointsLeft = (edge === "start") !== rtl;
   // `Button.Icon` swaps the glyph itself when today crosses to the other edge.
-  const glyph = pointsLeft ? "nav.chevronLeft" : "nav.chevronRight";
+  const EdgeGlyph = pointsLeft ? ChevronLeft : ChevronRight;
   const icon = (
     <Button.Icon>
-      <Icon name={glyph} />
+      <EdgeGlyph />
     </Button.Icon>
   );
   return (

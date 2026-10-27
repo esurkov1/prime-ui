@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import {
@@ -19,7 +18,10 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useResizeEffect } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { readCssLengthPx } from "@/hooks/usePosition";
-import { Icon } from "@/icons";
+import { ChevronDown } from "@/icons/glyphs/chevron-down";
+import { ListFilter } from "@/icons/glyphs/list-filter";
+import { Plus } from "@/icons/glyphs/plus";
+import { Search } from "@/icons/glyphs/search";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -505,7 +507,7 @@ function SmartFilterToolbar({
             >
               <Input.Wrapper>
                 <Input.Icon side="start">
-                  <Icon name="action.search" tone="secondary" />
+                  <Search tone="secondary" />
                 </Input.Icon>
                 <Input.Field
                   ref={fieldRef}
@@ -542,7 +544,7 @@ function SmartFilterToolbar({
                     className={styles.filterSection}
                     data-icon-only={compact && total === 0 ? "true" : undefined}
                   >
-                    <Icon name="action.filter" />
+                    <ListFilter />
                     {filterLabel}
                     {filterCount}
                   </FieldSectionButton>
@@ -559,7 +561,7 @@ function SmartFilterToolbar({
               className={styles.filterButton}
             >
               <Button.Icon>
-                <Icon name="action.filter" />
+                <ListFilter />
               </Button.Icon>
               {filterLabel}
               {filterCount}
@@ -644,7 +646,7 @@ function Panel({ searchable }: { searchable: boolean }) {
             }}
           >
             <Button.Icon>
-              <Icon name="action.search" />
+              <Search />
             </Button.Icon>
             {formatLabel(labels.searchText, { query })}
             <Kbd className={styles.queryKey}>↵</Kbd>
@@ -739,7 +741,7 @@ function Panel({ searchable }: { searchable: boolean }) {
       <LinkButton asChild tone="neutral" size={stepDown(tagSizeOf(size), 2)}>
         <button type="button" onClick={() => setExpanded((prev) => new Set(prev).add(field.key))}>
           {formatLabel(labels.more, { count: matched.length - collapsedLimit })}
-          <Icon name="nav.chevronDown" />
+          <ChevronDown />
         </button>
       </LinkButton>
     ) : null;
@@ -1027,7 +1029,7 @@ function SmartFilterChips({ className, ref, ...rest }: SmartFilterChipsProps) {
           data-search=""
         >
           <Badge.Icon>
-            <Icon name="action.search" />
+            <Search />
           </Badge.Icon>
           {formatLabel(labels.searchChip, { query: search })}
         </Badge.Root>
@@ -1076,7 +1078,7 @@ function SmartFilterChips({ className, ref, ...rest }: SmartFilterChipsProps) {
             setOpen(true);
           }}
         >
-          <Icon name="action.add" />
+          <Plus />
           {labels.add}
         </button>
       </LinkButton>

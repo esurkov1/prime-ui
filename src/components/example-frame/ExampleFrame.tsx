@@ -7,7 +7,16 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useElementSize, useResizeEffect } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { readCssLengthPx } from "@/hooks/usePosition";
-import { Icon } from "@/icons";
+import type { Glyph } from "@/icons/glyph";
+import { Check } from "@/icons/glyphs/check";
+import { CodeXml } from "@/icons/glyphs/code-xml";
+import { Copy } from "@/icons/glyphs/copy";
+import { Eye } from "@/icons/glyphs/eye";
+import { Monitor } from "@/icons/glyphs/monitor";
+import { Moon } from "@/icons/glyphs/moon";
+import { Smartphone } from "@/icons/glyphs/smartphone";
+import { Sun } from "@/icons/glyphs/sun";
+import { Tablet } from "@/icons/glyphs/tablet";
 import { cx } from "@/internal/cx";
 import { useLabels } from "@/internal/labels";
 import { RegionSwap } from "@/internal/RegionSwap";
@@ -24,6 +33,11 @@ import styles from "./ExampleFrame.module.css";
 type Pane = "preview" | "code";
 const VIEWPORTS = ["desktop", "tablet", "mobile"] as const;
 export type ExampleFrameViewport = (typeof VIEWPORTS)[number];
+const VIEWPORT_GLYPHS: Record<ExampleFrameViewport, Glyph> = {
+  desktop: Monitor,
+  tablet: Tablet,
+  mobile: Smartphone,
+};
 type ColorScheme = "light" | "dark";
 
 /**
@@ -364,8 +378,8 @@ function ExampleFrameToolbar({
   const copyLabel =
     copyState === "copied" ? labels.copied : copyState === "error" ? labels.copyError : labels.copy;
   // Button.Icon cross-fades a glyph that changes in place.
-  const themeGlyph = colorScheme === "light" ? "theme.dark" : "theme.light";
-  const copyGlyph = copyState === "copied" ? "action.check" : "action.copy";
+  const ThemeGlyph = colorScheme === "light" ? Moon : Sun;
+  const CopyGlyph = copyState === "copied" ? Check : Copy;
 
   return (
     <div ref={toolbarRef} className={styles.toolbar} data-narrow={narrow || undefined}>
@@ -380,13 +394,13 @@ function ExampleFrameToolbar({
         >
           <SegmentedControl.Item value="preview">
             <SegmentedControl.Icon>
-              <Icon name="view.preview" />
+              <Eye />
             </SegmentedControl.Icon>
             {labels.preview}
           </SegmentedControl.Item>
           <SegmentedControl.Item value="code">
             <SegmentedControl.Icon>
-              <Icon name="view.code" />
+              <CodeXml />
             </SegmentedControl.Icon>
             {labels.code}
           </SegmentedControl.Item>
@@ -402,7 +416,7 @@ function ExampleFrameToolbar({
               aria-label={colorScheme === "light" ? labels.themeDark : labels.themeLight}
             >
               <Button.Icon>
-                <Icon name={themeGlyph} size="s" tone="secondary" />
+                <ThemeGlyph size="s" tone="secondary" />
               </Button.Icon>
             </Button.Root>
           ) : null}
@@ -415,7 +429,7 @@ function ExampleFrameToolbar({
             aria-label={copyLabel}
           >
             <Button.Icon data-copy-state={copyState}>
-              <Icon name={copyGlyph} size="s" tone="secondary" />
+              <CopyGlyph size="s" tone="secondary" />
             </Button.Icon>
           </Button.Root>
         </div>
@@ -429,14 +443,17 @@ function ExampleFrameToolbar({
           size="s"
           aria-label={labels.viewportSwitch}
         >
-          {VIEWPORTS.map((option) => (
-            <SegmentedControl.Item key={option} value={option}>
-              <SegmentedControl.Icon>
-                <Icon name={`viewport.${option}`} />
-              </SegmentedControl.Icon>
-              {labels[option]}
-            </SegmentedControl.Item>
-          ))}
+          {VIEWPORTS.map((option) => {
+            const ViewportGlyph = VIEWPORT_GLYPHS[option];
+            return (
+              <SegmentedControl.Item key={option} value={option}>
+                <SegmentedControl.Icon>
+                  <ViewportGlyph />
+                </SegmentedControl.Icon>
+                {labels[option]}
+              </SegmentedControl.Item>
+            );
+          })}
         </SegmentedControl.Root>
       ) : null}
     </div>

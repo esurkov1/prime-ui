@@ -1,10 +1,10 @@
 import * as React from "react";
-
 import { MediaViewer, type MediaViewerItem } from "@/components/media-viewer/MediaViewer";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { Icon, type IconName } from "@/icons";
+import { Image } from "@/icons/glyphs/image";
+import { Video } from "@/icons/glyphs/video";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatClock } from "@/internal/formatClock";
@@ -141,7 +141,7 @@ function GalleryTileView({
   const transfer = item.transfer;
   const covered = transferCovers(transfer);
   const length = metaDuration ?? item.duration ?? null;
-  const fallbackGlyph: IconName = video ? "action.video" : "object.image";
+  const FallbackGlyph = video ? Video : Image;
 
   return (
     <div ref={mergedRef} className={styles.tile} style={style} data-gallery-tile="">
@@ -161,7 +161,7 @@ function GalleryTileView({
           <Thumbnail.Image src={item.src} alt={onOpen ? "" : (item.alt ?? "")} />
         )}
         <Thumbnail.Fallback>
-          <Icon name={fallbackGlyph} />
+          <FallbackGlyph />
         </Thumbnail.Fallback>
       </Thumbnail.Root>
       {video ? (

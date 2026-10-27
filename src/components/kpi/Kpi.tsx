@@ -1,11 +1,11 @@
 import * as React from "react";
-
 import { Badge } from "@/components/badge/Badge";
 import { DescriptionList } from "@/components/description-list/DescriptionList";
 import { ProgressCircle } from "@/components/progress-circle/ProgressCircle";
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { StatusDot } from "@/components/status-dot/StatusDot";
-import { Icon } from "@/icons";
+import { ArrowUp } from "@/icons/glyphs/arrow-up";
+
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -437,7 +437,7 @@ function KpiDelta({ reading, className, children, ...props }: KpiDeltaProps) {
         <Badge.Root size={tierMappings.kpiDelta[size]} tone={tone}>
           {moved ? (
             <Badge.Icon className={styles.trend} data-down={down || undefined}>
-              <Icon name="status.trendUp" />
+              <ArrowUp />
             </Badge.Icon>
           ) : null}
           {part.children}

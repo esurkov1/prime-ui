@@ -1,8 +1,10 @@
 import * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { Slider } from "@/components/slider/Slider";
-import { Icon, type IconName } from "@/icons";
+import { Pause } from "@/icons/glyphs/pause";
+import { Play } from "@/icons/glyphs/play";
+import { Volume2 } from "@/icons/glyphs/volume-2";
+import { VolumeX } from "@/icons/glyphs/volume-x";
 import { cx } from "@/internal/cx";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatClock } from "@/internal/formatClock";
@@ -203,7 +205,7 @@ export function ViewerVideo({
 
   const state: PlaybackState = playing ? "playing" : time > 0 ? "paused" : "idle";
   // One glyph slot: `Button.Icon` cross-fades the change in place.
-  const playGlyph: IconName = playing ? "action.pause" : "action.play";
+  const PlayGlyph = playing ? Pause : Play;
   const position = formatLabel(labels.position, {
     current: formatClock(time),
     duration: formatClock(duration),
@@ -262,7 +264,7 @@ export function ViewerVideo({
             onClick={toggle}
           >
             <Button.Icon>
-              <Icon name={playGlyph} fill="currentColor" />
+              <PlayGlyph fill="currentColor" />
             </Button.Icon>
           </Button.Root>
           <span className={timeClass} aria-hidden="true">
@@ -316,7 +318,7 @@ function SoundControl({
   const leaveTimer = React.useRef(0);
   const [open, setOpen] = React.useState(false);
   const silent = sound.muted || sound.volume === 0;
-  const muteGlyph: IconName = silent ? "status.muted" : "status.sound";
+  const MuteGlyph = silent ? VolumeX : Volume2;
 
   useLayer(open, {
     refs: [rootRef],
@@ -378,7 +380,7 @@ function SoundControl({
         }}
       >
         <Button.Icon>
-          <Icon name={muteGlyph} />
+          <MuteGlyph />
         </Button.Icon>
       </Button.Root>
       <div className={cx(pill.shade, fieldTierClass, styles.level)} data-size="s">

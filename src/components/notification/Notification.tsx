@@ -1,8 +1,12 @@
 import * as React from "react";
-
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
-import { Icon, type IconName } from "@/icons";
+import type { Glyph } from "@/icons/glyph";
+import { CircleCheck } from "@/icons/glyphs/circle-check";
+import { CircleX } from "@/icons/glyphs/circle-x";
+import { Info } from "@/icons/glyphs/info";
+import { TriangleAlert } from "@/icons/glyphs/triangle-alert";
+import { X } from "@/icons/glyphs/x";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -115,11 +119,11 @@ export type NotificationRecord = NotificationOptions & {
   createdAt: number;
 };
 
-const TONE_ICON: Record<NotificationTone, IconName> = {
-  info: "status.info",
-  success: "status.success",
-  warning: "status.warning",
-  danger: "status.danger",
+const TONE_ICON: Record<NotificationTone, Glyph> = {
+  info: Info,
+  success: CircleCheck,
+  warning: TriangleAlert,
+  danger: CircleX,
 };
 
 /** Native attributes of the card `<article>`; `title` is the notification title, not the attribute. */
@@ -168,6 +172,7 @@ function CardView({
   const size = tier.size;
   // The toast stands on the frame of its own size, as a Card does: each size reads apart.
   const frame = size;
+  const ToneGlyph = TONE_ICON[tone];
   const controlTier = size;
   const titleRef = React.useRef<HTMLParagraphElement>(null);
   useTitleFloor(titleRef);
@@ -196,7 +201,7 @@ function CardView({
         data-size={cardMarkSize.header.tile[frame]}
         aria-hidden="true"
       >
-        {icon ?? <Icon name={TONE_ICON[tone]} />}
+        {icon ?? <ToneGlyph />}
       </div>
       <div className={headerRowStyles.titles}>
         <div className={headerRowStyles.titleRow}>
@@ -240,7 +245,7 @@ function CardView({
             onClick={onClose}
           >
             <Button.Icon>
-              <Icon name="action.close" />
+              <X />
             </Button.Icon>
           </Button.Root>
         </div>

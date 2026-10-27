@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import { Divider } from "@/components/divider/Divider";
@@ -10,7 +9,8 @@ import { useResizeEffect } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { readCssLengthPx } from "@/hooks/usePosition";
 import { prefersReducedMotion } from "@/hooks/usePresence";
-import { Icon } from "@/icons";
+import { X } from "@/icons/glyphs/x";
+
 import { BlockStackContext } from "@/internal/blockStack";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
@@ -627,7 +627,7 @@ function TabsItem({
             onClick={remove}
           >
             <Button.Icon>
-              <Icon name="action.close" />
+              <X />
             </Button.Icon>
           </Button.Root>
         </span>

@@ -1,6 +1,5 @@
 import * as React from "react";
 import type { Color } from "react-aria-components";
-
 import {
   COLOR_PICKER_LABELS,
   ColorPicker,
@@ -10,7 +9,8 @@ import {
 } from "@/components/color-picker/ColorPicker";
 import { Popover } from "@/components/popover/Popover";
 import { useControllableState } from "@/hooks/useControllableState";
-import { Icon } from "@/icons";
+import { ChevronDown } from "@/icons/glyphs/chevron-down";
+
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -200,7 +200,7 @@ export function ColorField({
               <span id={textId} className={styles.value}>
                 {text}
               </span>
-              <Icon name="nav.chevronDown" className={styles.chevron} />
+              <ChevronDown className={styles.chevron} />
             </button>
           </Popover.Trigger>
           <Popover.Content size={size} trapFocus>

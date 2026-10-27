@@ -1,7 +1,7 @@
 import type * as React from "react";
-
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
-import { Icon } from "@/icons";
+import { ArrowRight } from "@/icons/glyphs/arrow-right";
+
 import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { formatTimeOfDay } from "@/internal/formatClock";
@@ -137,7 +137,7 @@ export function ChatServiceChange({
     <span className={cx(styles.serviceChange, className)} {...rest}>
       <span className={styles.serviceChangeValues} aria-hidden="true">
         {from}
-        <Icon name="nav.arrowRight" />
+        <ArrowRight />
         {to}
       </span>
       <VisuallyHidden>

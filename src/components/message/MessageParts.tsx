@@ -1,10 +1,10 @@
 import * as React from "react";
-
 import { Avatar } from "@/components/avatar/Avatar";
 import { Dropdown, type DropdownContentProps } from "@/components/dropdown/Dropdown";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { prefersReducedMotion } from "@/hooks/usePresence";
-import { Icon } from "@/icons";
+import { CircleCheck } from "@/icons/glyphs/circle-check";
+import { Forward } from "@/icons/glyphs/forward";
 import { cx } from "@/internal/cx";
 import { Disclosure } from "@/internal/Disclosure";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -340,7 +340,7 @@ export function MessageForwarded({ from, labels, className, ...rest }: MessageFo
   const [before, after = ""] = forwarded.split("{author}");
   return (
     <div className={cx(styles.forwarded, className)} data-message-fit="" {...rest}>
-      <Icon name="action.forward" animated={false} />
+      <Forward animated={false} />
       <span data-message-selectable="">
         {before}
         <strong>{from}</strong>
@@ -746,7 +746,7 @@ export function MessageMenu({ children, ...rest }: MessageMenuProps) {
           <Dropdown.Separator />
           <Dropdown.Item onSelect={startSelection}>
             <Dropdown.ItemIcon>
-              <Icon name="status.success" />
+              <CircleCheck />
             </Dropdown.ItemIcon>
             {labels.select}
           </Dropdown.Item>

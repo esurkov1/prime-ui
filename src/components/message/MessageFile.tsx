@@ -1,8 +1,9 @@
 import type * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
-import { Icon } from "@/icons";
+import { Download } from "@/icons/glyphs/download";
+import { FileText } from "@/icons/glyphs/file-text";
+
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { extensionOf, formatColor } from "@/internal/fileFormat";
@@ -98,7 +99,7 @@ export function MessageFile({
     <Thumbnail.Root size="m" className={styles.preview} aria-hidden="true">
       <Thumbnail.Image src={preview} />
       <Thumbnail.Fallback>
-        <Icon name="object.document" />
+        <FileText />
       </Thumbnail.Fallback>
     </Thumbnail.Root>
   ) : format ? (
@@ -106,7 +107,7 @@ export function MessageFile({
       {format.slice(0, 4).toUpperCase()}
     </span>
   ) : (
-    <Icon name="object.document" />
+    <FileText />
   );
 
   // The download link, drawn in the tile itself over the face; a transfer is the transfer disk's.
@@ -132,7 +133,7 @@ export function MessageFile({
           >
             <a href={href} download={name}>
               <Button.Icon>
-                <Icon name="action.download" />
+                <Download />
               </Button.Icon>
             </a>
           </Button.Root>

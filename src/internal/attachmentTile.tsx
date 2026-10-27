@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { Dnd } from "@/components/dnd/Dnd";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
@@ -7,7 +6,10 @@ import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import type { UploadItem } from "@/hooks/useUploadQueue";
-import { Icon } from "@/icons";
+import { File } from "@/icons/glyphs/file";
+import { Video } from "@/icons/glyphs/video";
+import { X } from "@/icons/glyphs/x";
+
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -152,7 +154,7 @@ export function AttachmentTile({
         ) : null
       ) : (
         <span className={styles.sheet} aria-hidden="true">
-          <Icon name="object.file" size="xl" animated={false} />
+          <File size="xl" animated={false} />
         </span>
       )}
       {href ? (
@@ -220,7 +222,7 @@ export function AttachmentTile({
             onClick={onRemove}
           >
             <Button.Icon>
-              <Icon name="action.close" />
+              <X />
             </Button.Icon>
           </Button.Root>
         </span>
@@ -259,7 +261,7 @@ function TileVideo({ src, onDuration }: { src: string; onDuration: (seconds: num
         />
       ) : null}
       <Thumbnail.Fallback>
-        <Icon name="action.video" />
+        <Video />
       </Thumbnail.Fallback>
     </Thumbnail.Root>
   );

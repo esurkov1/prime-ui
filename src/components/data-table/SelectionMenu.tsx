@@ -1,9 +1,10 @@
 import type * as React from "react";
-
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
-import { Icon } from "@/icons";
+import { ChevronDown } from "@/icons/glyphs/chevron-down";
+import { X } from "@/icons/glyphs/x";
+
 import type { ControlSize } from "@/internal/states";
 
 type SelectionMenuProps = {
@@ -30,14 +31,14 @@ export function SelectionMenu({ selected, actions, onClear, labels, size }: Sele
           {name}
           <Badge.Root>{selected.length}</Badge.Root>
           <Button.Icon>
-            <Icon name="nav.chevronDown" />
+            <ChevronDown />
           </Button.Icon>
         </Button.Root>
       </Dropdown.Trigger>
       <Dropdown.Content side="bottom" align="end" size={size}>
         <Dropdown.Item onSelect={onClear}>
           <Dropdown.ItemIcon>
-            <Icon name="action.close" />
+            <X />
           </Dropdown.ItemIcon>
           {labels.clearSelection}
         </Dropdown.Item>

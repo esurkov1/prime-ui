@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { Divider } from "@/components/divider/Divider";
 import { EmptyPage } from "@/components/empty-page/EmptyPage";
@@ -11,7 +10,11 @@ import { VisuallyHidden, visuallyHiddenClass } from "@/components/visually-hidde
 import { useControllableState } from "@/hooks/useControllableState";
 import { useLoadMore } from "@/hooks/useLoadMore";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { Icon } from "@/icons";
+import { ChevronDown } from "@/icons/glyphs/chevron-down";
+import { RefreshCw } from "@/icons/glyphs/refresh-cw";
+import { Search } from "@/icons/glyphs/search";
+import { X } from "@/icons/glyphs/x";
+
 import { AUTOFILL_OFF } from "@/internal/autofill";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import chipTier from "@/internal/chipTier.module.css";
@@ -534,13 +537,11 @@ function SelectTrigger({
             clear();
           }}
         >
-          <Icon name="action.close" />
+          <X />
         </span>
       ) : null}
       <span className={styles.chevron} aria-hidden="true">
-        <GlyphSwap>
-          {busy ? <Spinner aria-hidden="true" /> : <Icon name="nav.chevronDown" />}
-        </GlyphSwap>
+        <GlyphSwap>{busy ? <Spinner aria-hidden="true" /> : <ChevronDown />}</GlyphSwap>
       </span>
     </button>
   );
@@ -769,7 +770,7 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
       {searchable ? (
         // The permanent focus of the panel: no ring, the caret is the indicator (foundation §7).
         <div className={cx(menu.searchRow, styles.search)}>
-          <Icon name="action.search" size="s" />
+          <Search size="s" />
           <input
             type="search"
             className={menu.searchInput}
@@ -795,7 +796,7 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
               <EmptyPage.Actions>
                 <Button.Root variant="soft" tone="neutral" onClick={onRetry}>
                   <Button.Icon>
-                    <Icon name="action.refresh" />
+                    <RefreshCw />
                   </Button.Icon>
                   {labels.retry}
                 </Button.Root>

@@ -1,9 +1,10 @@
 import type * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
-import { Icon } from "@/icons";
+import { ChevronLeft } from "@/icons/glyphs/chevron-left";
+import { ChevronRight } from "@/icons/glyphs/chevron-right";
+
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -108,7 +109,7 @@ export function Pagination({
           aria-label={labels.previous}
         >
           <Button.Icon>
-            <Icon name="nav.chevronLeft" />
+            <ChevronLeft />
           </Button.Icon>
         </Button.Root>
 
@@ -154,7 +155,7 @@ export function Pagination({
           aria-label={labels.next}
         >
           <Button.Icon>
-            <Icon name="nav.chevronRight" />
+            <ChevronRight />
           </Button.Icon>
         </Button.Root>
       </div>

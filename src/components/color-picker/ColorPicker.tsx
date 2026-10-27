@@ -26,7 +26,8 @@ import { Input } from "@/components/input/Input";
 import { Select } from "@/components/select/Select";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useDraft } from "@/hooks/useDraft";
-import { Icon } from "@/icons";
+import { Pipette } from "@/icons/glyphs/pipette";
+
 import { AUTOFILL_OFF } from "@/internal/autofill";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
@@ -607,7 +608,7 @@ function EyeDropperButton({
     >
       {children ?? (
         <Button.Icon>
-          <Icon name="action.eyedropper" />
+          <Pipette />
         </Button.Icon>
       )}
     </Button.Root>

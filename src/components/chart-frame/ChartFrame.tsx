@@ -3,7 +3,9 @@ import { visuallyHiddenClass } from "@/components/visually-hidden/VisuallyHidden
 import { useControllableState } from "@/hooks/useControllableState";
 import { useElementSize } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { Icon } from "@/icons";
+import { ChartColumn } from "@/icons/glyphs/chart-column";
+import { CircleAlert } from "@/icons/glyphs/circle-alert";
+
 import { type AnchorPoint, ChartTooltip } from "@/internal/ChartTooltip";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
@@ -450,7 +452,7 @@ function ChartFramePlot({
           <div className={styles.stateBox}>
             <EmptyPage.Root layout="compact" role="status">
               <EmptyPage.Icon>
-                <Icon name="object.chart" />
+                <ChartColumn />
               </EmptyPage.Icon>
               <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
             </EmptyPage.Root>
@@ -459,7 +461,7 @@ function ChartFramePlot({
           <div className={styles.stateBox}>
             <EmptyPage.Root layout="compact" tone="danger" labels={{ retry: labels.retry }}>
               <EmptyPage.Icon>
-                <Icon name="status.failed" />
+                <CircleAlert />
               </EmptyPage.Icon>
               <EmptyPage.Title as="p">{labels.error}</EmptyPage.Title>
               {onRetry ? (

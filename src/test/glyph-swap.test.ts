@@ -24,11 +24,20 @@ describe("glyph and region swaps", () => {
     for (const file of sources) {
       if (ENGINES.has(file)) continue;
       const text = read(file);
-      const rules: [RegExp, string][] = [
-        [/\?\s*\(?\s*<Icon\b[^>]*\/>\s*\)?\s*:\s*\(?\s*<Icon\b/g, "glyph ternary"],
-        [/<Icon\s+name=\{[^}]*\?\s*"[\w.]+"\s*:\s*"[\w.]+"/g, "glyph name ternary"],
-        [/key=\{swapped\b/g, "key={swapped"],
-      ];
+      /* The kit's glyphs in this file: what it imports from `@/icons/glyphs/`. */
+      const glyphs = [...text.matchAll(/^import \{ (\w+) \} from "@\/icons\/glyphs\/[\w-]+";/gm)]
+        .map((m) => m[1])
+        .join("|");
+      const rules: [RegExp, string][] = [[/key=\{swapped\b/g, "key={swapped"]];
+      if (glyphs) {
+        rules.push([
+          new RegExp(
+            `\\?\\s*\\(?\\s*<(${glyphs})\\b[^>]*\\/>\\s*\\)?\\s*:\\s*\\(?\\s*<(${glyphs})\\b`,
+            "g",
+          ),
+          "glyph ternary",
+        ]);
+      }
       for (const [pattern, rule] of rules) {
         for (const _ of text.matchAll(pattern)) offenders.push(`${file}: ${rule}`);
       }

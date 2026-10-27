@@ -1,9 +1,8 @@
 import type * as React from "react";
-
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
-import { Icon } from "@/icons";
+import { Columns3 } from "@/icons/glyphs/columns-3";
 
 import { usePartPresence } from "./partPresence";
 import type { ControlSize } from "./states";
@@ -72,7 +71,7 @@ export function ViewMenuButton({ label, shown, size, ...rest }: ViewMenuButtonPr
       size={size}
     >
       <Button.Icon>
-        <Icon name="view.columns" />
+        <Columns3 />
       </Button.Icon>
       {label}
       <Badge.Root>{shown}</Badge.Root>

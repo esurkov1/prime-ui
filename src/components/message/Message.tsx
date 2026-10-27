@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { Button, type ButtonRootProps } from "@/components/button/Button";
 import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Dropdown } from "@/components/dropdown/Dropdown";
@@ -7,7 +6,14 @@ import { HOVER_QUERY } from "@/hooks/breakpoints";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useScrollRegion } from "@/hooks/useScrollRegion";
-import { Icon, type IconName } from "@/icons";
+import type { Glyph } from "@/icons/glyph";
+import { AppWindow } from "@/icons/glyphs/app-window";
+import { Check } from "@/icons/glyphs/check";
+import { CheckCheck } from "@/icons/glyphs/check-check";
+import { CircleAlert } from "@/icons/glyphs/circle-alert";
+import { Clock } from "@/icons/glyphs/clock";
+import { ExternalLink } from "@/icons/glyphs/external-link";
+import { RefreshCw } from "@/icons/glyphs/refresh-cw";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -115,10 +121,10 @@ export type MessageShell = "bubble" | "media" | "round";
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const STATUS_ICONS = [
-  ["sending", "status.pending"],
-  ["sent", "status.sent"],
-  ["read", "status.read"],
-  ["failed", "status.failed"],
+  ["sending", Clock],
+  ["sent", Check],
+  ["read", CheckCheck],
+  ["failed", CircleAlert],
 ] as const;
 
 type MetaProps = {
@@ -143,9 +149,9 @@ function Meta({ time, dateTime, edited, status, labels, reserve, className }: Me
         <span className={styles.status} />
       ) : status ? (
         <span className={styles.status} role="img" aria-label={labels[status]} data-status={status}>
-          {STATUS_ICONS.map(([state, name]) => (
+          {STATUS_ICONS.map(([state, TickGlyph]) => (
             <span key={state} className={styles.tick} data-tick={state} aria-hidden="true">
-              <Icon name={name} animated={false} />
+              <TickGlyph animated={false} />
             </span>
           ))}
         </span>
@@ -409,7 +415,7 @@ function leavesProduct(address: string): boolean {
  * `to`): `action.externalLink` when it leaves the product, `action.openApp` when it opens a page of
  * it — Telegram's url and web app keys. A key that is no link has none.
  */
-function linkMarkOf(props: ButtonRootProps): IconName | undefined {
+function linkMarkOf(props: ButtonRootProps): Glyph | undefined {
   const child = props.children;
   if (props.asChild !== true || !React.isValidElement<{ href?: unknown; to?: unknown }>(child)) {
     return undefined;
@@ -417,7 +423,7 @@ function linkMarkOf(props: ButtonRootProps): IconName | undefined {
   const { href, to } = child.props;
   const address = typeof href === "string" ? href : typeof to === "string" ? to : undefined;
   if (address === undefined) return undefined;
-  return leavesProduct(address) ? "action.externalLink" : "action.openApp";
+  return leavesProduct(address) ? ExternalLink : AppWindow;
 }
 
 /**
@@ -437,14 +443,14 @@ function MessageActions({ className, children, ...rest }: MessageActionsProps) {
           return child;
         }
         const { props } = child;
-        const mark = linkMarkOf(props);
+        const LinkMark = linkMarkOf(props);
         const linkChild = props.children as React.ReactElement<{ children?: React.ReactNode }>;
-        const link = mark
+        const link = LinkMark
           ? React.cloneElement(linkChild, {
               children: (
                 <>
                   {linkChild.props.children}
-                  <Icon name={mark} size="xs" className={styles.linkMark} />
+                  <LinkMark size="xs" className={styles.linkMark} />
                 </>
               ),
             })
@@ -1052,7 +1058,7 @@ function MessageRoot({
             onClick={() => retry?.()}
           >
             <Button.Icon>
-              <Icon name="action.refresh" />
+              <RefreshCw />
             </Button.Icon>
           </Button.Root>
         </span>

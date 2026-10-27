@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { Badge } from "@/components/badge/Badge";
 import { Breadcrumb, type BreadcrumbRootProps } from "@/components/breadcrumb/Breadcrumb";
 import { Button, type ButtonRootProps } from "@/components/button/Button";
@@ -13,7 +12,11 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useResizeEffect } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { usePresence } from "@/hooks/usePresence";
-import { Icon } from "@/icons";
+import { ChevronLeft } from "@/icons/glyphs/chevron-left";
+import { ChevronRight } from "@/icons/glyphs/chevron-right";
+import { Ellipsis } from "@/icons/glyphs/ellipsis";
+import { Menu } from "@/icons/glyphs/menu";
+
 import {
   type BarAction,
   type BarPlan,
@@ -417,7 +420,7 @@ function MenuButton() {
       onClick={() => nav.setOpen(!nav.open)}
     >
       <Button.Icon>
-        <Icon name="nav.menu" />
+        <Menu />
       </Button.Icon>
     </Button.Root>
   );
@@ -430,7 +433,7 @@ function MenuButton() {
 function PathSeparator() {
   return (
     <span aria-hidden="true" className={styles.pathSeparator}>
-      <Icon name="nav.chevronRight" />
+      <ChevronRight />
     </span>
   );
 }
@@ -836,7 +839,7 @@ function BarActions({ className, children, ...rest }: PageActionsProps) {
           <Dropdown.Trigger>
             <Button.Root variant="soft" tone="neutral" aria-label={labels.more}>
               <Button.Icon>
-                <Icon name="action.more" />
+                <Ellipsis />
               </Button.Icon>
             </Button.Root>
           </Dropdown.Trigger>
@@ -1270,7 +1273,7 @@ function PageBackButton({ className, onClick, ...rest }: PageBackButtonProps) {
       }}
     >
       <Button.Icon>
-        <Icon name="nav.chevronLeft" />
+        <ChevronLeft />
       </Button.Icon>
     </Button.Root>
   );

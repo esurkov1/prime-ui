@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { Badge } from "@/components/badge/Badge";
 import { Crossfade } from "@/components/crossfade/Crossfade";
 import { Dropdown, type DropdownContentProps } from "@/components/dropdown/Dropdown";
@@ -14,7 +13,14 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { readCssLengthPx } from "@/hooks/usePosition";
 import { rowGaps, useVirtualRows } from "@/hooks/useVirtualRows";
-import { Icon } from "@/icons";
+import { Check } from "@/icons/glyphs/check";
+import { CheckCheck } from "@/icons/glyphs/check-check";
+import { CircleAlert } from "@/icons/glyphs/circle-alert";
+import { Clock } from "@/icons/glyphs/clock";
+import { MessageSquare } from "@/icons/glyphs/message-square";
+import { Pin } from "@/icons/glyphs/pin";
+import { Search } from "@/icons/glyphs/search";
+import { VolumeX } from "@/icons/glyphs/volume-x";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -273,10 +279,10 @@ function partsOf(children: React.ReactNode): ItemParts {
 }
 
 const STATUS_ICONS = [
-  ["sending", "status.pending"],
-  ["sent", "status.sent"],
-  ["read", "status.read"],
-  ["failed", "status.failed"],
+  ["sending", Clock],
+  ["sent", Check],
+  ["read", CheckCheck],
+  ["failed", CircleAlert],
 ] as const;
 
 // ─── Item ─────────────────────────────────────────────────────────────────────
@@ -394,7 +400,7 @@ function ChatListItem({
       {muted ? " " : null}
       {muted ? (
         <span ref={mutedPart.ref} className={cx(styles.pop, styles.glyph, mutedPart.className)}>
-          <Icon name="status.muted" size={glyphSize} label={labels.muted} animated={false} />
+          <VolumeX size={glyphSize} label={labels.muted} animated={false} />
         </span>
       ) : null}
     </List.ItemText>
@@ -421,9 +427,9 @@ function ChatListItem({
             aria-label={labels[status]}
             data-status={status}
           >
-            {STATUS_ICONS.map(([state, name]) => (
+            {STATUS_ICONS.map(([state, TickGlyph]) => (
               <span key={state} className={styles.tick} data-tick={state} aria-hidden="true">
-                <Icon name={name} size={glyphSize} animated={false} />
+                <TickGlyph size={glyphSize} animated={false} />
               </span>
             ))}
           </span>
@@ -540,7 +546,7 @@ function ChatListItem({
         ) : null}
         {pin ? (
           <span ref={pinPart.ref} className={cx(styles.pop, styles.glyph, pinPart.className)}>
-            <Icon name="action.pin" size={glyphSize} label={labels.pinned} animated={false} />
+            <Pin size={glyphSize} label={labels.pinned} animated={false} />
           </span>
         ) : null}
       </List.ItemCount>
@@ -959,7 +965,7 @@ function ChatListRoot<T>({
     body = searching ? (
       <EmptyPage.Root layout="compact" size={size}>
         <EmptyPage.Icon>
-          <Icon name="action.search" />
+          <Search />
         </EmptyPage.Icon>
         <EmptyPage.Title>{labels.noResults}</EmptyPage.Title>
       </EmptyPage.Root>
@@ -967,7 +973,7 @@ function ChatListRoot<T>({
       (empty ?? (
         <EmptyPage.Root layout="compact" size={size}>
           <EmptyPage.Icon>
-            <Icon name="object.message" />
+            <MessageSquare />
           </EmptyPage.Icon>
           <EmptyPage.Title>{labels.empty}</EmptyPage.Title>
         </EmptyPage.Root>
@@ -1007,7 +1013,7 @@ function ChatListRoot<T>({
                 <Input.Root>
                   <Input.Wrapper>
                     <Input.Icon side="start">
-                      <Icon name="action.search" tone="secondary" />
+                      <Search tone="secondary" />
                     </Input.Icon>
                     <Input.Field
                       ref={searchRef}

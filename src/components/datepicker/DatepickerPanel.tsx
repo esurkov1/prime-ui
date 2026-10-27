@@ -1,14 +1,16 @@
 import { addMonths, format, type Locale, startOfDay, startOfMonth, subMonths } from "date-fns";
 import { ru } from "date-fns/locale";
 import * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { getViewportPadPx } from "@/hooks/usePosition";
-import { Icon } from "@/icons";
+import { Check } from "@/icons/glyphs/check";
+import { ChevronLeft } from "@/icons/glyphs/chevron-left";
+import { ChevronRight } from "@/icons/glyphs/chevron-right";
+
 import { AUTOFILL_OFF } from "@/internal/autofill";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
@@ -569,7 +571,7 @@ export function PanelView(props: PanelViewProps) {
                   <span className={listRowStyles.title}>{preset.label}</span>
                 </span>
                 <span className={cx(listRowStyles.check, styles.presetCheck)} aria-hidden="true">
-                  <Icon name="action.check" />
+                  <Check />
                 </span>
               </button>
             );
@@ -600,7 +602,7 @@ export function PanelView(props: PanelViewProps) {
                     onClick={() => shiftMonth(-1)}
                   >
                     <Button.Icon>
-                      <Icon name="nav.chevronLeft" />
+                      <ChevronLeft />
                     </Button.Icon>
                   </Button.Root>
                 ) : (
@@ -616,7 +618,7 @@ export function PanelView(props: PanelViewProps) {
                     onClick={() => shiftMonth(1)}
                   >
                     <Button.Icon>
-                      <Icon name="nav.chevronRight" />
+                      <ChevronRight />
                     </Button.Icon>
                   </Button.Root>
                 ) : (

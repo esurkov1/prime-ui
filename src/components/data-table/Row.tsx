@@ -1,9 +1,9 @@
 import * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { Checkbox } from "@/components/checkbox/Checkbox";
 import { usePresence } from "@/hooks/usePresence";
-import { Icon } from "@/icons";
+import { ChevronRight } from "@/icons/glyphs/chevron-right";
+
 import { cx } from "@/internal/cx";
 import { Disclosure } from "@/internal/Disclosure";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -266,7 +266,7 @@ function DataTableRowImpl<Row>({
                   }}
                 >
                   <Button.Icon>
-                    <Icon name="nav.chevronRight" className={styles.chevron} />
+                    <ChevronRight className={styles.chevron} />
                   </Button.Icon>
                 </Button.Root>
               ) : null,
@@ -422,7 +422,7 @@ export function GroupRow({ totalColumns, sticky, size, toggle, children }: Group
               onClick={toggle.onToggle}
             >
               <Button.Icon>
-                <Icon name="nav.chevronRight" className={styles.chevron} />
+                <ChevronRight className={styles.chevron} />
               </Button.Icon>
             </Button.Root>
           ) : null}

@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { Kbd } from "@/components/kbd/Kbd";
@@ -10,7 +9,9 @@ import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useLoadMore } from "@/hooks/useLoadMore";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { Icon } from "@/icons";
+import { RefreshCw } from "@/icons/glyphs/refresh-cw";
+import { Search } from "@/icons/glyphs/search";
+
 import { AUTOFILL_OFF } from "@/internal/autofill";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
@@ -392,7 +393,7 @@ function CommandMenuInput({
       className={cx(menu.searchRow, fieldTierClass, fieldInputTextClass, styles.inputRow)}
       data-size="l"
     >
-      <Icon name="action.search" />
+      <Search />
       <input
         {...rest}
         type="search"
@@ -486,7 +487,7 @@ function CommandMenuList({ className, children, ref, ...rest }: CommandMenuListP
               <EmptyPage.Actions>
                 <Button.Root variant="soft" tone="neutral" loading={retrying} onClick={onRetry}>
                   <Button.Icon>
-                    <Icon name="action.refresh" />
+                    <RefreshCw />
                   </Button.Icon>
                   {labels.retry}
                 </Button.Root>

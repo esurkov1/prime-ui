@@ -1,6 +1,6 @@
 import * as React from "react";
+import { ChevronDown } from "@/icons/glyphs/chevron-down";
 
-import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { Disclosure } from "@/internal/Disclosure";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -209,7 +209,7 @@ export function ReactionBar({
             onClick={() => setExpanded((value) => !value)}
           >
             <span className={styles.glyph} aria-hidden="true">
-              <Icon name="nav.chevronDown" animated={false} />
+              <ChevronDown animated={false} />
             </span>
           </button>
         ) : null}

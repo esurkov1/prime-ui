@@ -1,6 +1,5 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
-
 import { Button } from "@/components/button/Button";
 import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Crossfade } from "@/components/crossfade/Crossfade";
@@ -18,7 +17,23 @@ import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { readCssLengthPx } from "@/hooks/usePosition";
 import { prefersReducedMotion, usePresence } from "@/hooks/usePresence";
 import type { UploadItem, UploadQueue } from "@/hooks/useUploadQueue";
-import { Icon, type IconName } from "@/icons";
+import type { Glyph } from "@/icons/glyph";
+import { Check } from "@/icons/glyphs/check";
+import { ChevronDown } from "@/icons/glyphs/chevron-down";
+import { ChevronLeft } from "@/icons/glyphs/chevron-left";
+import { ChevronUp } from "@/icons/glyphs/chevron-up";
+import { LayoutGrid } from "@/icons/glyphs/layout-grid";
+import { Lock } from "@/icons/glyphs/lock";
+import { Mic } from "@/icons/glyphs/mic";
+import { Paperclip } from "@/icons/glyphs/paperclip";
+import { Pause } from "@/icons/glyphs/pause";
+import { Play } from "@/icons/glyphs/play";
+import { Reply } from "@/icons/glyphs/reply";
+import { Send } from "@/icons/glyphs/send";
+import { SquarePen } from "@/icons/glyphs/square-pen";
+import { Trash2 } from "@/icons/glyphs/trash-2";
+import { Video } from "@/icons/glyphs/video";
+import { X } from "@/icons/glyphs/x";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -949,7 +964,7 @@ function ComposerRoot({
   );
 
   const actionKind = recording ? "send" : editing ? "save" : showRecord ? recordMode : "send";
-  const pauseIcon: IconName = recorder.paused ? "action.play" : "action.pause";
+  const PauseGlyph = recorder.paused ? Play : Pause;
   const actionLabel =
     actionKind === "save"
       ? labels.save
@@ -960,12 +975,7 @@ function ComposerRoot({
           : recording
             ? labels.sendRecording
             : labels.send;
-  const actionIcon: Record<typeof actionKind, IconName> = {
-    send: "action.send",
-    save: "action.check",
-    voice: "action.voice",
-    video: "action.video",
-  };
+  const ActionGlyph = { send: Send, save: Check, voice: Mic, video: Video }[actionKind];
   const recordState = recording ? (locked ? "locked" : "hold") : undefined;
   const hintId = `${fieldId}-record-hint`;
   const errorId = `${fieldId}-error`;
@@ -1148,7 +1158,7 @@ function ComposerRoot({
                     onClick={() => stopRecording(false)}
                   >
                     <Button.Icon>
-                      <Icon name="action.delete" />
+                      <Trash2 />
                     </Button.Icon>
                   </Button.Root>
                 ) : null}
@@ -1163,14 +1173,14 @@ function ComposerRoot({
                     disabled={recorder.status !== "recording"}
                   >
                     <Button.Icon>
-                      <Icon name={pauseIcon} />
+                      <PauseGlyph />
                     </Button.Icon>
                   </Button.Root>
                 ) : null}
                 {/* The breathing dot in the pause glyph's box; paused, the glyph in its place. */}
                 <GlyphSwap className={styles.status}>
                   {recorder.paused ? (
-                    <Icon name="action.pause" size={stepDown(size)} animated={false} />
+                    <Pause size={stepDown(size)} animated={false} />
                   ) : (
                     <span
                       key="dot"
@@ -1188,7 +1198,7 @@ function ComposerRoot({
                   <canvas ref={waveRef} className={cx(styles.wave, enterMotion.enter)} />
                 ) : (
                   <span className={styles.slide} aria-hidden="true">
-                    <Icon name="nav.chevronLeft" />
+                    <ChevronLeft />
                     {labels.slideToCancel}
                   </span>
                 )}
@@ -1211,9 +1221,9 @@ function ComposerRoot({
                   aria-hidden="true"
                   onAnimationEnd={lockPill.onExitEnd}
                 >
-                  <Icon name="status.locked" size={stepDown(size)} />
+                  <Lock size={stepDown(size)} />
                   <span className={styles.lockArrow}>
-                    <Icon name="nav.chevronUp" size={stepDown(size)} />
+                    <ChevronUp size={stepDown(size)} />
                   </span>
                 </span>
               ) : null}
@@ -1232,7 +1242,7 @@ function ComposerRoot({
                 data-action={actionKind}
               >
                 <Button.Icon>
-                  <Icon name={actionIcon[actionKind]} />
+                  <ActionGlyph />
                 </Button.Icon>
               </Button.Root>
               <VisuallyHidden id={hintId}>
@@ -1310,9 +1320,9 @@ export type ComposerContextProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-const CONTEXT_ICON: Record<ComposerContextMode, IconName> = {
-  reply: "action.reply",
-  edit: "action.edit",
+const CONTEXT_ICON: Record<ComposerContextMode, Glyph> = {
+  reply: Reply,
+  edit: SquarePen,
 };
 
 /** The bar above the field: «Ответ Анне» with the quoted text, or «Редактирование». */
@@ -1355,6 +1365,7 @@ function ComposerContext({
     focusFieldIfLive();
   });
 
+  const ContextGlyph = CONTEXT_ICON[mode];
   return (
     <div
       {...rest}
@@ -1365,7 +1376,7 @@ function ComposerContext({
     >
       <span className={styles.contextIcon} aria-hidden="true">
         <GlyphSwap>
-          <Icon name={CONTEXT_ICON[mode]} />
+          <ContextGlyph />
         </GlyphSwap>
       </span>
       <div className={styles.contextText}>{children}</div>
@@ -1381,7 +1392,7 @@ function ComposerContext({
           }}
         >
           <Button.Icon>
-            <Icon name="action.close" />
+            <X />
           </Button.Icon>
         </Button.Root>
       ) : null}
@@ -1437,7 +1448,7 @@ function ComposerAttach({
   const name = ariaLabel ?? labels.attach;
   const icon = (
     <Button.Icon>
-      <Icon name="action.attach" />
+      <Paperclip />
     </Button.Icon>
   );
   const pick = React.useCallback((types: string) => picker.current?.open({ accept: types }), []);
@@ -1606,7 +1617,7 @@ function ComposerKeyboard({
   if (!keyboardSlot || !keyboardToggleSlot) return null;
   // The grid of keys while they are hidden, the chevron that hides them while shown; `Button.Icon`
   // cross-fades one into the other.
-  const toggleIcon: IconName = open ? "nav.chevronDown" : "nav.layoutGrid";
+  const ToggleGlyph = open ? ChevronDown : LayoutGrid;
 
   return (
     <>
@@ -1621,7 +1632,7 @@ function ComposerKeyboard({
           onClick={() => setOpen(!open)}
         >
           <Button.Icon>
-            <Icon name={toggleIcon} />
+            <ToggleGlyph />
           </Button.Icon>
         </Button.Root>,
         keyboardToggleSlot,

@@ -1,6 +1,6 @@
 import type * as React from "react";
+import { ChevronDown } from "@/icons/glyphs/chevron-down";
 
-import { Icon } from "@/icons";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -114,7 +114,7 @@ export function NativeSelect({
           {children}
         </select>
         <span className={styles.chevron} aria-hidden="true">
-          <Icon name="nav.chevronDown" />
+          <ChevronDown />
         </span>
       </span>
     </FieldFrame>,

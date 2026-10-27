@@ -1,10 +1,11 @@
 import { format, startOfDay } from "date-fns";
 import { ru } from "date-fns/locale";
 import type * as React from "react";
-
 import { Popover } from "@/components/popover/Popover";
 import { DEFAULT_ALIGN, type PositionAlign } from "@/hooks/usePosition";
-import { Icon } from "@/icons";
+import { Calendar } from "@/icons/glyphs/calendar";
+import { ChevronDown } from "@/icons/glyphs/chevron-down";
+
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -227,10 +228,7 @@ function DatepickerRoot(props: DatepickerRootProps) {
             <span id={textId} className={styles.triggerLabel}>
               {text}
             </span>
-            <Icon
-              name="nav.chevronDown"
-              className={cx(styles.triggerIcon, styles.triggerChevron)}
-            />
+            <ChevronDown className={cx(styles.triggerIcon, styles.triggerChevron)} />
           </button>
         </Popover.Trigger>
         <Popover.Content align={align} size={size} width="content" trapFocus flush>
@@ -261,7 +259,7 @@ export type DatepickerTriggerIconProps = React.HTMLAttributes<HTMLSpanElement> &
 function DatepickerTriggerIcon({ className, children, ...rest }: DatepickerTriggerIconProps) {
   return (
     <span aria-hidden="true" {...rest} className={cx(styles.triggerIcon, className)}>
-      {children ?? <Icon name="field.calendar" />}
+      {children ?? <Calendar />}
     </span>
   );
 }

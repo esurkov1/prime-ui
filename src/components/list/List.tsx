@@ -1,12 +1,12 @@
 import * as React from "react";
-
 import { Badge, type BadgeGroupProps } from "@/components/badge/Badge";
 import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Dnd, DndLock } from "@/components/dnd/Dnd";
 import { Switch } from "@/components/switch/Switch";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { Icon } from "@/icons";
+import { Check } from "@/icons/glyphs/check";
+
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -612,7 +612,7 @@ function ListItem({
         <Checkbox.Indicator checked={checked} />
       </span>
     ) : (
-      <span className={listRowStyles.check}>{checked ? <Icon name="action.check" /> : null}</span>
+      <span className={listRowStyles.check}>{checked ? <Check /> : null}</span>
     );
   const atStart = selection !== null && selection.multiple && selection.indicator === "start";
 

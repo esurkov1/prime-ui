@@ -1,8 +1,9 @@
 import type * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { useControllableState } from "@/hooks/useControllableState";
-import { Icon } from "@/icons";
+import { Pin } from "@/icons/glyphs/pin";
+import { X } from "@/icons/glyphs/x";
+
 import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
@@ -120,7 +121,7 @@ export function ChatPinned({
             ))}
           </span>
           <span className={styles.icon} aria-hidden="true">
-            <Icon name="action.pin" />
+            <Pin />
           </span>
           <span className={styles.text}>
             <span className={styles.title}>{title}</span>
@@ -143,7 +144,7 @@ export function ChatPinned({
             onClick={() => onRemove(current.value)}
           >
             <Button.Icon>
-              <Icon name="action.close" />
+              <X />
             </Button.Icon>
           </Button.Root>
         ) : null}

@@ -1,10 +1,12 @@
 import * as React from "react";
-
 import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Dnd } from "@/components/dnd/Dnd";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
-import { Icon } from "@/icons";
+import { ArrowDown } from "@/icons/glyphs/arrow-down";
+import { ArrowUp } from "@/icons/glyphs/arrow-up";
+import { ArrowUpDown } from "@/icons/glyphs/arrow-up-down";
+import { Info } from "@/icons/glyphs/info";
 import { cx } from "@/internal/cx";
 import { nodeText } from "@/internal/nodeText";
 import type { ControlSize } from "@/internal/states";
@@ -15,7 +17,7 @@ import { columnSizeProps } from "./Row";
 import type { DataTableColumn, DataTableSortState } from "./types";
 
 const ARIA_SORT = { asc: "ascending", desc: "descending" } as const;
-const SORT_ICON = { asc: "sort.ascending", desc: "sort.descending" } as const;
+const SORT_ICON = { asc: ArrowUp, desc: ArrowDown } as const;
 
 /** Columns that reorder by their headers (`columnOrder`): the head row is a `Dnd.Sortable`. */
 export type HeadColumnReorder = {
@@ -117,6 +119,7 @@ export function Head<Row>({
   /** A head cell's attributes and content; `moves`: it ends with the column's grip. */
   const cell = (column: DataTableColumn<Row>, columnIndex: number) => {
     const order = column.sortable && sort?.columnId === column.id ? sort.order : null;
+    const SortGlyph = order ? SORT_ICON[order] : ArrowUpDown;
     const isFirstColumn = columnIndex === 0;
     const isLastColumn = columnIndex === columns.length - 1;
     const described = column.description !== undefined && !column.hideHeader;
@@ -131,11 +134,7 @@ export function Head<Row>({
     // The info glyph after the label: the tooltip's trigger on a plain header (a tab stop of
     // its own); a sort button carries the tooltip itself (no control inside a button).
     const info = described ? (
-      <Icon
-        name="status.info"
-        className={styles.headInfo}
-        label={column.sortable ? undefined : infoLabel}
-      />
+      <Info className={styles.headInfo} label={column.sortable ? undefined : infoLabel} />
     ) : null;
     const label = column.sortable ? (
       <WithDescription description={described ? column.description : undefined}>
@@ -149,11 +148,7 @@ export function Head<Row>({
             <span className={styles.headLabel}>{column.header}</span>
             {info}
           </span>
-          <Icon
-            name={order ? SORT_ICON[order] : "sort.none"}
-            className={styles.sortIcon}
-            strokeWidth={2}
-          />
+          <SortGlyph className={styles.sortIcon} strokeWidth={2} />
         </button>
       </WithDescription>
     ) : column.hideHeader ? (

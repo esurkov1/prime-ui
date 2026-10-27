@@ -1,8 +1,8 @@
 import * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { Icon } from "@/icons";
+import { X } from "@/icons/glyphs/x";
+
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -59,7 +59,7 @@ function CloseButton({
       onClick={banner.onDismiss}
     >
       <Button.Icon>
-        <Icon name="action.close" />
+        <X />
       </Button.Icon>
     </Button.Root>
   );

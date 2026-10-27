@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import { Dnd, useDragAnnouncer } from "@/components/dnd/Dnd";
@@ -11,7 +10,13 @@ import { VisuallyHidden, visuallyHiddenClass } from "@/components/visually-hidde
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import type { UploadItem, UploadQueue } from "@/hooks/useUploadQueue";
-import { Icon } from "@/icons";
+import { CloudUpload } from "@/icons/glyphs/cloud-upload";
+import { Image } from "@/icons/glyphs/image";
+import { Paperclip } from "@/icons/glyphs/paperclip";
+import { Plus } from "@/icons/glyphs/plus";
+import { RefreshCw } from "@/icons/glyphs/refresh-cw";
+import { Trash2 } from "@/icons/glyphs/trash-2";
+
 import {
   AttachmentStripScroller,
   AttachmentTile,
@@ -348,7 +353,7 @@ function FileUploadItemPreview({ src, className, ...rest }: FileUploadItemPrevie
       <Thumbnail.Root {...rest} className={cx(styles.preview, className)} aria-hidden="true">
         <Thumbnail.Image src={src} />
         <Thumbnail.Fallback>
-          <Icon name="object.image" />
+          <Image />
         </Thumbnail.Fallback>
       </Thumbnail.Root>
     </ListRowMark>
@@ -1046,7 +1051,7 @@ function FileRow({
                 onClick={onRetry}
               >
                 <Button.Icon>
-                  <Icon name="action.refresh" />
+                  <RefreshCw />
                 </Button.Icon>
               </Button.Root>
             ) : null}
@@ -1059,7 +1064,7 @@ function FileRow({
                 onClick={onRemove}
               >
                 <Button.Icon>
-                  <Icon name="action.delete" />
+                  <Trash2 />
                 </Button.Icon>
               </Button.Root>
             ) : null}
@@ -1301,7 +1306,7 @@ function FileUploadField({
     const content = children ?? (
       <>
         <Button.Icon>
-          <Icon name="action.attach" />
+          <Paperclip />
         </Button.Icon>
         {labels.browse}
       </>
@@ -1353,7 +1358,7 @@ function FileUploadField({
         {children ?? (
           <FileUploadBody>
             <FileUploadIcon>
-              <Icon name="action.upload" size={size} tone="secondary" />
+              <CloudUpload size={size} tone="secondary" />
             </FileUploadIcon>
             <FileUploadTitle>{labels.title}</FileUploadTitle>
             {/* Decorative: the whole zone is the target, so the «button» is a styled span. */}
@@ -1401,7 +1406,7 @@ function FileUploadField({
       <label className={styles.addTarget}>
         {input}
         <span className={cx(fieldTierClass, styles.addIcon)} data-size="xs" aria-hidden="true">
-          <Icon name="action.add" />
+          <Plus />
         </span>
         <span className={cx(textRole.caption, styles.addText)}>
           <MorphText>{empty ? labels.empty : labels.add}</MorphText>

@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import type {
@@ -14,7 +13,8 @@ import { prefersReducedMotion, usePresence } from "@/hooks/usePresence";
 import { useScrollRegion } from "@/hooks/useScrollRegion";
 import { useStableValue } from "@/hooks/useStableValue";
 import { useVirtualRows } from "@/hooks/useVirtualRows";
-import { Icon } from "@/icons";
+import { ChevronDown } from "@/icons/glyphs/chevron-down";
+
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -1009,7 +1009,7 @@ function JumpToEnd({ flow, labels }: { flow: MessageFlow; labels: MessageListLab
           onClick={() => region?.scrollToEnd("smooth")}
         >
           <Button.Icon>
-            <Icon name="nav.chevronDown" />
+            <ChevronDown />
           </Button.Icon>
         </Button.Root>
         {count > 0 ? (

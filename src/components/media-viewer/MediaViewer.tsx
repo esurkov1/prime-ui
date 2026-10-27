@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Skeleton } from "@/components/skeleton/Skeleton";
@@ -12,7 +11,13 @@ import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useModalLayer } from "@/hooks/useModalLayer";
 import { readCssLengthPx } from "@/hooks/usePosition";
 import { prefersReducedMotion, usePresence } from "@/hooks/usePresence";
-import { Icon, type IconName } from "@/icons";
+import { ChevronLeft } from "@/icons/glyphs/chevron-left";
+import { ChevronRight } from "@/icons/glyphs/chevron-right";
+import { Image } from "@/icons/glyphs/image";
+import { Video } from "@/icons/glyphs/video";
+import { X } from "@/icons/glyphs/x";
+import { ZoomIn } from "@/icons/glyphs/zoom-in";
+import { ZoomOut } from "@/icons/glyphs/zoom-out";
 import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldTierClass } from "@/internal/fieldClasses";
@@ -390,7 +395,7 @@ function ViewerDialog({
   const canNext = looping || index < count - 1;
   const zoomable = (item.type ?? "image") === "image";
   // One glyph slot: `Button.Icon` cross-fades the change in place.
-  const zoomGlyph: IconName = zoomed ? "action.zoomOut" : "action.zoomIn";
+  const ZoomGlyph = zoomed ? ZoomOut : ZoomIn;
 
   /**
    * The keys of the video on screen, as in every player: Space / K play and pause (Space on a
@@ -538,7 +543,7 @@ function ViewerDialog({
                 onClick={() => engine.zoomBy(zoomed ? null : 2)}
               >
                 <Button.Icon>
-                  <Icon name={zoomGlyph} />
+                  <ZoomGlyph />
                 </Button.Icon>
               </Button.Root>
             ) : null}
@@ -549,7 +554,7 @@ function ViewerDialog({
               onClick={() => setOpen(false)}
             >
               <Button.Icon>
-                <Icon name="action.close" />
+                <X />
               </Button.Icon>
             </Button.Root>
           </div>
@@ -567,7 +572,7 @@ function ViewerDialog({
               onClick={() => engine.step(-1)}
             >
               <Button.Icon>
-                <Icon name="nav.chevronLeft" />
+                <ChevronLeft />
               </Button.Icon>
             </Button.Root>
             <Button.Root
@@ -580,7 +585,7 @@ function ViewerDialog({
               onClick={() => engine.step(1)}
             >
               <Button.Icon>
-                <Icon name="nav.chevronRight" />
+                <ChevronRight />
               </Button.Icon>
             </Button.Root>
           </>
@@ -884,7 +889,7 @@ function ViewerSlide({
           inert={failed.state === "closed"}
           onTransitionEnd={failed.onExitEnd}
         >
-          <Icon name="object.image" />
+          <Image />
           <p className={cx(textRole.bodyS, styles.errorText)}>{labels.loadError}</p>
           <Button.Root variant="soft" tone="neutral" size="s" onClick={retry}>
             {labels.retry}
@@ -1131,7 +1136,7 @@ function Filmstrip({ engine, items, index, labels, onSelect }: FilmstripProps) {
     const entry = items[at] as MediaViewerItem;
     const video = (entry.type ?? "image") === "video";
     const src = entry.thumbnail ?? (video ? entry.poster : entry.src);
-    const fallbackGlyph: IconName = video ? "action.video" : "object.image";
+    const FallbackGlyph = video ? Video : Image;
     thumbs.push(
       <Thumbnail.Root
         key={at}
@@ -1149,7 +1154,7 @@ function Filmstrip({ engine, items, index, labels, onSelect }: FilmstripProps) {
         >
           {src ? <Thumbnail.Image src={src} /> : null}
           <Thumbnail.Fallback>
-            <Icon name={fallbackGlyph} />
+            <FallbackGlyph />
           </Thumbnail.Fallback>
         </button>
       </Thumbnail.Root>,

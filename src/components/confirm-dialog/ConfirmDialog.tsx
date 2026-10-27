@@ -1,8 +1,8 @@
 import * as React from "react";
-
 import { Banner } from "@/components/banner/Banner";
 import { Button } from "@/components/button/Button";
-import { Icon } from "@/icons";
+import { CircleX } from "@/icons/glyphs/circle-x";
+
 import { useLabels } from "@/internal/labels";
 import {
   DialogBody,
@@ -122,7 +122,7 @@ function ConfirmDialogRoot({
             <Banner.Root tone="danger" size="s" role="alert">
               <Banner.Content>
                 <Banner.Icon>
-                  <Icon name="status.danger" />
+                  <CircleX />
                 </Banner.Icon>
                 <Banner.Description>{message}</Banner.Description>
               </Banner.Content>

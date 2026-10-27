@@ -1,8 +1,8 @@
 import * as React from "react";
-
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
-import { Icon } from "@/icons";
+import { Check } from "@/icons/glyphs/check";
+import { Copy } from "@/icons/glyphs/copy";
 import { cx } from "@/internal/cx";
 import { GlyphSwap } from "@/internal/glyphSwap";
 import { Slot } from "@/internal/slot";
@@ -135,7 +135,7 @@ export function FieldCopyButton({ getText, labels, onClick, ...rest }: FieldCopy
 
   const label =
     state === "copied" ? labels.copied : state === "error" ? labels.copyError : labels.copy;
-  const glyph = state === "copied" ? "action.check" : "action.copy";
+  const CopyGlyph = state === "copied" ? Check : Copy;
 
   return (
     <>
@@ -154,7 +154,7 @@ export function FieldCopyButton({ getText, labels, onClick, ...rest }: FieldCopy
           }
         }}
       >
-        <Icon name={glyph} />
+        <CopyGlyph />
       </FieldActionButton>
       <VisuallyHidden live="polite">{state === "idle" ? "" : label}</VisuallyHidden>
     </>

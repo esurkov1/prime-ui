@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import { Crossfade } from "@/components/crossfade/Crossfade";
@@ -11,7 +10,10 @@ import { Skeleton } from "@/components/skeleton/Skeleton";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { Icon } from "@/icons";
+import { ChevronDown } from "@/icons/glyphs/chevron-down";
+import { ChevronUp } from "@/icons/glyphs/chevron-up";
+import { Search } from "@/icons/glyphs/search";
+
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { fieldTierClass } from "@/internal/fieldClasses";
@@ -412,7 +414,7 @@ function ChatSearchButton({ onClick, ref, ...rest }: ChatSearchButtonProps) {
       }}
     >
       <Button.Icon>
-        <Icon name="action.search" />
+        <Search />
       </Button.Icon>
     </Button.Root>
   );
@@ -496,7 +498,7 @@ function ChatSearch({ persistent = false, className, children, ...rest }: ChatSe
       <Input.Root className={styles.searchField}>
         <Input.Wrapper>
           <Input.Icon side="start">
-            <Icon name="action.search" tone="secondary" />
+            <Search tone="secondary" />
           </Input.Icon>
           <Input.Field
             ref={fieldRef}
@@ -541,7 +543,7 @@ function ChatSearch({ persistent = false, className, children, ...rest }: ChatSe
               aria-disabled={count < 2 || undefined}
               onClick={() => step(1)}
             >
-              <Icon name="nav.chevronUp" />
+              <ChevronUp />
             </Input.Action>
           ) : null}
           {typed ? (
@@ -552,7 +554,7 @@ function ChatSearch({ persistent = false, className, children, ...rest }: ChatSe
               aria-disabled={count < 2 || undefined}
               onClick={() => step(-1)}
             >
-              <Icon name="nav.chevronDown" />
+              <ChevronDown />
             </Input.Action>
           ) : null}
           {typed ? (

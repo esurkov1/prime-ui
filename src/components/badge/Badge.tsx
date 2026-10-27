@@ -1,12 +1,14 @@
 import * as React from "react";
-
 import { Spinner } from "@/components/spinner/Spinner";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useResizeEffect } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { Icon } from "@/icons";
+import { ChevronDown } from "@/icons/glyphs/chevron-down";
+import { Minus } from "@/icons/glyphs/minus";
+import { X } from "@/icons/glyphs/x";
+
 import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { useChipTier } from "@/internal/chipTier";
 import chipTier from "@/internal/chipTier.module.css";
@@ -261,7 +263,7 @@ function BadgeRoot({
     ...(trigger
       ? [
           <BadgeIcon key="trigger-chevron" className={styles.chevron}>
-            <Icon name="nav.chevronDown" />
+            <ChevronDown />
           </BadgeIcon>,
         ]
       : []),
@@ -380,7 +382,7 @@ function BadgeRoot({
           disabled={disabled}
         >
           <GlyphSwap layerClassName={iconSlotClass}>
-            {busy ? <Spinner aria-hidden="true" /> : <Icon name="action.close" />}
+            {busy ? <Spinner aria-hidden="true" /> : <X />}
           </GlyphSwap>
         </button>
       ) : null}
@@ -482,7 +484,7 @@ function BadgeAction({
       disabled={disabled}
       onClick={onClick}
     >
-      {children ?? <Icon name="action.remove" />}
+      {children ?? <Minus />}
     </button>
   );
 }

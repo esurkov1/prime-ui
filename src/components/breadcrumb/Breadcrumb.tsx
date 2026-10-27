@@ -1,12 +1,12 @@
 import * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { LinkButton } from "@/components/link-button/LinkButton";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useResizeEffect } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { Icon } from "@/icons";
+import { ChevronRight } from "@/icons/glyphs/chevron-right";
+
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -65,7 +65,7 @@ function Separator() {
   if (first) return null;
   return (
     <span aria-hidden="true" className={styles.separator}>
-      <Icon name="nav.chevronRight" size={size} />
+      <ChevronRight size={size} />
     </span>
   );
 }

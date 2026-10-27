@@ -1,4 +1,4 @@
-import { Icon } from "@/icons";
+import { Play } from "@/icons/glyphs/play";
 import { cx } from "@/internal/cx";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import pill from "@/internal/mediaPill.module.css";
@@ -33,7 +33,7 @@ export function MediaPlayMark({
       data-shown={shown}
       aria-hidden="true"
     >
-      <Icon name="action.play" fill="currentColor" />
+      <Play fill="currentColor" />
     </span>
   );
 }

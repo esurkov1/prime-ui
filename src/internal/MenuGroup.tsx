@@ -1,6 +1,5 @@
 import * as React from "react";
-
-import { Icon } from "@/icons";
+import { Check } from "@/icons/glyphs/check";
 
 import { useOptionalControlSize } from "./ControlSizeContext";
 import { cx } from "./cx";
@@ -92,7 +91,7 @@ export function menuRowProps({
 export function MenuRowCheck({ checked }: { checked: boolean }) {
   return (
     <span className={listRowStyles.check} aria-hidden="true">
-      {checked ? <Icon name="action.check" /> : null}
+      {checked ? <Check /> : null}
     </span>
   );
 }
