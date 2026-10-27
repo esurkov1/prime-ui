@@ -834,6 +834,18 @@
         "Neither card has a Card.Footer or Card.Body for the single button",
         "A card that did hold fields (a form with «Сохранить») would keep its button in Card.Footer — the one-line cards are not moved there"
       ]
+    },
+    {
+      "id": 68,
+      "prompt": "Карточка «Сети Wi‑Fi» на prime-ui-kit: список сохранённых сетей (Office-5G — подключена, Guest, Home-2.4). Ничего по клику не открывается. Собери карточку.",
+      "expected_output": "A Card with a List.Root of rows with no onClick and no current; the connected network says its state once, as a StatusDot «Подключена» in List.ItemDescription; List.ItemIcon has no tone.",
+      "files": [],
+      "expectations": [
+        "No List.Item has `current` (nothing opens, the connected state is not a location)",
+        "The connected state is said once: one StatusDot «Подключена» in List.ItemDescription, not also a tinted List.ItemIcon tone or a fill",
+        "List.ItemIcon stays neutral (no `tone=\"success\"`) and rows have no onClick or asChild",
+        "The connected state is not expressed with `selected` or `pressed` either"
+      ]
     }
   ]
 }

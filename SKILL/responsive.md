@@ -374,8 +374,7 @@ of your own for a phone.
 ### The top bar on a phone
 
 The description of a `Page.TopBar` wraps to two lines on a phone: put the stable facts first and the
-volatile one (a time, a count that ticks) last. A status chip in `Page.Actions` stays one line — its
-details go into its popover, not into `Badge.Description`.
+volatile one (a time, a count that ticks) last.
 
 ### On a real phone
 

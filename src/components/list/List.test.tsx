@@ -134,15 +134,15 @@ describe("List", () => {
     ).toBe("calc(var(--list-bleed-block) * -1)");
   });
 
-  it("drops the side inset of a list whose rows nothing opens, and keeps it for a mixed one", () => {
+  it("drops the side inset of a list whose rows draw no fill, and keeps it for a mixed one", () => {
     const { rerender } = render(
       <List.Root aria-label="Сеансы">
         <List.Item>Chrome</List.Item>
         <List.Item>Safari</List.Item>
       </List.Root>,
     );
-    expect(document.querySelectorAll("li[data-interactive]")).toHaveLength(0);
-    const rule = cssRule(CSS, ".root:not(:has(.item[data-interactive]))");
+    expect(document.querySelectorAll("li[data-wash]")).toHaveLength(0);
+    const rule = cssRule(CSS, ".root:not(:has(.item[data-wash]))");
     expect(cssValue(rule, "--list-row-px")).toBe("0");
     expect(cssValue(rule, "--list-row-end")).toBe("0");
     rerender(
@@ -151,7 +151,14 @@ describe("List", () => {
         <List.Item onClick={() => {}}>Safari</List.Item>
       </List.Root>,
     );
-    expect(document.querySelectorAll("li[data-interactive]")).toHaveLength(1);
+    expect(document.querySelectorAll("li[data-wash]")).toHaveLength(1);
+    rerender(
+      <List.Root aria-label="Сети">
+        <List.Item current>Офис</List.Item>
+        <List.Item>Склад</List.Item>
+      </List.Root>,
+    );
+    expect(document.querySelectorAll("li[data-wash]")).toHaveLength(1);
   });
 
   it("takes the host tier without its own size", () => {

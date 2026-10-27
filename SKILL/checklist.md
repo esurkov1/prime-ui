@@ -39,6 +39,7 @@ checks.
 - [ ] Labels on a form of rows ≤ columns + the list label; none repeated, numbered or repeating its heading ([label economy](ux.md#3-label-economy)).
 - [ ] No text explains the layout; every hint is two to five words the label and the control leave out, never the obvious outcome ([label economy](ux.md#3-label-economy)).
 - [ ] Every setting sits with what it governs, as a field beside its neighbours; a stored choice is a `Select`, no section holds one setting ([where a setting lives](ux.md#10-where-a-setting-lives)).
+- [ ] `current` / `selected` mark only the open record or page on a row that opens something; a state of the thing (connected, active, default) is one `StatusDot` or `Badge`, the mark neutral ([`current` is where you are](ux.md#headers-and-rows-of-a-surface)).
 - [ ] Every value stands in one place: no summary block repeats a block (a switcher's count and the page's `Page.Description` may state the same figure), a setting's live value is its `hint`, no count beside a list that counts, no manual path beside the automatic one ([one fact, one place](ux.md#11-one-fact-one-place)).
 - [ ] A popover, the bar and a header hold only what a person acts on; a record's ID is its title's `number`; a `Banner` has an icon only where it reads worse without ([only what a person acts on](ux.md#only-what-a-person-acts-on)).
 - [ ] Inside every block the controls come before the readings; a summary popover opens with the mode and ends with the rare, a `Divider` between its sections ([controls first](ux.md#controls-first-readings-after)).
@@ -171,7 +172,7 @@ checks.
 - [ ] The app is `AppShell.Root` at the top level with no `100vh`, `overflow` or `position: fixed` box of mine around it; the viewport meta has `viewport-fit=cover` ([the frame owns the viewport](layouts.md#the-frame-owns-the-viewport)).
 - [ ] The document never scrolls: Main is the one scroller, every other region a `ScrollContainer`; no `interactive-widget=overlays-content` ([one scroller](responsive.md#one-scroller-a-still-frame)).
 - [ ] On a phone the blocks stand straight in `Page.Body` / `Page.Grid`, with no gap or padding of mine for a phone ([the phone rhythm](responsive.md#the-phone-rhythm)).
-- [ ] A top bar description puts its volatile fact last; a status chip in `Page.Actions` is one line ([the top bar on a phone](responsive.md#the-top-bar-on-a-phone)).
+- [ ] A top bar description puts its volatile fact last ([the top bar on a phone](responsive.md#the-top-bar-on-a-phone)).
 - [ ] On a real phone: no pull-to-refresh, nothing moves under a drag on the bars, the last block clears the capsule, the keyboard leaves no band and keeps a sheet's field in view ([on a real phone](responsive.md#on-a-real-phone)).
 - [ ] Tabs that outgrow the width scroll; no two topics merged into one tab ([switchers](responsive.md#switchers)).
 - [ ] No ButtonGroup or SegmentedControl holds more segments than its column shows; a long one is split by meaning or becomes a `Select` ([switchers](responsive.md#switchers)).

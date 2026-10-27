@@ -45,12 +45,12 @@
 }
 
 /*
- * A list nothing in opens, toggles, chooses or reorders: its rows have no wash, so no side inset
- * either. Text and marks stand on the content edge and the row's controls on its end edge, and
- * the list does not bleed sideways. One interactive row (`data-interactive` on its `<li>`) keeps
- * the inset for every row, so a mixed list stays aligned.
+ * A list nothing in opens, toggles, chooses or reorders and no row of which is current: its rows
+ * draw no fill, so no side inset either. Text and marks stand on the content edge and the row's
+ * controls on its end edge, and the list does not bleed sideways. One row with a fill (`data-wash`
+ * on its `<li>`) keeps the inset for every row, so a mixed list stays aligned.
  */
-.root:not(:has(.item[data-interactive])) {
+.root:not(:has(.item[data-wash])) {
   --list-bleed-size: 0;
   --list-row-px: 0;
   --list-row-end: 0;

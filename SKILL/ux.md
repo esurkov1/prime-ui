@@ -274,6 +274,43 @@ controls at the end. The rules below hold for all of them.
 </List.Item>
 ```
 
+- **`current` marks where the person is, never what the thing is.** It goes only on a row that
+  opens something — the open record of a list + detail, the page in a `Sidebar` — and answers «where
+  am I». A state of the thing itself (connected, active, default, online, primary) answers «what is
+  it»: it is never `current`, `selected` or `pressed`; it is said once, in words — a `StatusDot`
+  first in the description, or a `Badge` after the title ([one fact, one place](#11-one-fact-one-place)).
+  The mark then stays neutral: a `tone` on `List.ItemIcon` or a fill repeats what the word already
+  says, and a colour alone says nothing to everyone. A row that opens nothing has no `onClick`, no
+  `current`, no fill. Decide by one question: if the state disappeared, would the person still be
+  somewhere in the list? Yes → it is a state.
+
+```tsx partial
+// bad — nothing opens, yet the connected row is «open», a green tile and a green dot say it again
+<List.Root>
+  <List.Item current={network.connected}>
+    <List.ItemIcon tone="success"><Icon name="viewport.desktop" /></List.ItemIcon>
+    <List.ItemText>Office-5G</List.ItemText>
+    <List.ItemDescription>
+      <StatusDot tone="success">Подключена</StatusDot>
+    </List.ItemDescription>
+  </List.Item>
+</List.Root>
+```
+
+```tsx good
+// declare: const network: { connected: boolean }
+// good — a state is a StatusDot with its word; the mark is neutral, the row is not «current»
+<List.Root>
+  <List.Item>
+    <List.ItemIcon><Icon name="viewport.desktop" /></List.ItemIcon>
+    <List.ItemText>Office-5G</List.ItemText>
+    <List.ItemDescription>
+      {network.connected ? <StatusDot tone="success">Подключена</StatusDot> : "Сохранена"}
+    </List.ItemDescription>
+  </List.Item>
+</List.Root>
+```
+
 ## 3. Label economy
 
 Every word on screen must carry something the person does not see already.

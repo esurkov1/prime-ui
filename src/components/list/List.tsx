@@ -645,8 +645,10 @@ function ListItem({
   );
 
   const hitClass = cx(listRowStyles.hit, touchTargetRowClass, className);
-  // A row something opens, toggles, chooses or drags keeps the row's side inset (its wash).
-  const pressable =
+  // A row that draws a fill keeps the side inset: something opens, toggles, chooses or drags it,
+  // or it is the current one.
+  const washed =
+    current ||
     selection !== null ||
     reorder !== null ||
     asChild ||
@@ -827,7 +829,7 @@ function ListItem({
         ref={liRef}
         className={liClass}
         role={selection ? "presentation" : undefined}
-        data-interactive={pressable ? "" : undefined}
+        data-wash={washed ? "" : undefined}
       >
         {row}
       </li>
@@ -840,7 +842,7 @@ function ListItem({
       disabled={disabled}
       locked={locked}
       className={cx(liClass, styles.sortable)}
-      data-interactive={pressable ? "" : undefined}
+      data-wash={washed ? "" : undefined}
     >
       {row}
     </Dnd.SortableItem>
