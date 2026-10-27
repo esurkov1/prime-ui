@@ -132,8 +132,8 @@ and goes under the scrim of every overlay.
 
 Next.js App Router: the package is marked `"use client"`, but a server component cannot dot into it
 (`<Button.Root>`) or pass it callbacks. Put the frame and every screen in a file that starts with
-`"use client"` and render them from `app/layout.tsx` and the pages; import `bundle.css` in the root
-layout and put `data-theme` on `<html>` there.
+`"use client"` and render them from `app/layout.tsx` and the pages; put `data-theme` on `<html>` in
+the root layout.
 
 ## Navigation structure (the sidebar's content)
 

@@ -75,7 +75,6 @@ pathname to `AppShell.Template scrollResetKey` and use `asChild` for router link
 ## Set up styles and theme
 
 ```tsx
-import "prime-ui-kit/bundle.css"; // tokens, light and dark themes, component styles
 import "prime-ui-kit/fonts.css"; // optional: Golos Text + JetBrains Mono, metric-matched fallbacks
 import "prime-ui-kit/reset.css"; // optional: minimal document reset (skip if the app has its own)
 import { applyTheme } from "prime-ui-kit";
@@ -83,20 +82,26 @@ import { applyTheme } from "prime-ui-kit";
 applyTheme("dark"); // sets data-theme on <html> without a transition flash
 ```
 
-`bundle.css` is everything the components need; it leaves the root font size to the browser.
-`data-theme="light" | "dark"` also works on any wrapper, so one page can show both themes.
+The styles come with the code: `prime-ui-kit` brings the tokens, both themes and the base rules
+(focus ring, reduced motion), and every component imports its own CSS. Your bundler (Vite, webpack,
+Next.js, esbuild) keeps only the modules and the styles of the components you use — a screen of a
+few controls ships a few controls, not the whole kit. The base leaves the root font size to the
+browser. `data-theme="light" | "dark"` also works on any wrapper, so one page can show both themes.
+
+Tests that run the kit in Node need its CSS imports handled: in Vitest, inline the package
+(`test.server.deps.inline: ["prime-ui-kit"]`); in Jest, map `\.css$` to a stub with
+`moduleNameMapper`.
 
 ## Next.js (App Router)
 
-Every JS file of the package starts with `"use client"`: importing the kit never pulls React state
-into the server graph, and you need no re-export wrapper files. Import the CSS once in the root
-layout and set the theme on `<html>` there; `applyTheme` is for switching it later from a client
+Every module of the package starts with `"use client"` (the entry files are plain re-exports, as
+Next.js asks of a client boundary): importing the kit never pulls React state into the server
+graph, and you need no re-export wrapper files. The styles arrive with the components; set the
+theme on `<html>` in the root layout; `applyTheme` is for switching it later from a client
 component.
 
 ```tsx
 // app/layout.tsx
-import "prime-ui-kit/bundle.css";
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ru" data-theme="light">
@@ -163,8 +168,8 @@ Short rules that keep code correct — for people and for AI coding assistants:
 1. Import everything from the package root: `import { Button, Input } from "prime-ui-kit"`. The one
    exceptions are `import { ColorField, ColorPicker } from "prime-ui-kit/color-picker"` and the full glyph set,
    `import { BellIcon } from "prime-ui-kit/icons"`.
-2. Import styles once at the app root: `prime-ui-kit/bundle.css` (plus the optional `fonts.css` and
-   `reset.css`).
+2. Import no kit stylesheet: the styles come with the components. Only the optional `fonts.css` and
+   `reset.css` go to the app root, once.
 3. Compound components are used through parts: `<Button.Root>`, `<Modal.Root>` + `<Modal.Content>`.
    `<Button>` alone is not a component.
 4. Default `size` is `m`; controls in one row share one size.
@@ -411,13 +416,12 @@ the kit, run the command again: it replaces the folder with the skill of the new
 
 | Path | Purpose |
 |---|---|
-| `prime-ui-kit` | The JS/TS API: every component, layout, icon, hook and helper (no CSS side effects). |
+| `prime-ui-kit` | The JS/TS API: every component, layout, icon, hook and helper. It brings the base CSS (tokens, both themes, focus ring, reduced motion); every component brings its own; only what you import is bundled. |
 | `prime-ui-kit/color-picker` | `ColorPicker`, `ColorField` and `parseColor` — the only code on the optional peer `react-aria-components`. |
 | `prime-ui-kit/icons` | The full animated glyph set as named components (`<BellIcon />`): Lucide drawings, one gesture each; only what you import is bundled. |
-| `prime-ui-kit/bundle.css` | Tokens, both themes, base rules (focus ring, reduced motion) and every component's CSS. |
 | `prime-ui-kit/fonts.css` | Optional: Golos Text and JetBrains Mono from Google Fonts, with metric-matched local fallbacks, so text does not move when a face arrives. |
 | `prime-ui-kit/reset.css` | Optional: minimal document reset. |
-| `prime-ui-kit/tokens.css`, `theme-light.css`, `theme-dark.css` | The token layers alone (already inside `bundle.css`), for styling without components. |
+| `prime-ui-kit/tokens.css`, `theme-light.css`, `theme-dark.css` | The token layers alone (already brought by `prime-ui-kit`), for styling without components. |
 
 Type definitions ship with the package.
 
@@ -443,7 +447,7 @@ custom properties.
 dependency `date-fns` ^4. `react-aria-components` ^1.16 is an optional peer, needed only for
 `prime-ui-kit/color-picker` (ColorPicker, ColorField).
 
-**Does it use Tailwind?** No. Styles are CSS Modules compiled into `prime-ui-kit/bundle.css`; theming is
+**Does it use Tailwind?** No. Styles are CSS Modules shipped beside each component and imported by it; theming is
 done with `--prime-*` CSS variables and `data-theme="light" | "dark"`.
 
 **How do I switch to the dark theme?** Call `applyTheme("dark")` or set `data-theme="dark"` on `<html>`

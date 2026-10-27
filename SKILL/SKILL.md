@@ -88,7 +88,6 @@ project under `node_modules/prime-ui-kit/src/`.
 ## Setup (once per app)
 
 ```tsx
-import "prime-ui-kit/bundle.css"; // tokens, light + dark themes, component styles
 import "prime-ui-kit/fonts.css"; // optional: Golos Text + JetBrains Mono, metric-matched fallbacks
 import "prime-ui-kit/reset.css"; // optional: minimal document reset (skip if the app has one)
 import { applyTheme } from "prime-ui-kit";
@@ -101,6 +100,20 @@ and `AppShell` belong to the app root, once. A screen component you deliver rend
 `Page.Root` with its `Page.TopBar` and its `Page.Body` — and assumes the root exists. If the project has no app
 frame yet, also deliver it as a separate root layout from
 [layouts.md](layouts.md#app-frame-once-per-app) — never inline the frame into a page.
+
+Build: the kit's styles come with its components and the package is marked side-effect free, so any
+bundler (Vite, webpack, Next.js, esbuild) ships only the components a screen imports and their CSS —
+import from `"prime-ui-kit"`, never a copied component or stylesheet. Pick the build by where the
+frontend runs:
+
+- **Embedded UI** (a device's web panel served from a microcontroller, a router, a printer — flash
+  measured in megabytes): one small single-page app on Vite, the system font (no `fonts.css`), no
+  router package when two or three tabs do, no `prime-ui-kit/color-picker`; compress the output
+  (`.gz` or `.br` beside each file) and serve it with `Content-Encoding`; keep the asset count low
+  (no code splitting) when the device's web server handles few connections.
+- **An app or a site**: the framework's own build as is — code-split by route (`React.lazy` or the
+  router's lazy routes), so a page loads only its components; heavy optional parts (`color-picker`,
+  charts, the chat) load on the routes that use them.
 
 Icons: every glyph comes from the kit, and every kit icon is animated — its gesture plays when its
 button, link, tab, menu item or row is hovered or pressed, which gives the screen life with no code.

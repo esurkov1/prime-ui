@@ -1,5 +1,4 @@
-// Один раз в корне приложения
-import "prime-ui-kit/bundle.css"; // токены, обе темы и стили компонентов
+// Один раз в корне приложения; стили кита приходят вместе с компонентами
 import "prime-ui-kit/fonts.css"; // по желанию: Golos Text и JetBrains Mono из Google Fonts
 import "prime-ui-kit/reset.css"; // по желанию: минимальный сброс документа
 

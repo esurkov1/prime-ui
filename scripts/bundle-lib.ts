@@ -1,18 +1,16 @@
 /**
- * Library bundle via esbuild (no Rollup/treeshake pass that breaks CSS Modules).
- * JS: `src/index.ts` → `dist/index.js`, `src/color-picker.ts` → `dist/color-picker.js`,
+ * Library build via esbuild, module for module. JS: every source module at its own path in `dist/`;
+ * `src/index.ts` → `dist/index.js`, `src/color-picker.ts` → `dist/color-picker.js`,
  * `src/icon-set.ts` → `dist/icon-set.js` (next to its `icon-set.d.ts`; a `dist/icons.js` would shadow
- * the `dist/icons/` types folder for `./icons` specifiers), shared code in `dist/chunks/`. Every JS file starts with `"use client"` (checked).
- * CSS: the base layer (`src/styles/globals.css`: tokens, themes, focus ring,
- * reduced motion) followed by every component module → `dist/index.css` (`prime-ui-kit/bundle.css`,
- * minified). Types: the declarations of `tsconfig.dts.json` → `.dts-stage`, every documented prop
+ * the `dist/icons/` types folder for `./icons` specifiers). CSS: every CSS Module beside its module
+ * as `X.styles.js` + `X.styles.css`, the base layer as `dist/base.css`. Types: the declarations of `tsconfig.dts.json` → `.dts-stage`, every documented prop
  * carrying its `api.ts` `en` text as JSDoc (the one prose source), merged into `dist/`; every
  * specifier is rewritten to an explicit relative path inside `dist/` (no `@/` alias, no directory
  * import) and the build fails on any specifier that leaves `dist/` or does not resolve.
  */
 
 import { existsSync, readdirSync } from "node:fs";
-import { cp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { cp, mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { dirname, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
@@ -28,72 +26,174 @@ const USE_CLIENT = '"use client";';
 await rm(dist, { recursive: true, force: true });
 
 /*
- * Three JS entries: `prime-ui-kit`, `prime-ui-kit/color-picker` (the only code on react-aria) and
- * `prime-ui-kit/icons` (every glyph as a named, tree-shakable component). Splitting puts the shared
- * modules in chunks, so the entries use one copy of every context and glyph. A fourth, temporary
- * entry imports them all: one build keeps CSS Module class names identical, and its
- * CSS (every component) becomes `bundle.css`; the per-entry CSS files are dropped.
+ * Module-for-module output: every source module the three entries reach (`prime-ui-kit`,
+ * `prime-ui-kit/color-picker` — the only code on react-aria — and `prime-ui-kit/icons`) becomes its
+ * own file in `dist/`, at its source path, its specifiers rewritten to the files beside it. With
+ * `sideEffects` naming only the CSS and the entries, a consumer's bundler keeps only the modules a
+ * screen uses. A CSS Module becomes `X.styles.js` (its class map) importing `X.styles.css` (its
+ * rules), so the styles of a component travel with its code; the entries import `base.css`
+ * (`src/styles/globals.css`: tokens, themes, focus ring, reduced motion) before anything else.
+ * Every module but a re-export barrel starts with `"use client"` (checked): every component holds
+ * state or effects, and Next.js refuses `export *` inside a client boundary, so a barrel stays a
+ * server module that passes the client modules on.
  */
-const allEntry = resolve(root, ".bundle-all.ts");
-await writeFile(
-  allEntry,
-  'export * from "./src/index";\nexport * from "./src/color-picker";\nexport * from "./src/icon-set";\n',
-);
-try {
-  await esbuild.build({
-    absWorkingDir: root,
-    entryPoints: [
-      { in: "src/index.ts", out: "index" },
-      { in: "src/color-picker.ts", out: "color-picker" },
-      { in: "src/icon-set.ts", out: "icon-set" },
-      { in: ".bundle-all.ts", out: "all" },
-    ],
-    outdir: "dist",
-    bundle: true,
-    splitting: true,
-    chunkNames: "chunks/[name]-[hash]",
-    format: "esm",
-    platform: "neutral",
-    target: "es2022",
-    tsconfig: "tsconfig.json",
-    alias: { "@": resolve(root, "src") },
-    packages: "external",
-    logLevel: "info",
-    loader: { ".module.css": "local-css" },
-    /* Every component holds state or effects: each entry and chunk is a client module (RSC). */
-    banner: { js: `${USE_CLIENT}\n` },
-  });
-} finally {
-  await rm(allEntry, { force: true });
-}
-await rm(resolve(dist, "all.js"), { force: true });
+const ENTRIES = {
+  "src/index.ts": "index",
+  "src/color-picker.ts": "color-picker",
+  "src/icon-set.ts": "icon-set",
+};
+const shared = {
+  absWorkingDir: root,
+  format: "esm",
+  platform: "neutral",
+  target: "es2022",
+  tsconfig: "tsconfig.json",
+  logLevel: "warning",
+} satisfies esbuild.BuildOptions;
 
-/* Guard: every published JS file starts with the directive, or Next.js server components break. */
-const jsFiles = (await readdir(dist, { recursive: true })).filter((file) => file.endsWith(".js"));
-const missing: string[] = [];
-for (const file of jsFiles) {
-  if (!(await readFile(resolve(dist, file), "utf8")).startsWith(USE_CLIENT)) missing.push(file);
+const graph = await esbuild.build({
+  ...shared,
+  entryPoints: Object.keys(ENTRIES),
+  bundle: true,
+  write: false,
+  metafile: true,
+  outdir: "dist",
+  alias: { "@": resolve(root, "src") },
+  packages: "external",
+  loader: { ".module.css": "local-css" },
+});
+const inputs = graph.metafile.inputs;
+const modules = Object.keys(inputs).filter((path) => /\.tsx?$/.test(path));
+const cssModules = Object.keys(inputs).filter((path) => path.endsWith(".module.css"));
+
+/** The `dist/` path of a source module, without extension: `src/` drops its prefix, `tokens/` keeps it. */
+function outPath(input: string): string {
+  const stem = input.replace(/\.module\.css$/, ".styles").replace(/\.tsx?$/, "");
+  if (stem.startsWith("src/")) {
+    const rel = stem.slice("src/".length);
+    return ENTRIES[input as keyof typeof ENTRIES] ?? rel;
+  }
+  if (stem.startsWith("tokens/")) return stem;
+  throw new Error(`${input}: a module outside src/ and tokens/`);
 }
-if (missing.length > 0) throw new Error(`dist JS without "use client":\n${missing.join("\n")}`);
-await rm(resolve(dist, "color-picker.css"), { force: true });
-await rm(resolve(dist, "icon-set.css"), { force: true });
+
+function specifierTo(fromInput: string, toInput: string): string {
+  let rel = relative(dirname(outPath(fromInput)), `${outPath(toInput)}.js`)
+    .split(sep)
+    .join("/");
+  if (!rel.startsWith(".")) rel = `./${rel}`;
+  return rel;
+}
+
+const SPECIFIER = /(\bfrom\s*|\bimport\s*\(\s*|\bimport\s+)(["'])([^"']+)\2/g;
+const head = (client: boolean, imports: string[]) =>
+  [...(client ? [USE_CLIENT] : []), ...imports.map((spec) => `import "${spec}";`)].join("\n");
+/** A module whose every statement re-exports: imports, `export … from`, `export { names }`. */
+const REEXPORT =
+  /^((export|import) (\*|\* as \w+|\{[^}]*\}) from "[^"]+";|import "[^"]+";|export \{[^}]*\};)$/;
+const isBarrel = (code: string) =>
+  code
+    .split(/\n(?=export|import)/)
+    .map((statement) => statement.replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .every((statement) => REEXPORT.test(statement));
+
+const compiled = await esbuild.build({
+  ...shared,
+  entryPoints: modules,
+  bundle: false,
+  write: false,
+  outdir: "out",
+  outbase: ".",
+});
+const unresolved: string[] = [];
+for (const file of compiled.outputFiles) {
+  const input = relative(resolve(root, "out"), file.path).replace(/\.js$/, "");
+  const source = modules.find((path) => path.replace(/\.tsx?$/, "") === input);
+  if (!source) throw new Error(`${file.path}: no source module`);
+  const targets = new Map<string, string>();
+  for (const dep of inputs[source].imports) {
+    if (!dep.external && dep.original) targets.set(dep.original, specifierTo(source, dep.path));
+  }
+  const code = file.text.replace(SPECIFIER, (whole, lead: string, quote: string, spec: string) => {
+    if (!spec.startsWith(".") && !spec.startsWith("@/")) return whole;
+    const next = targets.get(spec);
+    if (!next) unresolved.push(`${source}: "${spec}"`);
+    return next ? `${lead}${quote}${next}${quote}` : whole;
+  });
+  await mkdir(dirname(resolve(dist, outPath(source))), { recursive: true });
+  await writeFile(
+    resolve(dist, `${outPath(source)}.js`),
+    `${head(!isBarrel(code), source in ENTRIES ? ["./base.css"] : [])}\n${code}`,
+  );
+}
+if (unresolved.length > 0)
+  throw new Error(`Specifiers without a module:\n${unresolved.join("\n")}`);
+
+/* One build for every CSS Module, so class names stay unique across the kit. */
+const styles = await esbuild.build({
+  ...shared,
+  entryPoints: cssModules.map((path) => ({ in: `css-module:${path}`, out: outPath(path) })),
+  bundle: true,
+  write: false,
+  outdir: "dist",
+  minifyWhitespace: true,
+  minifySyntax: true,
+  loader: { ".module.css": "local-css" },
+  plugins: [
+    {
+      name: "css-module-entry",
+      setup(build) {
+        build.onResolve({ filter: /^css-module:/ }, (args) => ({
+          path: args.path.slice("css-module:".length),
+          namespace: "css-module",
+        }));
+        build.onLoad({ filter: /.*/, namespace: "css-module" }, (args) => ({
+          contents: `export { default } from ${JSON.stringify(resolve(root, args.path))};`,
+          resolveDir: root,
+          loader: "js",
+        }));
+      },
+    },
+  ],
+});
+if (styles.warnings.length > 0) throw new Error("CSS Module warnings");
+for (const file of styles.outputFiles) {
+  await mkdir(dirname(file.path), { recursive: true });
+  if (file.path.endsWith(".css")) await writeFile(file.path, file.text);
+  else {
+    const css = `./${file.path.split(sep).at(-1)?.replace(/\.js$/, ".css")}`;
+    await writeFile(file.path, `${head(true, [css])}\n${file.text}`);
+  }
+}
 
 const base = await esbuild.build({
   absWorkingDir: root,
   entryPoints: ["src/styles/globals.css"],
   bundle: true,
   write: false,
+  minify: true,
   logLevel: "warning",
 });
-/* Shipped minified: comments, whitespace and duplicate declarations out (about a third of the raw
-   size); the hashed class names and the rule order stay as built. */
-const bundleCss = await esbuild.transform(
-  base.outputFiles[0].text + (await readFile(resolve(dist, "all.css"), "utf8")),
-  { loader: "css", minify: true, logLevel: "warning" },
-);
-if (bundleCss.warnings.length > 0) throw new Error("bundle.css minification warnings");
-await writeFile(resolve(dist, "index.css"), bundleCss.code);
-await rm(resolve(dist, "all.css"), { force: true });
+if (base.warnings.length > 0) throw new Error("base.css warnings");
+await writeFile(resolve(dist, "base.css"), base.outputFiles[0].text);
+
+/* Guards: every module but a barrel starts with the directive (or Next.js server components break),
+   no barrel does, and every relative specifier names a file that is in `dist/`. */
+const jsFiles = (await readdir(dist, { recursive: true })).filter((file) => file.endsWith(".js"));
+const broken: string[] = [];
+for (const file of jsFiles) {
+  const text = await readFile(resolve(dist, file), "utf8");
+  const barrel = isBarrel(text);
+  if (text.startsWith(USE_CLIENT) === barrel)
+    broken.push(`${file}: ${barrel ? "a barrel with" : "no"} "use client"`);
+  for (const match of text.matchAll(SPECIFIER)) {
+    const spec = match[3];
+    if (spec.startsWith(".") && !(await isFile(resolve(dist, dirname(file), spec))))
+      broken.push(`${file}: "${spec}" is not in dist/`);
+  }
+}
+if (broken.length > 0) throw new Error(`dist JS:\n${broken.join("\n")}`);
 
 const stage = resolve(root, ".dts-stage");
 await rm(stage, { recursive: true, force: true });
@@ -206,7 +306,6 @@ async function listDeclarations(dir: string): Promise<string[]> {
 
 const CSS_MODULE_DECLARATION =
   "declare const styles: Readonly<Record<string, string>>;\nexport default styles;\n";
-const SPECIFIER = /(\bfrom\s*|\bimport\s*\(\s*|\bimport\s+)(["'])([^"']+)\2/g;
 const problems: string[] = [];
 for (const file of [
   ...(await listDeclarations(stageSrc)),

@@ -385,9 +385,14 @@ describe("Setup docs", () => {
     expect(bin).toEqual({ "prime-ui-kit": "bin/prime-ui-kit.js" });
   });
 
-  it("the setup snippets import bundle.css, the one stylesheet components need", () => {
+  it("the setup snippets import no kit stylesheet but the opt-in fonts.css and reset.css", () => {
+    const sheets = /import "prime-ui-kit\/([^"]+\.css)";/g;
     for (const doc of ["README.md", "SKILL/SKILL.md", "SKILL/cheatsheet.md"]) {
-      expect(read(doc), doc).toContain('import "prime-ui-kit/bundle.css";');
+      const imported = [...read(doc).matchAll(sheets)].map((match) => match[1]);
+      expect(
+        imported.filter((sheet) => !["fonts.css", "reset.css"].includes(sheet)),
+        doc,
+      ).toEqual([]);
     }
   });
 });

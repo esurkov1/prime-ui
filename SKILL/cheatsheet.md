@@ -6,7 +6,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 
 ## Setup
 
-- Import the styles once at the app root: `import "prime-ui-kit/bundle.css"` (tokens, themes, components), plus the opt-in `prime-ui-kit/fonts.css` and `prime-ui-kit/reset.css` when the app has no fonts or reset of its own — not per page, not a copied token file.
+- Import no kit stylesheet: tokens, themes and every component's styles come with the code. Only the opt-in `prime-ui-kit/fonts.css` and `prime-ui-kit/reset.css` go to the app root, once, when the app has no fonts or reset of its own — never a copied token file.
 - Switch the theme with `applyTheme("light" | "dark")` — not a class or `style` on `<html>`.
 - Put `NotificationProvider` and `AppShell.Root` in the app root once — not inside a page component.
 - Import everything from `"prime-ui-kit"` — not from `prime-ui-kit/src/...` or `lucide-react` for a glyph the kit has. Two subpaths: `import { ColorField, ColorPicker, parseColor } from "prime-ui-kit/color-picker"` (needs the optional peer `react-aria-components`; `ColorPresets` and `ColorSwatches` come from the root), and `import { BellIcon } from "prime-ui-kit/icons"` for a glyph outside the `<Icon name>` set.
@@ -260,10 +260,9 @@ The whole list, bad → good: [anti-slop.md](anti-slop.md). Before handing over:
 
 ## Snippets to copy
 
-App root, once — the styles and the theme:
+App root, once — the theme:
 
 ```tsx
-import "prime-ui-kit/bundle.css";
 import { applyTheme } from "prime-ui-kit";
 
 applyTheme("light");

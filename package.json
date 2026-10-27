@@ -1,6 +1,6 @@
 {
   "name": "prime-ui-kit",
-  "version": "0.33.0",
+  "version": "0.34.0",
   "packageManager": "bun@1.3.13",
   "description": "React 19 UI kit for product interfaces: 82 composable components on one design contract — forms, selects, tables, overlays, navigation, app shell. CSS Modules, --prime-* tokens, light and dark themes, TypeScript, a11y, Next.js App Router ready. Ships COMPONENT.md docs, copyable examples and an agent skill.",
   "bin": {
@@ -119,7 +119,6 @@
       "types": "./dist/icon-set.d.ts",
       "default": "./dist/icon-set.js"
     },
-    "./bundle.css": "./dist/index.css",
     "./fonts.css": "./src/styles/fonts.css",
     "./reset.css": "./src/styles/reset.css",
     "./tokens.css": "./src/styles/tokens.css",
@@ -145,7 +144,10 @@
     "verify:tokens": "bun run tokens:build && git diff --exit-code -- src/styles/tokens.css src/styles/theme-light.css src/styles/theme-dark.css src/internal/tokenDefaults.ts docs/foundation.md"
   },
   "sideEffects": [
-    "**/*.css"
+    "**/*.css",
+    "./dist/index.js",
+    "./dist/color-picker.js",
+    "./dist/icon-set.js"
   ],
   "type": "module"
 }

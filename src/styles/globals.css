@@ -1,4 +1,4 @@
-/* Base layer of `prime-ui-kit/bundle.css`: tokens, both themes and the rules every component relies
+/* Base layer (`dist/base.css`, imported by every entry of the package): tokens, both themes and the rules every component relies
    on (focus ring, reduced motion, theme switching). No fonts and no reset — those are opt-in
    (`fonts.css`, `reset.css`) — and no root font size, so the user's browser setting stays in charge. */
 @import "./tokens.css";

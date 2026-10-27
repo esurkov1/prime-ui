@@ -21,7 +21,7 @@
 import { ColorField } from "prime-ui-kit/color-picker";
 ```
 
-ColorField ships from the `prime-ui-kit/color-picker` entry with ColorPicker: it needs the optional peer `react-aria-components`. Its styles are in `prime-ui-kit/bundle.css`.
+ColorField ships from the `prime-ui-kit/color-picker` entry with ColorPicker: it needs the optional peer `react-aria-components`. Its styles come with it.
 
 ## Anatomy
 ```

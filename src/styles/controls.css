@@ -1,4 +1,4 @@
-/* Browser form-control styles switched off (part of `bundle.css`, always on). Every UA look —
+/* Browser form-control styles switched off (part of the base layer, always on). Every UA look —
    native chrome, autofill paint, spin buttons, pickers, credential badges — is removed, so a
    control is drawn only by its component and looks the same in every browser. Everything sits in
    the `prime-reset` cascade layer: any unlayered rule wins over it whatever the specificity and the
