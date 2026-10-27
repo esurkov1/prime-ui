@@ -141,6 +141,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "verify": "bun run check:ci && bun run typecheck && bun run test && bun run verify:tokens && bun run build",
+    "verify:ci": "sh scripts/verify-ci.sh",
     "verify:tokens": "bun run tokens:build && git diff --exit-code -- src/styles/tokens.css src/styles/theme-light.css src/styles/theme-dark.css src/internal/tokenDefaults.ts docs/foundation.md"
   },
   "sideEffects": [

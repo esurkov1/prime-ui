@@ -214,12 +214,13 @@ const settle = () =>
 
 /**
  * The controls in `scope`, outside still copies and leaving states (`inert`): those are on their
- * way out.
+ * way out. A tooltip's surface is left out too: it is a layer that opens and closes on its own
+ * clock (a layer's open / close), not a part of the component whose state flips.
  */
 function controls(scope: Element): Set<Element> {
   return new Set(
     Array.from(scope.querySelectorAll(CONTROL)).filter(
-      (element) => element.closest("[inert]") === null,
+      (element) => element.closest('[inert], [role="tooltip"]') === null,
     ),
   );
 }

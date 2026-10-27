@@ -36,6 +36,7 @@ bun run skill:build         # installable skill in dist/skill (SKILL + every COM
 bun run tokens:build        # src/styles/*.css from tokens/
 bun run build               # tokens + bundle + d.ts + skill
 bun run verify              # everything CI runs — must be green before a commit
+bun run verify:ci           # the same verify as CI runs it (Docker: Linux, 2 CPUs, clean install) — before a release push
 bun run verify:tokens       # tokens:build shows no diff (generated API docs: the docs contract test)
 ```
 
@@ -619,7 +620,7 @@ example, glyph, playground module); `git status` shows only the change being pus
 untracked `kit-gaps.md` / `kit-done.md`). Check with `git ls-files` and `git status --ignored`; keep
 working files in the session scratchpad, never in the tree.
 
-`.github/workflows/ci.yml`: every push to `main` runs `bun run verify`; then, if the `package.json`
+`.github/workflows/ci.yml`: every push to `main` runs `bun run verify`; a release push is preceded by `bun run verify:ci`, the same run on a CI-like machine, so a timing-sensitive test fails locally first; then, if the `package.json`
 version is not on npm yet, publishes it. Bump `version` to release (`npm publish` runs `prepublishOnly`: clean + build). `package.json`
 `files` ships `dist` (with the built skill in `dist/skill/`), `bin/` (`prime-ui-kit skill [dir]`,
 Node built-ins only), styles, every `COMPONENT.md` and `examples/**`. Every JS module in `dist/` but a
